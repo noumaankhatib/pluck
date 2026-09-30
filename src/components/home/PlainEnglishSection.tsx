@@ -29,7 +29,7 @@ export function PlainEnglishSection() {
 
   return (
     <section
-      className="surface-ink relative py-[var(--section-space-loose)]"
+      className="surface-espresso relative py-[var(--section-space-loose)]"
       aria-labelledby="plain-heading"
     >
       <Container>

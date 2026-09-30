@@ -204,7 +204,7 @@ export function IntroNarrativeSection() {
   return (
     <section
       ref={ref}
-      className="surface-ink relative overflow-hidden py-[var(--section-space-loose)]"
+      className="surface-espresso relative overflow-hidden py-[var(--section-space-loose)]"
       aria-labelledby="intro-heading"
     >
 

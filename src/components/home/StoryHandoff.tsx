@@ -25,7 +25,7 @@ export function StoryHandoff({ label, tone = "light", className }: StoryHandoffP
     <div
       className={cn(
         "story-handoff relative pt-[clamp(2.5rem,1.75rem+2.5vw,4rem)]",
-        dark ? "surface-ink" : tone === "paper" ? "bg-paper text-forest" : "bg-ivory text-forest",
+        dark ? "surface-espresso" : tone === "paper" ? "bg-paper text-forest" : "bg-ivory text-forest",
         className,
       )}
     >

@@ -124,7 +124,7 @@ export function CaseStudySection() {
 
           {/* Return metric — the dark commercial payoff */}
           <motion.div
-            className="surface-ink"
+            className="surface-espresso"
             initial={reduce ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-10% 0px" }}
