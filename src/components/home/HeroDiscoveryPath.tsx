@@ -91,7 +91,8 @@ export function HeroDiscoveryPath({
         />
       )}
 
-      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 sm:gap-x-8">
+      {/* Desktop: vertical rail beside the message */}
+      <div className="hidden grid-cols-[auto_minmax(0,1fr)] gap-x-8 lg:grid">
         {/* Rail */}
         <ol aria-hidden>
           {hero.journey.map((item, index) => {
@@ -200,6 +201,84 @@ export function HeroDiscoveryPath({
             </AnimatePresence>
           </div>
         </div>
+      </div>
+
+      {/* Phones/tablets: a compact row — nodes on a filling track, message beneath */}
+      <div className="lg:hidden" aria-hidden>
+        <div className="relative flex items-center justify-between py-2">
+          <span className="absolute inset-x-[7px] top-1/2 h-[2px] -translate-y-1/2 rounded-full bg-forest/10" />
+          <motion.span
+            className="absolute inset-x-[7px] top-1/2 h-[2px] origin-left -translate-y-1/2 rounded-full"
+            style={{
+              backgroundImage: `linear-gradient(90deg, ${STEP_COLORS.join(", ")})`,
+              scaleX: reduce ? 1 : pathProgress,
+            }}
+          />
+          {hero.journey.map((item, index) => {
+            const isActive = index === activeStep;
+            const lit = index <= activeStep;
+            const color = STEP_COLORS[index];
+            return (
+              <span key={item.id} className="relative flex h-4 w-4 items-center justify-center">
+                {isActive && !reduce && (
+                  <motion.span
+                    key={`row-pulse-${index}`}
+                    className="absolute inset-0 rounded-full"
+                    style={{ backgroundColor: color }}
+                    initial={{ scale: 1, opacity: 0.45 }}
+                    animate={{ scale: 2.4, opacity: 0 }}
+                    transition={{ duration: 1.8, ease: "easeOut", repeat: Infinity }}
+                  />
+                )}
+                <motion.span
+                  className="relative block rounded-full border-2"
+                  initial={false}
+                  animate={{
+                    width: isActive ? 14 : 9,
+                    height: isActive ? 14 : 9,
+                    backgroundColor: lit ? color : "#f7f4ef",
+                    borderColor: lit ? color : "rgba(27,61,47,0.28)",
+                  }}
+                  transition={{ duration: 0.4, ease: motionEase }}
+                />
+              </span>
+            );
+          })}
+        </div>
+        <div className="mt-3 flex items-baseline gap-3">
+          <span className="font-mono text-[0.75rem] font-medium tabular-nums">
+            <motion.span animate={{ color: activeColor }} transition={{ duration: 0.5 }}>
+              {String(activeStep + 1).padStart(2, "0")}
+            </motion.span>
+            <span className="text-forest/35"> / {String(total).padStart(2, "0")}</span>
+          </span>
+          <span className="relative overflow-hidden">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={`row-${step.id}`}
+                className="block font-display text-[1.5rem] leading-[1.15] text-forest"
+                initial={reduce ? { opacity: 0 } : { y: "110%" }}
+                animate={reduce ? { opacity: 1 } : { y: "0%" }}
+                exit={reduce ? { opacity: 0 } : { y: "-110%" }}
+                transition={{ duration: 0.45, ease: motionEase }}
+              >
+                {step.label}
+              </motion.span>
+            </AnimatePresence>
+          </span>
+        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.p
+            key={`row-d-${step.id}`}
+            className="mt-1 text-[0.9375rem] leading-snug text-charcoal/85"
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: motionEase }}
+          >
+            {step.description}
+          </motion.p>
+        </AnimatePresence>
       </div>
 
       <p className="sr-only" aria-live="polite">

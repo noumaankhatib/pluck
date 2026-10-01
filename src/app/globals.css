@@ -10,6 +10,8 @@
   --color-copper-hover: #a84d1f;
   /* Copper tint for text on forest/charcoal — keeps AA contrast */
   --color-copper-soft: #e5895a;
+  /* Cool counterpoint to copper on warm dark surfaces */
+  --color-sage-light: #b4c2b6;
   /* Premium dark: near-black green, used sparingly for the story's big moments */
   --color-ink: #0f1d17;
   /* Warm espresso — the premise chapter's dark surface */
@@ -52,6 +54,7 @@
   --color-sand: var(--color-sand);
   --color-copper: var(--color-copper);
   --color-copper-soft: var(--color-copper-soft);
+  --color-sage-light: var(--color-sage-light);
   --color-sage: var(--color-sage);
   --color-ivory: var(--color-ivory);
   --color-charcoal: var(--color-charcoal);
@@ -185,8 +188,8 @@
     background-image:
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
       radial-gradient(ellipse 55% 45% at 88% 10%, rgb(196 92 38 / 0.2), transparent 70%),
-      radial-gradient(ellipse 70% 60% at 6% 100%, rgb(74 48 34 / 0.55), transparent 72%),
-      radial-gradient(ellipse 130% 100% at 50% 40%, transparent 58%, rgb(0 0 0 / 0.4));
+      radial-gradient(ellipse 70% 60% at 6% 100%, rgb(74 48 34 / 0.28), transparent 72%),
+      radial-gradient(ellipse 130% 100% at 50% 40%, transparent 55%, rgb(0 0 0 / 0.5));
     background-size: 180px 180px, auto, auto, auto;
     color: var(--color-ivory);
   }
@@ -222,6 +225,35 @@
         linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
       mask-composite: intersect;
     }
+  }
+
+  /* ─── One-screen chapters ─────────────────────────────────── */
+  /* Exactly one usable screen (viewport minus the sticky header) */
+  .screen {
+    height: calc(100svh - var(--header-h));
+  }
+
+  /* A chapter that simply fits: at least one screen, content centred */
+  .screen-fit {
+    min-height: calc(100svh - var(--header-h));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(1.5rem, 5svh, 3.5rem);
+  }
+
+  /* One-screen chapters keep their own compact spacing next to a bridge */
+  .story-handoff + section.screen-fit,
+  section.screen-fit:has(+ .story-handoff) {
+    padding-block: clamp(1.5rem, 5svh, 3.5rem);
+  }
+
+  /* Pinned scenes own their spacing — no bridge padding above or below the pin */
+  .story-handoff + section.pinned-scene {
+    padding-top: 0;
+  }
+  section.pinned-scene:has(+ .story-handoff) {
+    padding-bottom: 0;
   }
 
   /* A chapter bridge pulls the next section up tight to it */

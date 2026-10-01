@@ -120,8 +120,8 @@ export function HeroSection() {
         - Desktop: copy left; full, uncropped photo right at mid-height with the
           path set beneath it — nothing covers the objects
       */}
-      <div className="relative flex flex-col pb-[clamp(2.5rem,6vw,4rem)] md:grid md:grid-cols-12 md:gap-x-6 lg:sticky lg:top-[var(--header-h)] lg:h-[calc(100svh-var(--header-h))] lg:min-h-[640px] lg:grid-cols-[minmax(0,52fr)_minmax(0,48fr)] xl:grid-cols-[minmax(0,44fr)_minmax(0,56fr)] lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-0 lg:overflow-hidden lg:pb-0">
-        <div className="hero-plate relative order-2 mx-[var(--gutter)] aspect-[4/3] overflow-hidden sm:aspect-[16/9] md:col-span-12 md:row-start-2 md:mt-10 md:aspect-[1024/516] lg:col-start-2 lg:row-start-2 lg:mx-0 lg:mt-0">
+      <div className="relative flex min-h-[calc(100svh-var(--header-h))] flex-col justify-center pb-[clamp(0.75rem,3svh,3rem)] md:grid md:grid-cols-12 md:content-center md:gap-x-6 lg:sticky lg:top-[var(--header-h)] lg:h-[calc(100svh-var(--header-h))] lg:min-h-[640px] lg:grid-cols-[minmax(0,52fr)_minmax(0,48fr)] xl:grid-cols-[minmax(0,44fr)_minmax(0,56fr)] lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-0 lg:overflow-hidden lg:pb-0">
+        <div className="hero-plate relative order-2 mx-[var(--gutter)] aspect-[21/10] overflow-hidden sm:aspect-[16/9] md:col-span-12 md:row-start-2 md:mt-10 md:aspect-[1024/516] lg:col-start-2 lg:row-start-2 lg:mx-0 lg:mt-0">
           <motion.div
             className="pointer-events-none absolute inset-0"
             style={reduce ? undefined : { scale: imageScale, y: imageY }}
@@ -138,13 +138,13 @@ export function HeroSection() {
           </motion.div>
         </div>
 
-        <div className="relative z-10 order-1 flex w-full flex-col justify-center px-[var(--gutter)] pb-8 pt-[clamp(2.5rem,8vw,4rem)] sm:pb-10 md:col-span-12 md:row-start-1 md:pb-0 lg:col-start-1 lg:row-span-4 lg:row-start-1 lg:py-12 lg:pl-[max(var(--gutter),calc((100vw-var(--content-max))/2+var(--gutter)))] lg:pr-[clamp(2rem,4vw,4.5rem)]">
-          <SectionLabel index={homeSections.hero.index} className="mb-5 lg:mb-7">
+        <div className="relative z-10 order-1 flex w-full flex-col justify-center px-[var(--gutter)] pb-5 pt-[clamp(0.75rem,3svh,3rem)] sm:pb-8 md:col-span-12 md:row-start-1 md:pb-0 lg:col-start-1 lg:row-span-4 lg:row-start-1 lg:py-12 lg:pl-[max(var(--gutter),calc((100vw-var(--content-max))/2+var(--gutter)))] lg:pr-[clamp(2rem,4vw,4.5rem)]">
+          <SectionLabel index={homeSections.hero.index} className="mb-3 sm:mb-5 lg:mb-7">
             {homeSections.hero.name}
           </SectionLabel>
           <motion.h1
             id="hero-heading"
-            className="type-display-xl text-forest"
+            className="type-display-xl text-forest max-sm:text-[2.125rem]"
             initial={reduce ? false : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: motionDurations.slow, ease: motionEase }}
@@ -165,7 +165,7 @@ export function HeroSection() {
           </motion.h1>
 
           <motion.p
-            className="type-lead mt-5 max-w-[30rem] text-ink-soft lg:mt-7"
+            className="type-lead mt-3 max-w-[30rem] text-ink-soft sm:mt-5 lg:mt-7"
             initial={reduce ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
@@ -178,7 +178,7 @@ export function HeroSection() {
           </motion.p>
 
           <motion.div
-            className="mt-7 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-7 lg:mt-9"
+            className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-0 sm:mt-7 lg:mt-9"
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.16, duration: motionDurations.base }}
@@ -203,7 +203,7 @@ export function HeroSection() {
 
         {/* Discovery path — set into the page, not boxed: beneath the photo (a thread
             drops out of it into the first stage) at every size */}
-        <div className="relative z-10 order-3 mt-12 px-[var(--gutter)] md:col-span-12 md:row-start-3 lg:col-start-2 lg:row-start-3 lg:mt-10 lg:self-start lg:pl-[clamp(1.5rem,3vw,3rem)]">
+        <div className="relative z-10 order-3 mt-5 px-[var(--gutter)] sm:mt-8 md:col-span-12 md:mt-10 md:row-start-3 lg:col-start-2 lg:row-start-3 lg:mt-10 lg:self-start lg:pl-[clamp(1.5rem,3vw,3rem)]">
           <HeroDiscoveryPath
             activeStep={activeStep}
             pathProgress={isDesktop ? pathProgress : stepFill}

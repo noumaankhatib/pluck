@@ -1,12 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  AnimatePresence,
   motion,
+  useInView,
   useReducedMotion,
-  useScroll,
-  useMotionValueEvent,
-  useTransform,
 } from "framer-motion";
 import { searchIntelligence } from "@/content/home";
 import { Container } from "@/components/ui/Container";
@@ -16,6 +15,7 @@ import { cn } from "@/lib/cn";
 import { homeSections } from "@/content/home-sections";
 import { motionEase } from "@/lib/motion";
 
+/** One real query per stage — each search is the clue that reveals it. */
 const SEARCH_QUERIES = [
   "industrial cooling systems",
   "data centre cooling",
@@ -24,9 +24,13 @@ const SEARCH_QUERIES = [
   "how much does industrial cooling cost",
 ];
 
-function SearchIcon() {
+const TYPE_MS = 42;
+const HOLD_MS = 1900;
+const RESTART_MS = 3200;
+
+function SearchIcon({ size = 11 }: { size?: number }) {
   return (
-    <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 11 11" fill="none" aria-hidden>
       <circle cx="5" cy="5" r="3.5" stroke="currentColor" strokeWidth="1.4" />
       <path d="M8 8 10.5 10.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
@@ -34,164 +38,218 @@ function SearchIcon() {
 }
 
 export function SearchIntelligenceSection() {
-  const ref = useRef<HTMLElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
-  const [active, setActive] = useState(0);
+  const inView = useInView(sceneRef, { amount: 0.35 });
   const stages = searchIntelligence.stages;
-  const stageCount = stages.length;
+  const total = stages.length;
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 0.75", "end 0.4"],
-  });
+  const [step, setStep] = useState(0);
+  const [typed, setTyped] = useState(0);
+  const [picked, setPicked] = useState(false);
 
-  const lineProgress = useTransform(scrollYProgress, [0.08, 0.92], [0.04, 1]);
-  const queryReveal = useTransform(scrollYProgress, [0.05, 0.45], [0, 1]);
+  /* Reduced motion: no loop — show the finished trail until the reader picks a stage */
+  const active = reduce && !picked ? total - 1 : step;
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const index = Math.min(stageCount - 1, Math.max(0, Math.floor(v * stageCount * 1.02)));
-    setActive(index);
-  });
+  const query = SEARCH_QUERIES[active] ?? "";
+  const doneTyping = reduce || typed >= query.length;
+
+  /* Type the current query, hold on its clue, then move to the next — loop while visible */
+  useEffect(() => {
+    if (!inView || reduce) return;
+    if (!doneTyping) {
+      const id = window.setTimeout(() => setTyped((t) => t + 1), TYPE_MS);
+      return () => window.clearTimeout(id);
+    }
+    const last = active === total - 1;
+    const id = window.setTimeout(
+      () => {
+        setStep(last ? 0 : active + 1);
+        setTyped(0);
+      },
+      last ? RESTART_MS : HOLD_MS,
+    );
+    return () => window.clearTimeout(id);
+  }, [inView, reduce, doneTyping, typed, active, total]);
+
+  const jumpTo = (index: number) => {
+    setPicked(true);
+    setStep(index);
+    setTyped(0);
+  };
+
+  const headWords = searchIntelligence.headline.split(" ");
+  const headLast = headWords.pop();
+
+  const stage = stages[active];
+  const shown = reduce ? query : query.slice(0, typed);
 
   return (
     <section
-      ref={ref}
-      className="relative bg-paper py-[var(--section-space-loose)] text-forest"
+      className="screen-fit relative bg-paper text-forest"
       aria-labelledby="search-heading"
     >
       <Container>
-        <div className="grid gap-10 md:gap-12 lg:grid-cols-12 lg:gap-16">
-
-          {/* Left: editorial headline + search query visual */}
-          <div className="lg:col-span-5">
-            <SectionLabel index={homeSections.search.index} className="mb-5">
+        <div className="grid gap-5 sm:gap-10 lg:grid-cols-12 lg:items-center lg:gap-16">
+          {/* Left: the claim + the trail so far */}
+          <div className="min-w-0 md:max-w-[36rem] lg:col-span-5 lg:max-w-none">
+            <SectionLabel index={homeSections.search.index} className="mb-3 lg:mb-5">
               {homeSections.search.name}
             </SectionLabel>
             <Reveal>
-              <h2
-                id="search-heading"
-                className="type-display-l"
-              >
-                {searchIntelligence.headline}
+              <h2 id="search-heading" className="type-display-l max-lg:[@media(max-height:760px)]:text-[1.875rem]">
+                {headWords.join(" ")} <span className="italic text-copper">{headLast}</span>
               </h2>
             </Reveal>
-            <p className="type-lead mt-5 max-w-[32rem] text-ink-soft md:mt-6">
+            <p className="mt-3 max-w-[32rem] text-[0.9375rem] leading-[1.5] text-ink-soft sm:text-base lg:mt-6 lg:text-[1.1875rem]">
               {searchIntelligence.intro}
             </p>
 
-            {/* Search query visualization */}
-            <motion.div
-              className="mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 [&>*:nth-child(n+4)]:hidden sm:[&>*:nth-child(n+4)]:flex"
-              style={reduce ? undefined : { opacity: queryReveal }}
-              aria-hidden
-            >
-              {SEARCH_QUERIES.map((q, i) => (
-                <motion.div
-                  key={q}
-                  className="flex min-w-0 items-center gap-3 border border-forest/10 bg-surface/70 px-3.5 py-3 shadow-[0_1px_0_rgba(27,61,47,0.04)]"
-                  initial={reduce ? false : { opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08 + 0.2, duration: 0.45, ease: motionEase }}
-                >
-                  <span className="shrink-0 text-copper">
-                    <SearchIcon />
-                  </span>
-                  <span className="truncate font-mono text-[0.8125rem] text-charcoal/80">{q}</span>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Right: investigation stage trace */}
-          <div className="lg:col-span-7">
-
-            {/* Progress thread */}
-            <div className="relative mb-6 hidden md:block" aria-hidden>
-              <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-forest/12" />
-              <motion.div
-                className="absolute left-0 top-1/2 h-px w-full origin-left -translate-y-1/2 bg-copper/70"
-                style={reduce ? { scaleX: 1 } : { scaleX: lineProgress }}
-              />
-              <div className="relative flex items-center justify-between">
-                {stages.map((stage, index) => {
-                  const lit = index <= active;
-                  const isActive = index === active;
+            {/* Stage progress — segmented, tappable */}
+            <div className="mt-3 sm:mt-8 lg:mt-12">
+              <ol className="grid grid-cols-5 gap-1.5" aria-label="Investigation stages">
+                {stages.map((s, i) => {
+                  const lit = i <= active;
+                  const isActive = i === active;
                   return (
-                    <button
-                      key={stage.label}
-                      type="button"
-                      className={cn(
-                        "relative z-[1] min-h-11 bg-paper px-2 font-display text-[0.9375rem] transition-colors duration-300 first:pl-0 last:pr-0",
-                        lit ? "text-forest" : "text-forest/55",
-                        isActive && "text-copper",
-                      )}
-                      onClick={() => setActive(index)}
-                    >
-                      {stage.label}
-                    </button>
+                    <li key={s.label}>
+                      <button
+                        type="button"
+                        onClick={() => jumpTo(i)}
+                        aria-current={isActive ? "step" : undefined}
+                        aria-label={`${String(i + 1).padStart(2, "0")} ${s.label}`}
+                        className="group flex min-h-11 w-full flex-col justify-center gap-2 text-left"
+                      >
+                        <span className="relative block h-[3px] w-full overflow-hidden rounded-full bg-forest/12">
+                          <motion.span
+                            className={cn(
+                              "absolute inset-0 origin-left rounded-full",
+                              i === total - 1 ? "bg-copper" : "bg-forest",
+                            )}
+                            initial={false}
+                            animate={{ scaleX: lit ? 1 : 0 }}
+                            transition={{ duration: 0.6, ease: motionEase }}
+                          />
+                        </span>
+                        <span
+                          className={cn(
+                            "hidden truncate font-display text-[0.9375rem] transition-colors duration-300 md:block",
+                            isActive ? "text-forest" : lit ? "text-forest/70" : "text-forest/45 group-hover:text-forest/70",
+                          )}
+                        >
+                          {s.label}
+                        </span>
+                      </button>
+                    </li>
                   );
                 })}
-              </div>
+              </ol>
+            </div>
+          </div>
+
+          {/* Right: the live scene — a search, the clue it leaves, the evidence log */}
+          <div ref={sceneRef} className="min-w-0 lg:col-span-7">
+            {/* Search field */}
+            <div className="relative flex min-h-12 items-center gap-4 border border-forest/15 bg-surface/85 px-4 sm:min-h-16 sm:px-5 shadow-[0_18px_40px_-28px_rgba(27,61,47,0.45)] md:min-h-[4.5rem] md:px-6">
+              <span className="shrink-0 text-copper">
+                <SearchIcon size={16} />
+              </span>
+              <p className="min-w-0 flex-1 truncate text-[1.0625rem] text-charcoal md:text-[1.1875rem]" aria-hidden>
+                {shown}
+                {!reduce && (
+                  <motion.span
+                    className="ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.18em] bg-copper"
+                    animate={{ opacity: [1, 1, 0, 0] }}
+                    transition={{ duration: 1, repeat: Infinity, times: [0, 0.5, 0.5, 1] }}
+                  />
+                )}
+              </p>
+              <span className="hidden shrink-0 font-mono text-[0.75rem] tabular-nums text-forest/45 sm:block">
+                {String(active + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+              </span>
             </div>
 
-            {/* Stage list */}
-            <ol className="divide-y divide-forest/10 border-y border-forest/12" aria-label="Investigation stages">
-              {stages.map((stage, index) => {
-                const isActive = index === active;
-                const isPast = index < active;
-                return (
-                  <li key={stage.label}>
-                    <button
-                      type="button"
-                      onClick={() => setActive(index)}
-                      aria-current={isActive ? "step" : undefined}
-                      className={cn(
-                        "relative grid min-h-14 w-full grid-cols-[2.25rem_1fr] items-baseline gap-x-3 py-4 pl-4 text-left transition-colors duration-300 md:grid-cols-[2.75rem_9rem_1fr] md:gap-x-4 md:py-5",
-                        isActive ? "bg-surface/70" : "hover:bg-surface/40",
-                      )}
+            {/* The clue it leaves */}
+            <div className="relative ml-5 border-l border-forest/15 pb-1 pl-6 pt-4 sm:pl-8 sm:pt-8 md:ml-6 md:pl-10 md:pt-10">
+              <motion.span
+                key={`thread-${active}`}
+                className="absolute -left-px top-0 h-full w-[2px] origin-top bg-copper"
+                initial={reduce ? false : { scaleY: 0 }}
+                animate={{ scaleY: doneTyping ? 1 : 0 }}
+                transition={{ duration: 0.6, ease: motionEase }}
+                aria-hidden
+              />
+              <p className="font-mono text-[0.75rem] uppercase tracking-[0.18em] text-copper">
+                Clue {String(active + 1).padStart(2, "0")}
+              </p>
+              <div className="relative mt-1 min-h-[4.75rem] overflow-hidden sm:mt-2 md:min-h-[6rem]" aria-live="polite">
+                <AnimatePresence mode="wait" initial={false}>
+                  {doneTyping && (
+                    <motion.div
+                      key={stage.label}
+                      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
+                      transition={{ duration: 0.5, ease: motionEase }}
                     >
-                      <span
+                      <p
                         className={cn(
-                          "absolute inset-y-0 left-0 w-[2px] origin-top bg-copper transition-transform duration-500",
-                          isActive ? "scale-y-100" : "scale-y-0",
-                        )}
-                        aria-hidden
-                      />
-                      <span
-                        className={cn(
-                          "font-mono text-[0.75rem] tabular-nums",
-                          isActive || isPast ? "text-copper" : "text-forest/45",
-                        )}
-                      >
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <span
-                        className={cn(
-                          "type-title block transition-colors duration-300 md:text-2xl",
-                          isActive ? "text-forest" : "text-forest/60",
+                          "font-display text-[clamp(1.75rem,1.2rem+2.4vw,3.25rem)] leading-[1.02] tracking-[-0.015em]",
+                          active === total - 1 ? "italic text-copper" : "text-forest",
                         )}
                       >
                         {stage.label}
+                      </p>
+                      <p className="mt-1 text-[0.9375rem] leading-[1.45] text-ink-soft sm:mt-2 sm:text-[1.0625rem] lg:text-[1.1875rem]">{stage.description}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Evidence log — the trail builds up */}
+            <div className="mt-4 sm:mt-8 md:mt-10">
+              <p className="type-eyebrow text-ink-soft">The trail</p>
+              <ol className="mt-2 border-t border-forest/12 sm:mt-3">
+                {SEARCH_QUERIES.map((q, i) => {
+                  const logged = i < active || (i === active && doneTyping);
+                  const isActive = i === active;
+                  return (
+                    <motion.li
+                      key={q}
+                      className="flex items-center gap-3 border-b border-forest/10 py-1.5 max-lg:[@media(max-height:760px)]:py-1 sm:py-2.5 md:gap-4 md:py-3"
+                      initial={false}
+                      animate={{ opacity: logged ? 1 : 0.28 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <span className={cn("shrink-0", logged ? "text-copper" : "text-forest/40")}>
+                        <SearchIcon />
                       </span>
-                      {isActive ? (
-                        <motion.span
-                          className="type-small col-start-2 mt-1 block text-ink-soft md:col-start-3 md:mt-0"
-                          initial={reduce ? false : { opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ duration: 0.35, ease: motionEase }}
-                          aria-live="polite"
-                        >
-                          {stage.description}
-                        </motion.span>
-                      ) : (
-                        <span className="hidden md:col-start-3 md:block" aria-hidden />
-                      )}
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
+                      <span
+                        className={cn(
+                          "min-w-0 flex-1 truncate font-mono text-[0.75rem] md:text-[0.8125rem]",
+                          isActive ? "text-charcoal" : "text-charcoal/70",
+                        )}
+                      >
+                        {q}
+                      </span>
+                      <span
+                        className={cn(
+                          "shrink-0 font-display text-[0.9375rem] transition-colors duration-300",
+                          !logged
+                            ? "text-transparent"
+                            : i === total - 1
+                              ? "italic text-copper"
+                              : "text-forest",
+                        )}
+                      >
+                        {stages[i]?.label}
+                      </span>
+                    </motion.li>
+                  );
+                })}
+              </ol>
+            </div>
           </div>
         </div>
       </Container>

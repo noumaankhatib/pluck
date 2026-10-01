@@ -1,82 +1,72 @@
 "use client";
 
-import {
-  animate,
-  motion,
-  useInView,
-  useMotionValue,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { motion, useTransform, type MotionValue } from "framer-motion";
 import { quality } from "@/content/home";
 import { Container } from "@/components/ui/Container";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { homeSections } from "@/content/home-sections";
-import { motionEase } from "@/lib/motion";
+import { PinnedScene } from "@/components/motion/PinnedScene";
+import { useBeat } from "@/components/motion/useBeat";
+import { useIsDesktop } from "@/lib/useIsDesktop";
 import { cn } from "@/lib/cn";
-
-/* ─── Layout helpers ──────────────────────────────────────────── */
-
-const DESKTOP_QUERY = "(min-width: 1024px)";
-
-function subscribeDesktop(onChange: () => void) {
-  const mql = window.matchMedia(DESKTOP_QUERY);
-  mql.addEventListener("change", onChange);
-  return () => mql.removeEventListener("change", onChange);
-}
-
-/** Desktop pins the scene and scrubs it with scroll; smaller screens let it play. */
-function useIsDesktop() {
-  return useSyncExternalStore(
-    subscribeDesktop,
-    () => window.matchMedia(DESKTOP_QUERY).matches,
-    () => false,
-  );
-}
 
 /** Loose cloud positions for the volume words — scattered, like noise. */
 const CLOUD = [
-  { left: "2%", top: "14%", rest: "74%", rotate: -3 },
-  { left: "36%", top: "0%", rest: "78%", rotate: 2 },
-  { left: "70%", top: "22%", rest: "72%", rotate: -2 },
-  { left: "14%", top: "56%", rest: "80%", rotate: 3 },
-  { left: "54%", top: "60%", rest: "76%", rotate: -4 },
+  { left: "2%", top: "14%", rotate: -3 },
+  { left: "36%", top: "0%", rotate: 2 },
+  { left: "70%", top: "22%", rotate: -2 },
+  { left: "14%", top: "56%", rotate: 3 },
+  { left: "54%", top: "60%", rotate: -4 },
+];
+/** Where held-back words come to rest on the filter: one row on desktop, two on smaller screens. */
+const REST_WIDE = [0, 1, 2, 3, 4].map((i) => ({ left: `${[0, 19, 40, 59, 78][i]}%`, top: "84%" }));
+const REST_NARROW = [
+  { left: "0%", top: "60%" },
+  { left: "34%", top: "60%" },
+  { left: "68%", top: "60%" },
+  { left: "0%", top: "84%" },
+  { left: "34%", top: "84%" },
 ];
 
 /* ─── Scene pieces ────────────────────────────────────────────── */
 
-/** A volume word drifts down onto the filter, blurs and is held back there. */
+/** A volume word drifts down onto the filter and is held back there — struck out, but still legible. */
 function NoiseWord({
   word,
   index,
   total,
   progress,
+  wide,
 }: {
   word: string;
   index: number;
   total: number;
   progress: MotionValue<number>;
+  wide: boolean;
 }) {
   const start = 0.04 + (index / total) * 0.3;
   const end = start + 0.26;
   const pos = CLOUD[index % CLOUD.length];
+  const rest = (wide ? REST_WIDE : REST_NARROW)[index % 5];
 
-  /* Settles in a loose pile resting on the filter line — sediment, not deleted */
-  const top = useTransform(progress, [start, end], [pos.top, pos.rest]);
-  const rotate = useTransform(progress, [start, end], [pos.rotate, pos.rotate * 2.5]);
-  const opacity = useTransform(progress, [start, end], [1, 0.22]);
-  const blur = useTransform(progress, [start + 0.06, end], [0, 2.5]);
-  const filter = useTransform(blur, (b) => `blur(${b}px)`);
+  const top = useTransform(progress, [start, end], [pos.top, rest.top]);
+  const left = useTransform(progress, [start, end], [pos.left, rest.left]);
+  const rotate = useTransform(progress, [start, end], [pos.rotate, 0]);
+  const scale = useTransform(progress, [start, end], [1, wide ? 0.46 : 0.62]);
+  const opacity = useTransform(progress, [start, end], [1, 0.55]);
+  const strike = useTransform(progress, [end - 0.02, end + 0.08], [0, 1]);
 
   return (
     <motion.span
-      className="absolute whitespace-nowrap font-display text-[clamp(1.375rem,1rem+1.6vw,2.375rem)] capitalize leading-none tracking-[-0.01em] text-forest/40"
-      style={{ left: pos.left, top, rotate, opacity, filter }}
+      className="absolute origin-top-left whitespace-nowrap font-display text-[clamp(1.375rem,1rem+1.6vw,2.375rem)] capitalize leading-none tracking-[-0.01em] text-forest/45"
+      style={{ left, top, rotate, scale, opacity }}
     >
       {word}
+      <motion.span
+        className="absolute inset-x-[-4%] top-[55%] h-[3px] origin-left rounded-full bg-copper/70"
+        style={{ scaleX: strike }}
+        aria-hidden
+      />
     </motion.span>
   );
 }
@@ -103,7 +93,7 @@ function SignalRow({
 
   return (
     <motion.li className="relative" style={{ y, opacity }}>
-      <div className="flex items-baseline gap-4 py-2.5 md:py-3">
+      <div className="flex items-baseline gap-4 py-1.5 md:py-3">
         <span className="w-6 shrink-0 font-mono text-[0.75rem] tabular-nums text-copper">
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -130,14 +120,64 @@ function SignalRow({
   );
 }
 
-function FilterScene({ progress }: { progress: MotionValue<number> }) {
+/** A copper spark dropping through the filter as each signal that matters passes. */
+function Spark({ index, progress }: { index: number; progress: MotionValue<number> }) {
+  const start = 0.38 + index * 0.1;
+  const y = useTransform(progress, [start, start + 0.12], [-14, 26]);
+  const opacity = useTransform(progress, [start, start + 0.03, start + 0.1, start + 0.12], [0, 1, 1, 0]);
+  return (
+    <motion.span
+      className="absolute top-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-copper shadow-[0_0_10px_2px_rgba(196,92,38,0.45)]"
+      style={{ left: `${22 + index * 18}%`, y, opacity }}
+    />
+  );
+}
+
+/** A live readout of the filter — counts that climb as the scene plays. */
+function Meter({
+  label,
+  count,
+  fill,
+  accent,
+}: {
+  label: string;
+  count: MotionValue<number>;
+  fill: MotionValue<number>;
+  accent?: boolean;
+}) {
+  const shown = useTransform(count, (c) => String(Math.round(c)).padStart(2, "0"));
+  return (
+    <div>
+      <div className="flex items-baseline justify-between gap-4">
+        <span className="type-eyebrow text-ink-soft">{label}</span>
+        <motion.span
+          className={cn(
+            "font-display text-[1.75rem] leading-none tabular-nums",
+            accent ? "text-copper" : "text-forest/45",
+          )}
+        >
+          {shown}
+        </motion.span>
+      </div>
+      <div className="mt-2.5 h-[3px] overflow-hidden rounded-full bg-forest/10">
+        <motion.div
+          className={cn("h-full origin-left rounded-full", accent ? "bg-copper" : "bg-forest/35")}
+          style={{ scaleX: fill }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function FilterScene({ progress, wide }: { progress: MotionValue<number>; wide: boolean }) {
   const words = quality.moreSignals;
   const signals = quality.rightSignals;
 
   const glow = useTransform(progress, [0.08, 0.35, 0.7], [0.15, 1, 0.45]);
-  const moreFade = useTransform(progress, [0.2, 0.6], [1, 0.35]);
+  const moreFade = useTransform(progress, [0.2, 0.6], [1, 0.5]);
   const rightIn = useTransform(progress, [0.34, 0.5], [0, 1]);
   const rightY = useTransform(progress, [0.34, 0.5], [18, 0]);
+  const heldCaption = useTransform(progress, [0.4, 0.55], [0, 1]);
 
   return (
     <div className="relative">
@@ -152,14 +192,20 @@ function FilterScene({ progress }: { progress: MotionValue<number> }) {
         </span>
       </motion.p>
 
-      <div className="relative mt-4 h-[9.5rem] sm:h-[10.5rem] md:h-[11.5rem]" aria-hidden>
+      <div className="relative mt-3 h-[6.5rem] sm:h-[8.5rem] md:mt-4 md:h-[11.5rem] max-lg:[@media(max-height:760px)]:h-[5rem]" aria-hidden>
         {words.map((w, i) => (
-          <NoiseWord key={w} word={w} index={i} total={words.length} progress={progress} />
+          <NoiseWord key={w} word={w} index={i} total={words.length} progress={progress} wide={wide} />
         ))}
+        <motion.span
+          className="absolute left-0 top-[calc(60%-1.5rem)] font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-forest/55 lg:top-[calc(84%-1.75rem)]"
+          style={{ opacity: heldCaption }}
+        >
+          Held back
+        </motion.span>
       </div>
 
       {/* The filter */}
-      <div className="relative my-6 md:my-8" aria-hidden>
+      <div className="relative my-3 md:my-8" aria-hidden>
         <motion.div
           className="absolute -inset-x-4 -inset-y-6 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(196,92,38,0.18),transparent_70%)]"
           style={{ opacity: glow }}
@@ -168,21 +214,26 @@ function FilterScene({ progress }: { progress: MotionValue<number> }) {
           <span className="whitespace-nowrap font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-copper">
             Relevance filter
           </span>
-          <motion.span
-            className="h-[2px] flex-1 bg-[repeating-linear-gradient(90deg,var(--color-copper)_0_14px,transparent_14px_22px)]"
-            style={{ opacity: glow }}
-          />
+          <div className="relative h-[3px] flex-1">
+            <motion.span
+              className="absolute inset-0 rounded-full bg-[repeating-linear-gradient(90deg,var(--color-copper)_0_18px,transparent_18px_26px)]"
+              style={{ opacity: glow }}
+            />
+            {signals.map((_, i) => (
+              <Spark key={i} index={i} progress={progress} />
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Below the filter: what matters */}
       <motion.p
-        className="font-display text-[clamp(2.5rem,1.6rem+3.4vw,4.25rem)] font-semibold leading-none tracking-[-0.02em] text-forest"
+        className="font-display text-[clamp(2rem,1.3rem+3.4vw,4.25rem)] font-semibold leading-none tracking-[-0.02em] text-forest"
         style={{ opacity: rightIn, y: rightY }}
       >
         {quality.right}
       </motion.p>
-      <ol className="mt-4 md:mt-5" aria-label="What remains">
+      <ol className="mt-2 md:mt-5" aria-label="What remains">
         {signals.map((s, i) => (
           <SignalRow key={s} label={s} index={i} total={signals.length} progress={progress} />
         ))}
@@ -193,82 +244,58 @@ function FilterScene({ progress }: { progress: MotionValue<number> }) {
 
 /* ─── Section ─────────────────────────────────────────────────── */
 
-export function QualitySection() {
-  const ref = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+function QualityScene({ scrubbed }: { scrubbed: MotionValue<number> }) {
   const isDesktop = useIsDesktop();
-  const stageInView = useInView(stageRef, { once: true, amount: 0.35 });
+  const progress = useTransform(scrubbed, [0.04, 0.92], [0, 1]);
 
-  /* Desktop: scrubbed across the pinned stretch */
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const scrubbed = useTransform(scrollYProgress, [0.05, 0.9], [0, 1]);
-
-  /* Mobile/tablet: plays once when the scene arrives */
-  const played = useMotionValue(0);
-  useEffect(() => {
-    if (isDesktop) return;
-    if (reduce) {
-      played.set(1);
-      return;
-    }
-    if (!stageInView) return;
-    const controls = animate(played, 1, { duration: 3.6, ease: [0.4, 0, 0.2, 1] });
-    return () => controls.stop();
-  }, [isDesktop, reduce, stageInView, played]);
-
-  const finished = useMotionValue(1);
-  const progress = reduce ? finished : isDesktop ? scrubbed : played;
+  /* Readout — same timeline as the scene */
+  const heldFill = useTransform(progress, [0.04, 0.62], [0, 1]);
+  const heldCount = useTransform(heldFill, [0, 1], [0, quality.moreSignals.length]);
+  const keptFill = useTransform(progress, [0.42, 0.92], [0, 1]);
+  const keptCount = useTransform(keptFill, [0, 1], [0, quality.rightSignals.length]);
+  const headIn = useBeat(scrubbed, [0, 0.05]);
 
   const dot = quality.statement.indexOf(". ");
   const lead = dot === -1 ? quality.statement : quality.statement.slice(0, dot + 1);
   const turn = dot === -1 ? "" : quality.statement.slice(dot + 2);
 
   return (
-    <section
-      id="quality"
-      ref={ref}
-      className="relative scroll-mt-[var(--header-h)] bg-ivory py-[var(--section-space-loose)] lg:h-[220vh] lg:py-0"
-      aria-labelledby="quality-heading"
-    >
-      <div className="lg:sticky lg:top-[var(--header-h)] lg:flex lg:h-[calc(100svh-var(--header-h))] lg:items-center">
-        <Container>
-          <div className="grid gap-12 md:gap-14 lg:grid-cols-12 lg:items-center lg:gap-14">
-            <div className="md:max-w-[36rem] lg:col-span-5 lg:max-w-none">
-              <SectionLabel index={homeSections.quality.index} className="mb-5">
-                {homeSections.quality.name}
-              </SectionLabel>
-              <motion.h2
-                id="quality-heading"
-                className="type-display-l text-forest"
-                initial={reduce ? false : { opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10% 0px" }}
-                transition={{ duration: 0.7, ease: motionEase }}
-              >
-                {lead}{" "}
-                {turn ? <span className="italic text-copper">{turn}</span> : null}
-              </motion.h2>
-              <motion.p
-                className="type-lead mt-5 text-ink-soft md:mt-6"
-                initial={reduce ? false : { opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-10% 0px" }}
-                transition={{ duration: 0.6, ease: motionEase, delay: 0.12 }}
-              >
-                {quality.narrative}
-              </motion.p>
-            </div>
+    <Container>
+      <div className="grid gap-5 sm:gap-8 max-lg:[@media(max-height:760px)]:gap-3 lg:grid-cols-12 lg:items-center lg:gap-14">
+        <motion.div className="md:max-w-[36rem] lg:col-span-5 lg:max-w-none" style={headIn}>
+          <SectionLabel index={homeSections.quality.index} className="mb-3 lg:mb-5">
+            {homeSections.quality.name}
+          </SectionLabel>
+          <h2
+            id="quality-heading"
+            className="font-display text-[clamp(1.75rem,1.1rem+2.8vw,3.75rem)] max-lg:[@media(max-height:760px)]:text-[1.625rem] font-medium leading-[1.06] tracking-[-0.015em] text-balance text-forest"
+          >
+            {lead}
+            {turn ? <span className="block italic text-copper">{turn}</span> : null}
+          </h2>
+          <p className="mt-3 text-[0.9375rem] leading-[1.5] text-ink-soft sm:text-base lg:mt-6 lg:text-[1.1875rem]">
+            {quality.narrative}
+          </p>
 
-            <div
-              ref={stageRef}
-              className="border-y border-forest/10 py-8 md:py-10 lg:col-span-6 lg:col-start-7 lg:border-y-0 lg:border-l lg:py-2 lg:pl-12"
-            >
-              <FilterScene progress={progress} />
-            </div>
+          <div className="mt-4 grid max-w-[26rem] grid-cols-2 gap-5 max-lg:[@media(max-height:760px)]:mt-3 lg:mt-12 lg:grid-cols-1 lg:gap-6">
+            <Meter label="Noise held back" count={heldCount} fill={heldFill} />
+            <Meter label="Signals that matter" count={keptCount} fill={keptFill} accent />
           </div>
-        </Container>
+        </motion.div>
+
+        <div className="border-t border-forest/10 pt-4 lg:col-span-6 lg:col-start-7 lg:border-l lg:border-t-0 lg:py-2 lg:pl-12">
+          <FilterScene progress={progress} wide={isDesktop} />
+        </div>
       </div>
-    </section>
+    </Container>
+  );
+}
+
+/** 03 — one pinned screen at every size; scroll runs the relevance filter. */
+export function QualitySection() {
+  return (
+    <PinnedScene length={2} id="quality" className="scroll-mt-[var(--header-h)] bg-ivory" labelledBy="quality-heading">
+      {(p) => <QualityScene scrubbed={p} />}
+    </PinnedScene>
   );
 }

@@ -1,18 +1,15 @@
 "use client";
 
-import { Fragment, useRef, type ReactNode } from "react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
+import { Fragment, type ReactNode } from "react";
+import { motion, useTransform, type MotionValue } from "framer-motion";
 import { intro } from "@/content/home";
 import { Container } from "@/components/ui/Container";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { homeSections } from "@/content/home-sections";
-import { motionEase } from "@/lib/motion";
+import { PinnedScene } from "@/components/motion/PinnedScene";
+import { useBeat } from "@/components/motion/useBeat";
+import { useIsDesktop } from "@/lib/useIsDesktop";
+import { cn } from "@/lib/cn";
 
 /* ─── Sifting field: many leads → a few right customers ───────── */
 
@@ -38,11 +35,11 @@ function NoiseGroup({
   reduce: boolean | null;
 }) {
   /* Three bands fade at slightly different moments so the field thins organically */
-  const opacity = useTransform(sift, [band * 0.18, 0.55 + band * 0.18], [0.4, 0.07]);
+  const opacity = useTransform(sift, [band * 0.18, 0.55 + band * 0.18], [0.55, 0.08]);
   return (
     <motion.g style={{ opacity: reduce ? 0.07 : opacity }}>
       {NOISE.filter((d) => d.i % 3 === band).map((d) => (
-        <circle key={d.i} cx={d.cx} cy={d.cy} r={2.2} fill="var(--color-ivory)" />
+        <circle key={d.i} cx={d.cx} cy={d.cy} r={2.2} fill="var(--color-sage-light)" />
       ))}
     </motion.g>
   );
@@ -50,7 +47,7 @@ function NoiseGroup({
 
 function SiftingField({ sift, reduce }: { sift: MotionValue<number>; reduce: boolean | null }) {
   const chosenR = useTransform(sift, [0.35, 0.85], [2.2, 5.5]);
-  const chosenFill = useTransform(sift, [0.3, 0.7], ["#f7f4ef", "#e5895a"]);
+  const chosenFill = useTransform(sift, [0.3, 0.7], ["#b4c2b6", "#e5895a"]);
   const ringOpacity = useTransform(sift, [0.7, 0.95], [0, 1]);
   const beforeOpacity = useTransform(sift, [0.25, 0.5], [1, 0]);
   const afterOpacity = useTransform(sift, [0.55, 0.85], [0, 1]);
@@ -104,7 +101,7 @@ function SiftingField({ sift, reduce }: { sift: MotionValue<number>; reduce: boo
       {/* Caption crossfades as the field sifts */}
       <figcaption className="mt-6 grid font-mono text-[0.75rem] uppercase tracking-[0.16em]">
         <motion.span
-          className="col-start-1 row-start-1 text-ivory/70"
+          className="col-start-1 row-start-1 text-sage-light"
           style={{ opacity: reduce ? 0 : beforeOpacity }}
         >
           Thousands of leads
@@ -142,23 +139,17 @@ function markPhrase(
 function Marked({
   children,
   variant,
-  reduce,
-  delay = 0.5,
+  draw,
 }: {
   children: ReactNode;
   variant: "strike" | "underline";
-  reduce: boolean | null;
-  delay?: number;
+  /** 0 → 1: how much of the mark is drawn (driven by scroll). */
+  draw: MotionValue<number>;
 }) {
+  const fade = useTransform(draw, [0.4, 1], [1, 0.5]);
   return (
     <span className="relative inline-block whitespace-nowrap">
-      <motion.span
-        className="inline-block"
-        initial={false}
-        whileInView={variant === "strike" ? { opacity: 0.55 } : undefined}
-        viewport={{ once: true, margin: "-20% 0px" }}
-        transition={{ duration: 0.4, delay: delay + 0.3 }}
-      >
+      <motion.span className="inline-block" style={variant === "strike" ? { opacity: fade } : undefined}>
         {children}
       </motion.span>
       <motion.span
@@ -167,12 +158,36 @@ function Marked({
             ? "absolute inset-x-[-2px] top-[55%] h-[2px] origin-left rounded-full bg-copper-soft"
             : "absolute inset-x-0 bottom-[-0.08em] h-[2px] origin-left rounded-full bg-copper-soft"
         }
-        initial={reduce ? false : { scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true, margin: "-20% 0px" }}
-        transition={{ duration: 0.7, ease: motionEase, delay }}
+        style={{ scaleX: draw }}
         aria-hidden
       />
+    </span>
+  );
+}
+
+/** One word of the payoff, rising through its own mask on cue. */
+function PayoffWord({
+  word,
+  index,
+  total,
+  progress,
+}: {
+  word: string;
+  index: number;
+  total: number;
+  progress: MotionValue<number>;
+}) {
+  const start = 0.72 + (index / total) * 0.12;
+  const y = useTransform(progress, [start, start + 0.08], ["105%", "0%"]);
+  const isPayoff = index === total - 1;
+  return (
+    <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+      <motion.span
+        className={isPayoff ? "text-copper-metal inline-block italic" : "inline-block"}
+        style={{ y }}
+      >
+        {word}
+      </motion.span>
     </span>
   );
 }
@@ -181,118 +196,156 @@ function Marked({
 
 const METHOD = ["Examine", "Reach"] as const;
 
-export function IntroNarrativeSection() {
-  const ref = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 0.75", "end 0.65"],
-  });
-  const sift = useTransform(scrollYProgress, [0, 1], [0, 1]);
-
+/**
+ * The premise as one pinned screen, played in beats:
+ * setup (strike) → pivot (underline) + the field sifts → the method →
+ * the argument lifts away and the payoff takes the screen.
+ */
+function PremiseScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean }) {
+  const isDesktop = useIsDesktop();
   const [setup, pivot, ...method] = intro.sentences;
-  const anchorWords = intro.anchor.split(" ");
+  const words = intro.anchor.split(" ");
 
-  const rise = (i: number) => ({
-    initial: reduce ? false : { opacity: 0, y: 22 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true, margin: "-10% 0px" },
-    transition: { duration: 0.6, ease: motionEase, delay: reduce ? 0 : i * 0.12 },
-  });
+  const label = useBeat(p, [0, 0.04]);
+  const setupIn = useBeat(p, [0, 0.06]);
+  const strike = useTransform(p, [0.06, 0.16], [0, 1]);
+  const pivotIn = useBeat(p, [0.13, 0.22]);
+  const underline = useTransform(p, [0.2, 0.3], [0, 1]);
+  const sift = useTransform(p, [0.16, 0.56], [0, 1]);
+  const m0 = useBeat(p, [0.42, 0.5]);
+  const m1 = useBeat(p, [0.47, 0.55]);
+  const methodIn = [m0, m1];
+
+  /* On phones the method takes the field's place; on desktop they sit side by side */
+  const fieldSwap = useTransform(p, [0.38, 0.44], [1, 0]);
+
+  /* The argument steps back as the payoff arrives */
+  const argOut = useTransform(p, [0.64, 0.72], [1, 0]);
+  const argY = useTransform(p, [0.64, 0.72], [0, -40]);
+  const fieldDim = useTransform(p, [0.64, 0.74], [1, 0.22]);
+  const fieldScale = useTransform(p, [0.64, 0.74], [1, 0.92]);
+  const rule = useTransform(p, [0.7, 0.8], [0, 1]);
 
   return (
-    <section
-      ref={ref}
-      className="surface-espresso relative overflow-hidden py-[var(--section-space-loose)]"
-      aria-labelledby="intro-heading"
-    >
+    <Container className="relative h-full">
+      {/* The argument + the field */}
+      <motion.div
+        className="relative flex h-full flex-col justify-center"
+        style={isStatic ? undefined : { opacity: argOut, y: argY }}
+      >
+        <motion.div style={label}>
+          <SectionLabel index={homeSections.intro.index} tone="dark" className="mb-5 lg:mb-10">
+            {homeSections.intro.name}
+          </SectionLabel>
+        </motion.div>
 
-      <Container className="relative">
-        <SectionLabel index={homeSections.intro.index} tone="dark" className="mb-10 md:mb-14">
-          {homeSections.intro.name}
-        </SectionLabel>
-
-        <div className="grid gap-12 md:gap-14 lg:grid-cols-12 lg:gap-10">
-          {/* The argument */}
+        <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
           <div className="lg:col-span-7">
             <motion.p
-              className="text-[clamp(1.25rem,1rem+1vw,1.75rem)] leading-[1.45] text-ivory/90"
-              {...rise(0)}
+              className="text-[clamp(1.125rem,0.95rem+1vw,1.75rem)] leading-[1.42] text-ivory"
+              style={setupIn}
             >
-              {markPhrase(setup, "thousands of new leads", (p) => (
-                <Marked variant="strike" reduce={reduce}>
-                  {p}
+              {markPhrase(setup, "thousands of new leads", (ph) => (
+                <Marked variant="strike" draw={strike}>
+                  {ph}
                 </Marked>
               ))}
             </motion.p>
 
             <motion.p
-              className="type-display-l text-copper-metal mt-6 !font-normal italic md:mt-8"
-              {...rise(1)}
+              className="text-copper-metal mt-4 font-display text-[clamp(1.75rem,1.1rem+3vw,3.75rem)] italic leading-[1.08] tracking-[-0.015em] lg:mt-8"
+              style={pivotIn}
             >
-              {markPhrase(pivot, "right customers", (p) => (
-                <Marked variant="underline" reduce={reduce} delay={0.8}>
-                  {p}
+              {markPhrase(pivot, "right customers", (ph) => (
+                <Marked variant="underline" draw={underline}>
+                  {ph}
                 </Marked>
               ))}
             </motion.p>
 
-            {/* How — the method as two numbered moves */}
-            <ol className="mt-10 grid gap-8 border-t border-ivory/12 pt-8 sm:grid-cols-2 sm:gap-10 md:mt-14">
+            {/* Desktop: the method under the argument */}
+            <ol className="mt-12 hidden gap-10 border-t border-sage-light/20 pt-8 lg:grid lg:grid-cols-2">
               {method.map((sentence, i) => (
-                <motion.li key={sentence} {...rise(i + 2)}>
-                  <p className="flex items-center gap-3 font-mono text-[0.75rem] uppercase tracking-[0.18em] text-copper-soft">
-                    <span className="tabular-nums">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="h-px w-6 bg-ivory/25" aria-hidden />
-                    {METHOD[i] ?? ""}
-                  </p>
-                  <p className="type-body mt-3 text-ivory/85">{sentence}</p>
-                </motion.li>
+                <MethodItem key={sentence} index={i} sentence={sentence} style={methodIn[i]} />
               ))}
             </ol>
           </div>
 
-          {/* The picture of it */}
-          <motion.div
-            className="mx-auto w-full max-w-[26rem] lg:col-span-4 lg:col-start-9 lg:mx-0 lg:max-w-none lg:self-center"
-            initial={reduce ? false : { opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-10% 0px" }}
-            transition={{ duration: 0.8 }}
-          >
-            <SiftingField sift={sift} reduce={reduce} />
-          </motion.div>
+          {/* The field — and, on phones, the method in the same spot */}
+          <div className="relative grid lg:col-span-4 lg:col-start-9 lg:self-center">
+            <motion.div
+              className="col-start-1 row-start-1 mx-auto w-full max-w-[22rem] lg:max-w-none"
+              style={isStatic ? undefined : { opacity: isDesktop ? fieldDim : fieldSwap, scale: fieldScale }}
+            >
+              <SiftingField sift={sift} reduce={isStatic} />
+            </motion.div>
+            <ol
+              className={cn(
+                "grid content-start gap-5 border-t border-sage-light/20 pt-5 lg:hidden",
+                isStatic ? "mt-8" : "col-start-1 row-start-1",
+              )}
+            >
+              {method.map((sentence, i) => (
+                <MethodItem key={sentence} index={i} sentence={sentence} style={methodIn[i]} />
+              ))}
+            </ol>
+          </div>
         </div>
+      </motion.div>
 
-        {/* The payoff — words rise into place */}
-        <div className="mt-16 border-t border-copper/60 pt-8 md:mt-20 md:pt-10">
-          <h2
-            id="intro-heading"
-            className="font-display max-w-[22ch] text-balance text-[clamp(2.25rem,1.2rem+4.4vw,5rem)] font-medium leading-[1.04] tracking-[-0.02em] text-ivory"
-          >
-            {anchorWords.map((word, i) => {
-              const isPayoff = i === anchorWords.length - 1;
-              return (
-                <Fragment key={i}>
-                <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
-                  <motion.span
-                    className={isPayoff ? "text-copper-metal inline-block italic" : "inline-block"}
-                    initial={reduce ? false : { y: "105%" }}
-                    whileInView={{ y: "0%" }}
-                    viewport={{ once: true, margin: "-10% 0px" }}
-                    transition={{ duration: 0.7, ease: motionEase, delay: reduce ? 0 : i * 0.07 }}
-                  >
-                    {word}
-                  </motion.span>
-                </span>
-                {i < anchorWords.length - 1 ? " " : null}
-                </Fragment>
-              );
-            })}
-          </h2>
-        </div>
-      </Container>
-    </section>
+      {/* The payoff takes the screen */}
+      <div
+        className={cn(
+          "pointer-events-none flex flex-col justify-center",
+          isStatic ? "relative mt-16" : "absolute inset-0 px-[var(--gutter)]",
+        )}
+      >
+        <motion.span
+          className="mb-6 block h-px w-full max-w-[14rem] origin-left bg-copper/70 md:mb-8"
+          style={{ scaleX: rule }}
+          aria-hidden
+        />
+        <h2
+          id="intro-heading"
+          className="font-display max-w-[22ch] text-balance text-[clamp(2.5rem,1.3rem+5vw,5.75rem)] font-medium leading-[1.03] tracking-[-0.02em] text-ivory"
+        >
+          {words.map((word, i) => (
+            <Fragment key={i}>
+              <PayoffWord word={word} index={i} total={words.length} progress={p} />
+              {i < words.length - 1 ? " " : null}
+            </Fragment>
+          ))}
+        </h2>
+      </div>
+    </Container>
+  );
+}
+
+function MethodItem({
+  index,
+  sentence,
+  style,
+}: {
+  index: number;
+  sentence: string;
+  style: { opacity: MotionValue<number>; y: MotionValue<number> };
+}) {
+  return (
+    <motion.li style={style}>
+      <p className="flex items-center gap-3 font-mono text-[0.75rem] uppercase tracking-[0.18em] text-sage-light">
+        <span className="tabular-nums text-copper-soft">{String(index + 1).padStart(2, "0")}</span>
+        <span className="h-px w-6 bg-sage-light/40" aria-hidden />
+        {METHOD[index] ?? ""}
+      </p>
+      <p className="mt-2 text-[0.9375rem] leading-[1.55] text-ivory/90 lg:mt-3 lg:text-base">{sentence}</p>
+    </motion.li>
+  );
+}
+
+export function IntroNarrativeSection() {
+  return (
+    <PinnedScene length={2.5} className="surface-espresso" stageClassName="items-stretch" labelledBy="intro-heading">
+      {(p, _ref, isStatic) => <PremiseScene p={p} isStatic={isStatic} />}
+    </PinnedScene>
   );
 }

@@ -1,11 +1,14 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useTransform, type MotionValue } from "framer-motion";
 import { qualification } from "@/content/home";
 import { Container } from "@/components/ui/Container";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { homeSections } from "@/content/home-sections";
-import { motionEase } from "@/lib/motion";
+import { PinnedScene } from "@/components/motion/PinnedScene";
+import { useBeat } from "@/components/motion/useBeat";
+import { useIsDesktop } from "@/lib/useIsDesktop";
+import { cn } from "@/lib/cn";
 
 /** Simple SVG icon paths — keyed by criteria index */
 function CriterionIcon({ index }: { index: number }) {
@@ -75,107 +78,156 @@ const CRITERION_DESCRIPTIONS = [
   "Commercial opportunity being left on the table.",
 ];
 
-export function QualificationSection() {
-  const reduce = useReducedMotion();
+/** A criterion checks in: rises, then a copper tick draws beside it. */
+function Criterion({
+  item,
+  index,
+  progress,
+}: {
+  item: string;
+  index: number;
+  progress: MotionValue<number>;
+}) {
+  const start = 0.06 + index * 0.06;
+  const beat = useBeat(progress, [start, start + 0.05], undefined, 18);
+  const tick = useTransform(progress, [start + 0.03, start + 0.08], [0, 1]);
+  return (
+    <motion.li className="flex gap-3 border-b border-forest/12 py-2 max-lg:[@media(max-height:760px)]:py-1.5 sm:py-4 lg:gap-4 lg:py-5" style={beat}>
+      <span className="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center">
+        <CriterionIcon index={index} />
+        <svg viewBox="0 0 24 24" className="absolute -bottom-1.5 -right-1.5 h-3.5 w-3.5" aria-hidden>
+          <circle cx="12" cy="12" r="11" fill="var(--color-ivory)" />
+          <motion.path
+            d="M6.5 12.5l3.5 3.5 7.5-8"
+            fill="none"
+            stroke="var(--color-copper)"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ pathLength: tick }}
+          />
+        </svg>
+      </span>
+      <div className="min-w-0">
+        <p className="font-display text-[1.0625rem] leading-snug text-forest lg:text-[1.3125rem]">{item}</p>
+        <p className="mt-0.5 text-[0.8125rem] leading-[1.4] text-ink-soft sm:text-[0.9375rem] lg:mt-1.5">
+          {CRITERION_DESCRIPTIONS[index]}
+        </p>
+      </div>
+    </motion.li>
+  );
+}
+
+/**
+ * 07 — a pinned checklist. The criteria check in one by one, the industries
+ * follow, then everything lifts away and the question takes the screen —
+ * the bridge into Plain English.
+ */
+function FitScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean }) {
+  const isDesktop = useIsDesktop();
+  const swap = !isDesktop && !isStatic;
+
+  const head = useBeat(p, [0, 0.05]);
+  const industries = useBeat(p, [0.46, 0.54]);
+  /* Phones: the industries take the criteria's place */
+  const criteriaOut = useTransform(p, [0.42, 0.48], [1, 0]);
+  /* Then the question takes the screen */
+  const allOut = useTransform(p, [0.64, 0.72], [1, 0]);
+  const allY = useTransform(p, [0.64, 0.72], [0, -36]);
+  const question = useBeat(p, [0.7, 0.8], undefined, 40);
+  const questionScale = useTransform(p, [0.7, 0.82], [0.94, 1]);
+  const drop = useTransform(p, [0.82, 0.95], [0, 1]);
+
   const words = qualification.centerStatement.split(" ");
   const questionLast = words.pop();
   const questionLead = words.join(" ");
 
+  const industriesBlock = (
+    <motion.div style={industries} className={cn(swap && "col-start-1 row-start-1 self-start")}>
+      <p className="max-w-[34rem] text-[0.9375rem] leading-[1.5] text-ink-soft lg:text-base">
+        {qualification.industriesIntro}
+      </p>
+      <ul className="mt-3 flex flex-wrap gap-2 lg:mt-5" aria-label="Example industries">
+        {qualification.industries.map((industry) => (
+          <li
+            key={industry}
+            className="border border-forest/20 bg-surface/50 px-3 py-1.5 font-mono text-[0.75rem] text-forest lg:py-2"
+          >
+            {industry}
+          </li>
+        ))}
+      </ul>
+    </motion.div>
+  );
+
   return (
-    <section
-      className="bg-ivory pt-[var(--section-space-loose)]"
-      aria-labelledby="qual-heading"
-    >
-      <Container>
-        <div className="grid gap-10 md:gap-12 lg:grid-cols-12 lg:gap-14">
-          {/* Left: headline + context */}
-          <div className="md:max-w-[36rem] lg:col-span-5 lg:max-w-none lg:self-start">
-            <SectionLabel index={homeSections.qualification.index} className="mb-5">
+    <Container className="relative h-full">
+      <motion.div
+        className="flex h-full flex-col justify-center"
+        style={isStatic ? undefined : { opacity: allOut, y: allY }}
+      >
+        <div className="grid gap-4 sm:gap-8 lg:grid-cols-12 lg:gap-14">
+          <motion.div className="md:max-w-[36rem] lg:col-span-5 lg:max-w-none" style={head}>
+            <SectionLabel index={homeSections.qualification.index} className="mb-3 lg:mb-5">
               {homeSections.qualification.name}
             </SectionLabel>
-            <h2 id="qual-heading" className="type-display-l text-forest">
+            <h2
+              id="qual-heading"
+              className="font-display text-[clamp(1.75rem,1.1rem+2.8vw,3.75rem)] font-medium leading-[1.06] tracking-[-0.015em] text-balance text-forest max-lg:[@media(max-height:760px)]:text-[1.5rem]"
+            >
               {qualification.headline}
             </h2>
-            <p className="type-lead mt-5 max-w-[30rem] text-ink-soft md:mt-6">
+            <p className="mt-2 max-w-[30rem] text-[0.9375rem] leading-[1.5] text-ink-soft sm:text-base lg:mt-6 lg:text-[1.1875rem]">
               {qualification.intro}
             </p>
-          </div>
+            {/* Desktop: the industries under the claim */}
+            <div className="mt-10 hidden lg:block">{industriesBlock}</div>
+          </motion.div>
 
-          {/* Right: criteria */}
-          <div className="lg:col-span-7">
-            <ul
-              className="grid grid-cols-1 border-t border-forest/12 sm:grid-cols-2 sm:gap-x-10"
+          <div className={cn("lg:col-span-7", swap && "grid")}>
+            <motion.ul
+              className={cn(
+                "grid grid-cols-1 border-t border-forest/12 sm:grid-cols-2 sm:gap-x-8 lg:gap-x-10",
+                swap && "col-start-1 row-start-1",
+              )}
+              style={swap ? { opacity: criteriaOut } : undefined}
               aria-label="Qualification criteria"
             >
               {qualification.criteria.map((item, i) => (
-                <motion.li
-                  key={item}
-                  className="flex gap-4 border-b border-forest/12 py-5 md:py-7"
-                  initial={reduce ? false : { opacity: 0, y: 14 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-8% 0px" }}
-                  transition={{ duration: 0.5, ease: motionEase, delay: reduce ? 0 : (i % 2) * 0.1 }}
-                >
-                  <div className="mt-1 shrink-0">
-                    <CriterionIcon index={i} />
-                  </div>
-                  <div>
-                    <p className="type-title text-forest">{item}</p>
-                    <p className="type-small mt-1.5 text-ink-soft">
-                      {CRITERION_DESCRIPTIONS[i]}
-                    </p>
-                  </div>
-                </motion.li>
+                <Criterion key={item} item={item} index={i} progress={p} />
               ))}
-            </ul>
-
-            {/* Industry examples */}
-            <motion.div
-              className="mt-10 md:mt-12"
-              initial={reduce ? false : { opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-6%" }}
-              transition={{ duration: 0.5, ease: motionEase }}
-            >
-              <p className="type-body max-w-[34rem] text-ink-soft">
-                {qualification.industriesIntro}
-              </p>
-              <ul className="mt-5 flex flex-wrap gap-2" aria-label="Example industries">
-                {qualification.industries.map((industry) => (
-                  <li
-                    key={industry}
-                    className="border border-forest/20 bg-surface/50 px-3 py-2 font-mono text-[0.75rem] text-forest"
-                  >
-                    {industry}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
+            </motion.ul>
+            {/* Phones/tablets: the industries in the criteria's place (or below, when static) */}
+            <div className={cn("lg:hidden", swap ? "col-start-1 row-start-1 grid" : "mt-8")}>{industriesBlock}</div>
           </div>
         </div>
+      </motion.div>
 
-        {/* The self-selection question — the bridge into Plain English */}
-        <motion.div
-          className="mt-[clamp(3.5rem,2.5rem+4vw,6rem)] flex flex-col items-center pb-[clamp(2.5rem,2rem+2vw,3.5rem)] text-center"
-          initial={reduce ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.7, ease: motionEase }}
-        >
-          <p className="font-display text-[clamp(2.25rem,1.3rem+4vw,4.75rem)] font-medium leading-[1.04] tracking-[-0.02em] text-balance text-forest">
-            {questionLead}{" "}
-            <span className="italic text-copper">{questionLast}</span>
-          </p>
-          <motion.span
-            className="mt-8 block h-14 w-px origin-top bg-copper md:h-20"
-            initial={reduce ? false : { scaleY: 0 }}
-            whileInView={{ scaleY: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: motionEase, delay: 0.3 }}
-            aria-hidden
-          />
-        </motion.div>
-      </Container>
-    </section>
+      {/* The question takes the screen */}
+      <motion.div
+        className={cn(
+          "pointer-events-none flex flex-col items-center justify-center text-center",
+          isStatic ? "relative mt-16" : "absolute inset-0 px-[var(--gutter)]",
+        )}
+        style={isStatic ? undefined : { ...question, scale: questionScale }}
+      >
+        <p className="font-display text-[clamp(2.5rem,1.3rem+5vw,5.5rem)] font-medium leading-[1.03] tracking-[-0.02em] text-balance text-forest">
+          {questionLead} <span className="italic text-copper">{questionLast}</span>
+        </p>
+        <motion.span
+          className="mt-8 block h-16 w-px origin-top bg-copper md:h-24"
+          style={{ scaleY: isStatic ? 1 : drop }}
+          aria-hidden
+        />
+      </motion.div>
+    </Container>
+  );
+}
+
+export function QualificationSection() {
+  return (
+    <PinnedScene length={2.5} className="bg-ivory" stageClassName="items-stretch" labelledBy="qual-heading">
+      {(p, _ref, isStatic) => <FitScene p={p} isStatic={isStatic} />}
+    </PinnedScene>
   );
 }
