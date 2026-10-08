@@ -6,10 +6,12 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-charcoal text-ivory">
+    <footer className="surface-espresso relative text-ivory">
+      {/* Spectrum hairline ties the footer to the chapter accents */}
+      <div className="h-px bg-gradient-to-r from-copper via-saffron to-teal opacity-70" aria-hidden />
 
       {/* Main footer body */}
-      <Container className="grid gap-12 py-16 md:grid-cols-2 md:gap-8 md:py-20 lg:grid-cols-12 lg:gap-12">
+      <Container className="grid items-end gap-8 py-10 md:grid-cols-2 md:py-12 lg:grid-cols-12 lg:gap-12">
 
         {/* Brand block */}
         <div className="lg:col-span-5">
@@ -19,15 +21,15 @@ export function SiteFooter() {
           <p className="mt-1 font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-ivory/55">
             Commercial intelligence
           </p>
-          <p className="mt-6 max-w-xs text-[0.9375rem] leading-relaxed text-ivory/70">
+          <p className="mt-4 max-w-xs text-[0.9375rem] leading-relaxed text-ivory/70">
             {site.description}
           </p>
         </div>
 
         {/* Nav + CTA */}
-        <div className="flex flex-col justify-between gap-8 lg:col-span-7 lg:flex-row lg:items-end">
+        <div className="flex flex-col justify-between gap-6 lg:col-span-7 lg:flex-row lg:items-end">
           <nav aria-label="Footer navigation">
-            <ul className="flex flex-wrap gap-x-7 gap-y-3">
+            <ul className="flex flex-wrap gap-x-7 gap-y-1">
               {navigation.map((item) => (
                 <li key={item.href}>
                   <Link
@@ -43,7 +45,7 @@ export function SiteFooter() {
 
           <Link
             href="/contact"
-            className="inline-flex min-h-[2.75rem] items-center border border-ivory/20 px-7 text-sm font-medium tracking-wide text-ivory transition-all hover:border-ivory/50 hover:bg-ivory hover:text-forest"
+            className="inline-flex min-h-[2.75rem] items-center border border-ivory/20 px-7 text-sm font-medium tracking-wide text-ivory transition-all hover:-translate-y-0.5 hover:border-copper hover:bg-copper hover:text-ivory"
           >
             Talk to us
           </Link>
@@ -52,7 +54,7 @@ export function SiteFooter() {
 
       {/* Copyright strip */}
       <div className="border-t border-ivory/10">
-        <Container className="flex flex-wrap items-center justify-between gap-3 py-5">
+        <Container className="flex flex-wrap items-center justify-between gap-2 py-4">
           <p className="font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-ivory/50">
             &copy; {year} {site.name}.media
           </p>

@@ -14,6 +14,7 @@ import {
 import { hero } from "@/content/home";
 import { Button } from "@/components/ui/Button";
 import { SectionLabel } from "@/components/ui/SectionLabel";
+import { KeywordMarquee } from "@/components/home/KeywordMarquee";
 import { HeroDiscoveryPath } from "@/components/home/HeroDiscoveryPath";
 import { homeSections } from "@/content/home-sections";
 import { motionEase, motionDurations } from "@/lib/motion";
@@ -120,7 +121,7 @@ export function HeroSection() {
         - Desktop: copy left; full, uncropped photo right at mid-height with the
           path set beneath it — nothing covers the objects
       */}
-      <div className="relative flex min-h-[calc(100svh-var(--header-h))] flex-col justify-center pb-[clamp(0.75rem,3svh,3rem)] md:grid md:grid-cols-12 md:content-center md:gap-x-6 lg:sticky lg:top-[var(--header-h)] lg:h-[calc(100svh-var(--header-h))] lg:min-h-[640px] lg:grid-cols-[minmax(0,52fr)_minmax(0,48fr)] xl:grid-cols-[minmax(0,44fr)_minmax(0,56fr)] lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-0 lg:overflow-hidden lg:pb-0">
+      <div className="relative flex min-h-[calc(100svh-var(--header-h))] flex-col justify-center pb-[clamp(0.75rem,3svh,3rem)] md:grid md:grid-cols-12 md:content-center md:gap-x-6 lg:sticky lg:top-[var(--header-h)] lg:h-[calc(100svh-var(--header-h))] lg:min-h-[640px] lg:grid-cols-[minmax(0,52fr)_minmax(0,48fr)] xl:grid-cols-[minmax(0,44fr)_minmax(0,56fr)] lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-0 lg:overflow-hidden lg:pb-12">
         <div className="hero-plate relative order-2 mx-[var(--gutter)] aspect-[21/10] overflow-hidden sm:aspect-[16/9] md:col-span-12 md:row-start-2 md:mt-10 md:aspect-[1024/516] lg:col-start-2 lg:row-start-2 lg:mx-0 lg:mt-0">
           <motion.div
             className="pointer-events-none absolute inset-0"
@@ -212,6 +213,9 @@ export function HeroSection() {
             className="w-full"
           />
         </div>
+
+        {/* Keyword strip — the foot of the first screen, so hero + strip read as one view */}
+        <KeywordMarquee className="order-4 mt-5 md:col-span-12 md:mt-8 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0" />
       </div>
     </section>
   );

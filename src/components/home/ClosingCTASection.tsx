@@ -118,28 +118,6 @@ export function ClosingCTASection() {
           </motion.div>
         </motion.div>
 
-        {/* Drifting strip keeps the lower band alive on tall screens */}
-        <div className="-mx-[var(--gutter)] overflow-hidden border-y border-ivory/10 py-3" aria-hidden>
-          <div className="marquee font-display text-xl italic text-ivory/40 md:text-2xl">
-            {[0, 1].map((n) => (
-              <span key={n} className="flex shrink-0 items-center gap-8 pr-8">
-                {["Data", "Research", "Tools", "Execution"].map((w, i) => (
-                  <span key={w} className="flex items-center gap-8">
-                    {w}
-                    <span className={["text-copper-soft", "text-saffron-soft", "text-teal-soft", "text-rose-soft"][i]}>✦</span>
-                  </span>
-                ))}
-                {["Data", "Research", "Tools", "Execution"].map((w, i) => (
-                  <span key={w + "2"} className="flex items-center gap-8">
-                    {w}
-                    <span className={["text-copper-soft", "text-saffron-soft", "text-teal-soft", "text-rose-soft"][i]}>✦</span>
-                  </span>
-                ))}
-              </span>
-            ))}
-          </div>
-        </div>
-
       </Container>
     </section>
   );
