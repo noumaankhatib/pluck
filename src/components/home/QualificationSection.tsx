@@ -18,7 +18,7 @@ function CriterionIcon({ index }: { index: number }) {
       height="20"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="var(--color-copper)"
+      stroke="var(--chapter-accent)"
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -100,7 +100,7 @@ function Criterion({
           <motion.path
             d="M6.5 12.5l3.5 3.5 7.5-8"
             fill="none"
-            stroke="var(--color-copper)"
+            stroke="var(--chapter-accent)"
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -212,10 +212,10 @@ function FitScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean }
         style={isStatic ? undefined : { ...question, scale: questionScale }}
       >
         <p className="font-display text-[clamp(2.5rem,1.3rem+5vw,5.5rem)] font-medium leading-[1.03] tracking-[-0.02em] text-balance text-forest">
-          {questionLead} <span className="italic text-copper">{questionLast}</span>
+          {questionLead} <span className="italic text-accent">{questionLast}</span>
         </p>
         <motion.span
-          className="mt-8 block h-16 w-px origin-top bg-copper md:h-24"
+          className="mt-8 block h-16 w-px origin-top bg-accent md:h-24"
           style={{ scaleY: isStatic ? 1 : drop }}
           aria-hidden
         />
@@ -226,7 +226,7 @@ function FitScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean }
 
 export function QualificationSection() {
   return (
-    <PinnedScene length={2.5} className="bg-ivory" stageClassName="items-stretch" labelledBy="qual-heading">
+    <PinnedScene length={2.5} className="accent-saffron bg-ivory" stageClassName="items-stretch" labelledBy="qual-heading">
       {(p, _ref, isStatic) => <FitScene p={p} isStatic={isStatic} />}
     </PinnedScene>
   );

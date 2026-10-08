@@ -22,7 +22,7 @@ function Question({
   const lit = useTransform(progress, [start, start + 0.06], [0, 1]);
   const opacity = useTransform(lit, [0, 1], [0.32, 1]);
   const x = useTransform(lit, [0, 1], [0, 6]);
-  const dot = useTransform(lit, [0, 1], ["rgba(180,194,182,0.35)", "rgba(196,92,38,1)"]);
+  const dot = useTransform(lit, [0, 1], ["rgba(180,194,182,0.35)", "rgba(229,146,166,1)"]);
   const dotScale = useTransform(lit, [0, 1], [1, 1.35]);
 
   return (
@@ -55,7 +55,9 @@ function PlainScene({ p }: { p: MotionValue<number> }) {
   const rule = useTransform(p, [0.58, 0.68], [0, 1]);
 
   return (
-    <Container>
+    <>
+    <div className="glow-multi" aria-hidden />
+    <Container className="relative">
       <motion.div style={label}>
         <SectionLabel index={homeSections.plainEnglish.index} tone="dark" className="mb-4 lg:mb-12">
           {homeSections.plainEnglish.name}
@@ -68,7 +70,7 @@ function PlainScene({ p }: { p: MotionValue<number> }) {
       <div className="grid gap-6 sm:gap-10 lg:grid-cols-12 lg:items-center lg:gap-8">
         <div className="relative lg:col-span-6">
           <div className="absolute bottom-0 left-[3px] top-0 w-px bg-ivory/12" aria-hidden>
-            <motion.div className="h-full w-full origin-top bg-copper" style={{ scaleY: thread }} />
+            <motion.div className="h-full w-full origin-top bg-accent-soft" style={{ scaleY: thread }} />
           </div>
           <ul aria-label="Plain English questions">
             {qs.map((q, i) => (
@@ -79,7 +81,7 @@ function PlainScene({ p }: { p: MotionValue<number> }) {
 
         <div className="lg:col-span-5 lg:col-start-8">
           <motion.span
-            className="mb-4 block h-px w-12 origin-left bg-copper lg:mb-6"
+            className="mb-4 block h-px w-12 origin-left bg-accent-soft lg:mb-6"
             style={{ scaleX: rule }}
             aria-hidden
           />
@@ -98,12 +100,13 @@ function PlainScene({ p }: { p: MotionValue<number> }) {
         </div>
       </div>
     </Container>
+    </>
   );
 }
 
 export function PlainEnglishSection() {
   return (
-    <PinnedScene length={2} className="surface-espresso" labelledBy="plain-heading">
+    <PinnedScene length={2} className="accent-rose surface-espresso" labelledBy="plain-heading">
       {(p) => <PlainScene p={p} />}
     </PinnedScene>
   );

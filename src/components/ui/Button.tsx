@@ -18,7 +18,7 @@ export function Button({
     <Link
       href={href}
       className={cn(
-        "inline-flex min-h-11 items-center justify-center px-6 py-3 text-sm font-medium tracking-wide transition-colors",
+        "inline-flex min-h-11 items-center justify-center px-6 py-3 text-sm font-medium tracking-wide transition-[background-color,border-color,color,transform] duration-300 hover:-translate-y-0.5 motion-reduce:transform-none",
         variant === "primary" &&
           "bg-forest text-ivory hover:bg-charcoal focus-visible:outline-offset-4",
         variant === "ghost" &&

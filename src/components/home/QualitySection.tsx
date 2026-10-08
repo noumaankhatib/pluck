@@ -63,7 +63,7 @@ function NoiseWord({
     >
       {word}
       <motion.span
-        className="absolute inset-x-[-4%] top-[55%] h-[3px] origin-left rounded-full bg-copper/70"
+        className="absolute inset-x-[-4%] top-[55%] h-[3px] origin-left rounded-full bg-accent/70"
         style={{ scaleX: strike }}
         aria-hidden
       />
@@ -94,14 +94,14 @@ function SignalRow({
   return (
     <motion.li className="relative" style={{ y, opacity }}>
       <div className="flex items-baseline gap-4 py-1.5 md:py-3">
-        <span className="w-6 shrink-0 font-mono text-[0.75rem] tabular-nums text-copper">
+        <span className="w-6 shrink-0 font-mono text-[0.75rem] tabular-nums text-accent">
           {String(index + 1).padStart(2, "0")}
         </span>
         <span
           className={cn(
             "font-display leading-tight",
             isPayoff
-              ? "text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] italic text-copper"
+              ? "text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] italic text-accent"
               : "type-title text-forest",
           )}
         >
@@ -111,7 +111,7 @@ function SignalRow({
       <motion.span
         className={cn(
           "absolute bottom-0 left-10 right-0 h-px origin-left",
-          isPayoff ? "bg-copper/60" : "bg-forest/12",
+          isPayoff ? "bg-accent/60" : "bg-forest/12",
         )}
         style={{ scaleX: rule }}
         aria-hidden
@@ -127,7 +127,7 @@ function Spark({ index, progress }: { index: number; progress: MotionValue<numbe
   const opacity = useTransform(progress, [start, start + 0.03, start + 0.1, start + 0.12], [0, 1, 1, 0]);
   return (
     <motion.span
-      className="absolute top-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-copper shadow-[0_0_10px_2px_rgba(196,92,38,0.45)]"
+      className="absolute top-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-accent shadow-[0_0_10px_2px_rgba(47,127,122,0.45)]"
       style={{ left: `${22 + index * 18}%`, y, opacity }}
     />
   );
@@ -153,7 +153,7 @@ function Meter({
         <motion.span
           className={cn(
             "font-display text-[1.75rem] leading-none tabular-nums",
-            accent ? "text-copper" : "text-forest/45",
+            accent ? "text-accent" : "text-forest/45",
           )}
         >
           {shown}
@@ -161,7 +161,7 @@ function Meter({
       </div>
       <div className="mt-2.5 h-[3px] overflow-hidden rounded-full bg-forest/10">
         <motion.div
-          className={cn("h-full origin-left rounded-full", accent ? "bg-copper" : "bg-forest/35")}
+          className={cn("h-full origin-left rounded-full", accent ? "bg-accent" : "bg-forest/35")}
           style={{ scaleX: fill }}
         />
       </div>
@@ -207,16 +207,16 @@ function FilterScene({ progress, wide }: { progress: MotionValue<number>; wide: 
       {/* The filter */}
       <div className="relative my-3 md:my-8" aria-hidden>
         <motion.div
-          className="absolute -inset-x-4 -inset-y-6 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(196,92,38,0.18),transparent_70%)]"
+          className="absolute -inset-x-4 -inset-y-6 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(47,127,122,0.18),transparent_70%)]"
           style={{ opacity: glow }}
         />
         <div className="relative flex items-center gap-4">
-          <span className="whitespace-nowrap font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-copper">
+          <span className="whitespace-nowrap font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-accent">
             Relevance filter
           </span>
           <div className="relative h-[3px] flex-1">
             <motion.span
-              className="absolute inset-0 rounded-full bg-[repeating-linear-gradient(90deg,var(--color-copper)_0_18px,transparent_18px_26px)]"
+              className="absolute inset-0 rounded-full bg-[repeating-linear-gradient(90deg,var(--chapter-accent)_0_18px,transparent_18px_26px)]"
               style={{ opacity: glow }}
             />
             {signals.map((_, i) => (
@@ -271,7 +271,7 @@ function QualityScene({ scrubbed }: { scrubbed: MotionValue<number> }) {
             className="font-display text-[clamp(1.75rem,1.1rem+2.8vw,3.75rem)] max-lg:[@media(max-height:760px)]:text-[1.625rem] font-medium leading-[1.06] tracking-[-0.015em] text-balance text-forest"
           >
             {lead}
-            {turn ? <span className="block italic text-copper">{turn}</span> : null}
+            {turn ? <span className="block italic text-accent">{turn}</span> : null}
           </h2>
           <p className="mt-3 text-[0.9375rem] leading-[1.5] text-ink-soft sm:text-base lg:mt-6 lg:text-[1.1875rem]">
             {quality.narrative}
@@ -294,7 +294,7 @@ function QualityScene({ scrubbed }: { scrubbed: MotionValue<number> }) {
 /** 03 — one pinned screen at every size; scroll runs the relevance filter. */
 export function QualitySection() {
   return (
-    <PinnedScene length={2} id="quality" className="scroll-mt-[var(--header-h)] bg-ivory" labelledBy="quality-heading">
+    <PinnedScene length={2} id="quality" className="accent-teal scroll-mt-[var(--header-h)] bg-ivory" labelledBy="quality-heading">
       {(p) => <QualityScene scrubbed={p} />}
     </PinnedScene>
   );

@@ -24,7 +24,7 @@ export function HomeStoryShell({ children }: { children: React.ReactNode }) {
           aria-hidden
         >
           <motion.div
-            className="h-full w-full origin-top bg-copper"
+            className="h-full w-full origin-top bg-gradient-to-b from-copper via-saffron to-teal"
             style={{ scaleY: progress }}
           />
         </div>

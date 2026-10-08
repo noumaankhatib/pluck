@@ -21,6 +21,17 @@
   --color-surface: #ffffff;
   --color-border: #d9d0c4;
 
+  /* Secondary accents — one per chapter, copper stays the brand colour.
+     Deep variants read on ivory/paper; soft variants keep AA on espresso/ink. */
+  --color-teal: #2f7f7a;
+  --color-teal-soft: #6fc0b8;
+  --color-saffron: #9a6b10;
+  --color-saffron-soft: #f0be55;
+  --color-rose: #b04a63;
+  --color-rose-soft: #e592a6;
+  --chapter-accent: var(--color-copper);
+  --chapter-accent-soft: var(--color-copper-soft);
+
   --background: var(--color-ivory);
   --foreground: var(--color-charcoal);
   --muted: var(--color-sage);
@@ -61,6 +72,14 @@
   --color-ink: var(--color-ink);
   --color-espresso: var(--color-espresso);
   --color-paper: var(--color-paper);
+  --color-teal: var(--color-teal);
+  --color-teal-soft: var(--color-teal-soft);
+  --color-saffron: var(--color-saffron);
+  --color-saffron-soft: var(--color-saffron-soft);
+  --color-rose: var(--color-rose);
+  --color-rose-soft: var(--color-rose-soft);
+  --color-accent: var(--chapter-accent);
+  --color-accent-soft: var(--chapter-accent-soft);
   --font-display: var(--font-fraunces);
   --font-sans: var(--font-dm-sans);
 }
@@ -289,6 +308,155 @@
   .editorial-grid--bleed {
     grid-column: 1 / -1;
   }
+}
+
+/* ─── Accent scopes: set on a section, children use bg-accent / text-accent ─── */
+.accent-copper { --chapter-accent: var(--color-copper); --chapter-accent-soft: var(--color-copper-soft); }
+.accent-teal { --chapter-accent: var(--color-teal); --chapter-accent-soft: var(--color-teal-soft); }
+.accent-saffron { --chapter-accent: var(--color-saffron); --chapter-accent-soft: var(--color-saffron-soft); }
+.accent-rose { --chapter-accent: var(--color-rose); --chapter-accent-soft: var(--color-rose-soft); }
+
+@layer utilities {
+  /* Multi-colour gradient text for a single hero phrase */
+  .text-spectrum {
+    background-image: linear-gradient(100deg, #e5895a, #f0be55 28%, #6fc0b8 56%, #e592a6 82%, #e5895a);
+    background-size: 240% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-pan 12s linear infinite;
+  }
+
+  /* Ambient colour wash for dark surfaces: three soft blobs that drift slowly */
+  .glow-multi {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .glow-multi::before,
+  .glow-multi::after {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(80px);
+    opacity: 0.22;
+    animation: float-slow 18s ease-in-out infinite alternate;
+  }
+  .glow-multi::before {
+    width: 46vmax;
+    height: 46vmax;
+    top: -14vmax;
+    right: -10vmax;
+    background: var(--chapter-accent);
+  }
+  .glow-multi::after {
+    width: 38vmax;
+    height: 38vmax;
+    bottom: -16vmax;
+    left: -8vmax;
+    background: var(--color-teal);
+    animation-duration: 24s;
+    animation-delay: -6s;
+  }
+  /* Light-surface variant: pastel, lower strength */
+  .glow-multi--light::before,
+  .glow-multi--light::after {
+    opacity: 0.13;
+    filter: blur(90px);
+  }
+
+  /* Ambient motion helpers */
+  .anim-float { animation: float-slow 9s ease-in-out infinite alternate; }
+  .anim-pulse::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    border: 1px solid var(--chapter-accent);
+    animation: pulse-ring 2.4s var(--ease-out) infinite;
+  }
+  .rule-shimmer {
+    background-image: linear-gradient(90deg, transparent, var(--chapter-accent), transparent);
+    background-size: 200% 100%;
+    animation: shimmer-line 3.6s linear infinite;
+  }
+
+  /* Drifting keyword strip — fills a quiet band with motion */
+  .marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee 38s linear infinite;
+  }
+
+  /* Interaction */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition: background-size var(--duration-base) var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .hover-lift {
+      transition:
+        transform var(--duration-fast) var(--ease-out),
+        box-shadow var(--duration-fast) var(--ease-out),
+        border-color var(--duration-fast) var(--ease-out);
+    }
+    .hover-lift:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px -18px color-mix(in srgb, var(--chapter-accent) 55%, transparent);
+    }
+    .card-glow:hover {
+      border-color: var(--chapter-accent);
+    }
+    .link-underline:hover,
+    .group:hover .link-underline {
+      background-size: 100% 1px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .text-spectrum,
+    .glow-multi::before,
+    .glow-multi::after,
+    .anim-float,
+    .anim-pulse::after,
+    .rule-shimmer,
+    .marquee {
+      animation: none;
+    }
+    .hover-lift:hover {
+      transform: none;
+    }
+  }
+}
+
+@keyframes float-slow {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(3vmax, 2.5vmax, 0) scale(1.08); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+@keyframes shimmer-line {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@keyframes gradient-pan {
+  from { background-position: 0% 50%; }
+  to { background-position: 240% 50%; }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
 
 @keyframes copper-sheen {

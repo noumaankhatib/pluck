@@ -46,7 +46,7 @@ function Diagram({ p, lit, isStatic }: { p: MotionValue<number>; lit: number; is
             key={i}
             d={`M ${node.cx} ${node.cy} L ${HUB.cx} ${HUB.cy}`}
             fill="none"
-            stroke="var(--color-copper)"
+            stroke="var(--chapter-accent)"
             strokeWidth="2"
             strokeLinecap="round"
             style={isStatic ? { opacity: 0.6 } : { opacity: lineOpacity, pathLength: linePathLength }}
@@ -64,7 +64,7 @@ function Diagram({ p, lit, isStatic }: { p: MotionValue<number>; lit: number; is
                 animate={{
                   r: isLit ? 32 : 26,
                   fill: isLit ? "#f3e2d6" : "#f7f4ef",
-                  stroke: isLit ? "#c45c26" : "rgba(27,61,47,0.35)",
+                  stroke: isLit ? "#b04a63" : "rgba(27,61,47,0.35)",
                 }}
                 strokeWidth={1.5}
                 transition={{ duration: 0.4 }}
@@ -74,7 +74,7 @@ function Diagram({ p, lit, isStatic }: { p: MotionValue<number>; lit: number; is
                 cy={node.cy}
                 r={7}
                 initial={false}
-                animate={{ fill: isLit ? "#c45c26" : "#1b3d2f" }}
+                animate={{ fill: isLit ? "#b04a63" : "#1b3d2f" }}
                 transition={{ duration: 0.4 }}
               />
             </motion.g>
@@ -85,7 +85,7 @@ function Diagram({ p, lit, isStatic }: { p: MotionValue<number>; lit: number; is
           cx={HUB.cx}
           cy={HUB.cy}
           r="30"
-          fill="var(--color-copper)"
+          fill="var(--chapter-accent)"
           opacity="0.15"
           style={isStatic ? undefined : { scale: hubScale }}
         />
@@ -93,7 +93,7 @@ function Diagram({ p, lit, isStatic }: { p: MotionValue<number>; lit: number; is
           cx={HUB.cx}
           cy={HUB.cy}
           r="12"
-          fill="var(--color-copper)"
+          fill="var(--chapter-accent)"
           style={isStatic ? { opacity: 1 } : { scale: hubScale, opacity: hubOpacity }}
         />
       </svg>
@@ -103,7 +103,7 @@ function Diagram({ p, lit, isStatic }: { p: MotionValue<number>; lit: number; is
           key={i}
           className={cn(
             "absolute w-max max-w-[7rem] -translate-x-1/2 text-center text-[0.6875rem] font-medium uppercase leading-snug tracking-[0.14em] transition-colors duration-300 sm:max-w-none sm:text-xs",
-            i === lit ? "text-copper" : "text-forest",
+            i === lit ? "text-accent" : "text-forest",
           )}
           style={{
             left: `${(node.labelX / 800) * 100}%`,
@@ -117,7 +117,7 @@ function Diagram({ p, lit, isStatic }: { p: MotionValue<number>; lit: number; is
       ))}
 
       <motion.span
-        className="absolute top-[calc(100%+1.75rem)] w-max -translate-x-1/2 bg-ivory px-2 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-copper sm:top-[var(--hub-label-top)] sm:text-xs"
+        className="absolute top-[calc(100%+1.75rem)] w-max -translate-x-1/2 bg-ivory px-2 font-mono text-[0.6875rem] font-medium uppercase tracking-[0.18em] text-accent sm:top-[var(--hub-label-top)] sm:text-xs"
         style={{
           left: `${(HUB.cx / 800) * 100}%`,
           /* Beneath the hub on wider screens; below the whole diagram on phones */
@@ -148,7 +148,7 @@ function Person({
   const y = useTransform(p, [start, start + 0.08], [dir === 0 ? 18 : 0, 0]);
   return (
     <motion.li className="border-b border-forest/12 py-2.5 sm:py-4 lg:py-5" style={{ opacity, x, y }}>
-      <p className="font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-copper">{DISCIPLINE_LABELS[index]}</p>
+      <p className="font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-accent">{DISCIPLINE_LABELS[index]}</p>
       <h3 className="mt-1 font-display text-[1.25rem] leading-tight text-forest sm:text-[1.5rem] lg:mt-2 lg:text-[1.875rem]">
         {person.name}
       </h3>
@@ -219,7 +219,7 @@ function DisciplinesScene({ p, isStatic }: { p: MotionValue<number>; isStatic: b
 
 export function DisciplinesSection() {
   return (
-    <PinnedScene length={2} className="bg-ivory" labelledBy="disciplines-heading">
+    <PinnedScene length={2} className="accent-rose bg-ivory" labelledBy="disciplines-heading">
       {(p, _ref, isStatic) => <DisciplinesScene p={p} isStatic={isStatic} />}
     </PinnedScene>
   );

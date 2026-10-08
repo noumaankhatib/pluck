@@ -47,6 +47,7 @@ export function ClosingCTASection() {
         <div className="absolute inset-0 bg-gradient-to-b from-charcoal/85 via-charcoal/75 to-charcoal/90" />
         <div className="absolute inset-0 bg-forest/30 mix-blend-multiply" />
       </motion.div>
+      <div className="glow-multi accent-rose" aria-hidden />
 
       {/* Copper top rule */}
       <div className="absolute left-0 right-0 top-0 h-px overflow-hidden bg-ivory/8">
@@ -107,7 +108,7 @@ export function ClosingCTASection() {
           >
             <Link
               href={closing.ctaHref}
-              className="group inline-flex min-h-12 w-full items-center justify-center gap-3 bg-ivory px-10 py-3 font-sans text-[0.9375rem] font-medium tracking-[0.06em] text-forest transition-colors hover:bg-copper hover:text-ivory sm:w-auto"
+              className="group inline-flex min-h-12 w-full items-center justify-center gap-3 bg-ivory px-10 py-3 font-sans text-[0.9375rem] font-medium tracking-[0.06em] text-forest transition-colors hover:-translate-y-0.5 hover:bg-copper hover:text-ivory sm:w-auto"
             >
               {closing.cta}
               <svg width="14" height="10" viewBox="0 0 14 10" fill="none" className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden>
@@ -116,6 +117,28 @@ export function ClosingCTASection() {
             </Link>
           </motion.div>
         </motion.div>
+
+        {/* Drifting strip keeps the lower band alive on tall screens */}
+        <div className="-mx-[var(--gutter)] overflow-hidden border-y border-ivory/10 py-3" aria-hidden>
+          <div className="marquee font-display text-xl italic text-ivory/40 md:text-2xl">
+            {[0, 1].map((n) => (
+              <span key={n} className="flex shrink-0 items-center gap-8 pr-8">
+                {["Data", "Research", "Tools", "Execution"].map((w, i) => (
+                  <span key={w} className="flex items-center gap-8">
+                    {w}
+                    <span className={["text-copper-soft", "text-saffron-soft", "text-teal-soft", "text-rose-soft"][i]}>✦</span>
+                  </span>
+                ))}
+                {["Data", "Research", "Tools", "Execution"].map((w, i) => (
+                  <span key={w + "2"} className="flex items-center gap-8">
+                    {w}
+                    <span className={["text-copper-soft", "text-saffron-soft", "text-teal-soft", "text-rose-soft"][i]}>✦</span>
+                  </span>
+                ))}
+              </span>
+            ))}
+          </div>
+        </div>
 
       </Container>
     </section>

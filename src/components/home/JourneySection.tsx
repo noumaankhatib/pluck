@@ -76,7 +76,7 @@ function Loop({
           cy={C}
           r={R}
           fill="none"
-          stroke="var(--color-copper)"
+          stroke="var(--chapter-accent)"
           strokeWidth={2.5}
           strokeLinecap="round"
           transform={`rotate(-90 ${C} ${C})`}
@@ -93,7 +93,7 @@ function Loop({
                   cx={x}
                   cy={y}
                   r={14}
-                  fill="var(--color-copper)"
+                  fill="var(--chapter-accent)"
                   style={{ transformBox: "fill-box", transformOrigin: "center" }}
                   initial={{ scale: 1, opacity: 0.35 }}
                   animate={{ scale: 2.2, opacity: 0 }}
@@ -106,8 +106,8 @@ function Loop({
                 initial={false}
                 animate={{
                   r: isActive ? 11 : 7,
-                  fill: lit ? "#c45c26" : "#f7f4ef",
-                  stroke: lit ? "#c45c26" : "rgba(27,61,47,0.3)",
+                  fill: lit ? "#b04a63" : "#f7f4ef",
+                  stroke: lit ? "#b04a63" : "rgba(27,61,47,0.3)",
                 }}
                 strokeWidth={2}
                 transition={{ duration: 0.4, ease: motionEase }}
@@ -121,7 +121,7 @@ function Loop({
             cx={sparkX}
             cy={sparkY}
             fill="#f5c6a0"
-            style={{ filter: "drop-shadow(0 0 6px rgba(196,92,38,0.8))" }}
+            style={{ filter: "drop-shadow(0 0 6px rgba(176,74,99,0.8))" }}
           />
         )}
       </svg>
@@ -140,9 +140,9 @@ function Loop({
               onClick={() => onPick(i)}
               aria-current={i === active ? "step" : undefined}
               className={cn(
-                "absolute whitespace-nowrap px-1 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.14em] transition-colors duration-500 hover:text-copper lg:text-[0.75rem] lg:tracking-[0.16em]",
+                "absolute whitespace-nowrap px-1 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.14em] transition-colors duration-500 hover:text-accent lg:text-[0.75rem] lg:tracking-[0.16em]",
                 LABEL_POS[i],
-                i === active ? "text-copper" : i < active ? "text-forest" : "text-forest/50",
+                i === active ? "text-accent" : i < active ? "text-forest" : "text-forest/50",
               )}
             >
               {s.title}
@@ -154,7 +154,7 @@ function Loop({
       {/* Centre: the active stage */}
       <div className="absolute inset-[22%] flex flex-col items-center justify-center text-center">
         <p className="font-mono text-[0.6875rem] tabular-nums text-forest/50 lg:text-[0.75rem]">
-          <span className="text-copper">{stages[active].step}</span> / {String(stages.length).padStart(2, "0")}
+          <span className="text-accent">{stages[active].step}</span> / {String(stages.length).padStart(2, "0")}
         </p>
         <div className="relative mt-0.5 h-[1.75rem] w-full overflow-hidden lg:mt-1 lg:h-[3.25rem]">
           <AnimatePresence mode="wait" initial={false}>
@@ -184,7 +184,7 @@ function StageBody({ stage, index }: { stage: (typeof journey.stages)[0]; index:
         {stage.prompts.map((c) => (
           <li
             key={c}
-            className="border border-copper/35 bg-surface/50 px-3.5 py-2 font-mono text-[0.8125rem] text-copper-hover"
+            className="border border-accent/35 bg-surface/50 px-3.5 py-2 font-mono text-[0.8125rem] text-accent"
           >
             {c}
           </li>
@@ -207,11 +207,11 @@ function StageBody({ stage, index }: { stage: (typeof journey.stages)[0]; index:
             )}
           >
             {learn ? (
-              <span className="mt-[3px] w-6 shrink-0 font-mono text-[0.75rem] tabular-nums text-copper">
+              <span className="mt-[3px] w-6 shrink-0 font-mono text-[0.75rem] tabular-nums text-accent">
                 {String(i + 1).padStart(2, "0")}
               </span>
             ) : (
-              <span className="mt-[0.55em] block h-1.5 w-1.5 shrink-0 rounded-full bg-copper/70" />
+              <span className="mt-[0.55em] block h-1.5 w-1.5 shrink-0 rounded-full bg-accent/70" />
             )}
             {p}
           </li>
@@ -221,7 +221,7 @@ function StageBody({ stage, index }: { stage: (typeof journey.stages)[0]; index:
         <div className="mt-6 hidden gap-2 md:grid md:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3" aria-hidden>
           {FIND_QUERIES.map((q) => (
             <div key={q} className="flex min-w-0 items-center gap-2 border border-forest/10 bg-surface/60 px-3 py-2">
-              <span className="shrink-0 text-copper">
+              <span className="shrink-0 text-accent">
                 <SearchQueryIcon />
               </span>
               <span className="truncate font-mono text-[0.75rem] text-ink-soft">{q}</span>
@@ -265,7 +265,7 @@ export function JourneySection() {
   return (
     <section
       ref={ref}
-      className="relative h-[300svh] bg-ivory"
+      className="accent-rose relative h-[300svh] bg-ivory"
       aria-labelledby="journey-heading"
     >
       <div className="sticky top-[var(--header-h)] flex h-[calc(100svh-var(--header-h))] items-start overflow-hidden pt-[clamp(0.75rem,4svh,3.5rem)] lg:items-center lg:pt-0">
@@ -282,7 +282,7 @@ export function JourneySection() {
               >
                 Understand. Find.
                 <br />
-                Reach. <span className="italic text-copper">Learn.</span>
+                Reach. <span className="italic text-accent">Learn.</span>
               </h2>
               <p className="type-lead mt-4 hidden max-w-[26rem] text-ink-soft lg:block">
                 A connected journey from insight to opportunity.
@@ -296,7 +296,7 @@ export function JourneySection() {
                 className="mt-4 hidden items-center justify-center gap-3 font-display text-[1.125rem] italic text-forest lg:flex"
                 style={{ opacity: reduce ? 1 : closing }}
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0 text-copper" aria-hidden>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0 text-accent" aria-hidden>
                   <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 …and back to {stages[0].title}, continuously.
@@ -315,7 +315,7 @@ export function JourneySection() {
                   aria-live="polite"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="font-mono text-[0.8125rem] tracking-[0.2em] text-copper">
+                    <span className="font-mono text-[0.8125rem] tracking-[0.2em] text-accent">
                       {stage.step} <span className="text-forest/40">/ {String(total).padStart(2, "0")}</span>
                     </span>
                     <span className="h-px w-10 bg-forest/15" aria-hidden />
@@ -323,7 +323,7 @@ export function JourneySection() {
                   <h3
                     className={cn(
                       "mt-2 font-display text-[clamp(2rem,1.3rem+3vw,3.75rem)] leading-[1.02] tracking-[-0.02em] lg:mt-4",
-                      active === total - 1 ? "italic text-copper" : "text-forest",
+                      active === total - 1 ? "italic text-accent" : "text-forest",
                     )}
                   >
                     {stage.title}

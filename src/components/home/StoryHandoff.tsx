@@ -31,7 +31,7 @@ export function StoryHandoff({ label, tone = "light", className }: StoryHandoffP
     >
       <div className="mx-auto flex max-w-[var(--content-max)] items-center gap-4 px-[var(--gutter)] md:gap-6">
         <motion.span
-          className="h-px w-10 shrink-0 origin-left bg-copper md:w-20"
+          className="rule-shimmer h-px w-10 shrink-0 origin-left md:w-20"
           initial={reduce ? false : { scaleX: 0 }}
           whileInView={{ scaleX: 1 }}
           viewport={{ once: true, margin: "-10% 0px" }}

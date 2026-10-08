@@ -86,10 +86,11 @@ export function SearchIntelligenceSection() {
 
   return (
     <section
-      className="screen-fit relative bg-paper text-forest"
+      className="accent-saffron screen-fit relative overflow-hidden bg-paper text-forest"
       aria-labelledby="search-heading"
     >
-      <Container>
+      <div className="glow-multi glow-multi--light" aria-hidden />
+      <Container className="relative">
         <div className="grid gap-5 sm:gap-10 lg:grid-cols-12 lg:items-center lg:gap-16">
           {/* Left: the claim + the trail so far */}
           <div className="min-w-0 md:max-w-[36rem] lg:col-span-5 lg:max-w-none">
@@ -98,7 +99,7 @@ export function SearchIntelligenceSection() {
             </SectionLabel>
             <Reveal>
               <h2 id="search-heading" className="type-display-l max-lg:[@media(max-height:760px)]:text-[1.875rem]">
-                {headWords.join(" ")} <span className="italic text-copper">{headLast}</span>
+                {headWords.join(" ")} <span className="italic text-accent">{headLast}</span>
               </h2>
             </Reveal>
             <p className="mt-3 max-w-[32rem] text-[0.9375rem] leading-[1.5] text-ink-soft sm:text-base lg:mt-6 lg:text-[1.1875rem]">
@@ -124,7 +125,7 @@ export function SearchIntelligenceSection() {
                           <motion.span
                             className={cn(
                               "absolute inset-0 origin-left rounded-full",
-                              i === total - 1 ? "bg-copper" : "bg-forest",
+                              i === total - 1 ? "bg-accent" : "bg-forest",
                             )}
                             initial={false}
                             animate={{ scaleX: lit ? 1 : 0 }}
@@ -151,14 +152,14 @@ export function SearchIntelligenceSection() {
           <div ref={sceneRef} className="min-w-0 lg:col-span-7">
             {/* Search field */}
             <div className="relative flex min-h-12 items-center gap-4 border border-forest/15 bg-surface/85 px-4 sm:min-h-16 sm:px-5 shadow-[0_18px_40px_-28px_rgba(27,61,47,0.45)] md:min-h-[4.5rem] md:px-6">
-              <span className="shrink-0 text-copper">
+              <span className="shrink-0 text-accent">
                 <SearchIcon size={16} />
               </span>
               <p className="min-w-0 flex-1 truncate text-[1.0625rem] text-charcoal md:text-[1.1875rem]" aria-hidden>
                 {shown}
                 {!reduce && (
                   <motion.span
-                    className="ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.18em] bg-copper"
+                    className="ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.18em] bg-accent"
                     animate={{ opacity: [1, 1, 0, 0] }}
                     transition={{ duration: 1, repeat: Infinity, times: [0, 0.5, 0.5, 1] }}
                   />
@@ -173,13 +174,13 @@ export function SearchIntelligenceSection() {
             <div className="relative ml-5 border-l border-forest/15 pb-1 pl-6 pt-4 sm:pl-8 sm:pt-8 md:ml-6 md:pl-10 md:pt-10">
               <motion.span
                 key={`thread-${active}`}
-                className="absolute -left-px top-0 h-full w-[2px] origin-top bg-copper"
+                className="absolute -left-px top-0 h-full w-[2px] origin-top bg-accent"
                 initial={reduce ? false : { scaleY: 0 }}
                 animate={{ scaleY: doneTyping ? 1 : 0 }}
                 transition={{ duration: 0.6, ease: motionEase }}
                 aria-hidden
               />
-              <p className="font-mono text-[0.75rem] uppercase tracking-[0.18em] text-copper">
+              <p className="font-mono text-[0.75rem] uppercase tracking-[0.18em] text-accent">
                 Clue {String(active + 1).padStart(2, "0")}
               </p>
               <div className="relative mt-1 min-h-[4.75rem] overflow-hidden sm:mt-2 md:min-h-[6rem]" aria-live="polite">
@@ -195,7 +196,7 @@ export function SearchIntelligenceSection() {
                       <p
                         className={cn(
                           "font-display text-[clamp(1.75rem,1.2rem+2.4vw,3.25rem)] leading-[1.02] tracking-[-0.015em]",
-                          active === total - 1 ? "italic text-copper" : "text-forest",
+                          active === total - 1 ? "italic text-accent" : "text-forest",
                         )}
                       >
                         {stage.label}
@@ -222,7 +223,7 @@ export function SearchIntelligenceSection() {
                       animate={{ opacity: logged ? 1 : 0.28 }}
                       transition={{ duration: 0.4 }}
                     >
-                      <span className={cn("shrink-0", logged ? "text-copper" : "text-forest/40")}>
+                      <span className={cn("shrink-0", logged ? "text-accent" : "text-forest/40")}>
                         <SearchIcon />
                       </span>
                       <span
@@ -239,7 +240,7 @@ export function SearchIntelligenceSection() {
                           !logged
                             ? "text-transparent"
                             : i === total - 1
-                              ? "italic text-copper"
+                              ? "italic text-accent"
                               : "text-forest",
                         )}
                       >

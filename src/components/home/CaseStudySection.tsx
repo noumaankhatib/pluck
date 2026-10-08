@@ -44,7 +44,7 @@ function Metric({
   return (
     <motion.li className="relative bg-ivory px-4 py-4 sm:px-6 sm:py-6 lg:px-7 lg:py-7 lg:[@media(max-height:760px)]:py-5" style={beat}>
       <p className="flex items-center gap-2 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-ink-soft">
-        <span className="tabular-nums text-copper">{String(index + 1).padStart(2, "0")}</span>
+        <span className="tabular-nums text-accent">{String(index + 1).padStart(2, "0")}</span>
         {metric.label}
       </p>
       <p className="font-display mt-2 text-[clamp(2rem,1.3rem+2.6vw,3.5rem)] font-medium leading-none tracking-[-0.02em] tabular-nums text-forest lg:mt-3">
@@ -52,7 +52,7 @@ function Metric({
       </p>
       {index < 3 && (
         <div
-          className="absolute -right-[7px] top-1/2 z-10 hidden h-3.5 w-3.5 -translate-y-1/2 items-center justify-center bg-ivory text-copper md:flex"
+          className="absolute -right-[7px] top-1/2 z-10 hidden h-3.5 w-3.5 -translate-y-1/2 items-center justify-center bg-ivory text-accent md:flex"
           aria-hidden
         >
           <svg width="7" height="11" viewBox="0 0 7 11" fill="none">
@@ -95,7 +95,7 @@ function CaseScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean 
             <SectionLabel index={homeSections.caseStudy.index} className="mb-3 lg:mb-5">
               {homeSections.caseStudy.name}
             </SectionLabel>
-            <p className="type-eyebrow text-copper">{caseStudy.client}</p>
+            <p className="type-eyebrow text-accent">{caseStudy.client}</p>
             <h2
               id="case-heading"
               className="mt-2 font-display text-[clamp(1.875rem,1.2rem+2.8vw,3.75rem)] font-medium leading-[1.06] tracking-[-0.015em] text-balance text-forest lg:mt-3"
@@ -109,7 +109,7 @@ function CaseScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean 
 
           <motion.div className="md:max-w-[38rem] lg:col-span-5 lg:col-start-8 lg:max-w-none" style={context}>
             <p className="type-eyebrow flex items-center gap-3 text-ink-soft">
-              <span className="h-px w-6 bg-copper" aria-hidden />
+              <span className="h-px w-6 bg-accent" aria-hidden />
               {caseStudy.timeline}
             </p>
             <p className="mt-2 text-[0.9375rem] leading-[1.55] text-charcoal/85 lg:mt-4 lg:text-base">
@@ -126,7 +126,7 @@ function CaseScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean 
           {/* Phones: keep the reader oriented once the story has stepped aside */}
           {swap && (
             <p className="type-eyebrow mb-3 flex items-center gap-3 text-ink-soft">
-              <span className="text-copper">{caseStudy.client}</span>
+              <span className="text-accent">{caseStudy.client}</span>
               <span className="h-px w-5 bg-forest/20" aria-hidden />
               {caseStudy.timeline}
             </p>
@@ -174,7 +174,7 @@ function CaseScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean 
 
 export function CaseStudySection() {
   return (
-    <PinnedScene length={2} className="bg-ivory" labelledBy="case-heading">
+    <PinnedScene length={2} className="accent-teal bg-ivory" labelledBy="case-heading">
       {(p, _ref, isStatic) => <CaseScene p={p} isStatic={isStatic} />}
     </PinnedScene>
   );
