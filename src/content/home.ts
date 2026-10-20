@@ -39,7 +39,6 @@ export const intro = {
 };
 
 export const quality = {
-  handoff: "So why is it being missed?",
   headlineLead: "You don't just need more leads.",
   headlineTurn: "You need the right ones.",
   subheading:

@@ -9,7 +9,6 @@ import { QualificationSection } from "@/components/home/QualificationSection";
 import { PlainEnglishSection } from "@/components/home/PlainEnglishSection";
 import { DisciplinesSection } from "@/components/home/DisciplinesSection";
 import { ClosingCTASection } from "@/components/home/ClosingCTASection";
-import { StoryHandoff } from "@/components/home/StoryHandoff";
 import { HomeStoryShell } from "@/components/home/HomeStoryShell";
 import { HeroVideoPreload } from "@/components/home/HeroVideoPreload";
 import { homeSeo, site } from "@/content/site";
@@ -41,16 +40,11 @@ export default function HomePage() {
       <HeroSection />
       <IntroNarrativeSection />
       <QualitySection />
-      <StoryHandoff label="Then where are the right ones?" tone="paper" />
       <SearchIntelligenceSection />
-      <StoryHandoff label="How do clues become customers?" />
       <JourneySection />
-      <StoryHandoff label="Does it actually work?" tone="light" />
       <CaseStudySection />
-      <StoryHandoff label="Is Pluck right for you?" tone="light" />
       <QualificationSection />
       <PlainEnglishSection />
-      <StoryHandoff label="Who does the work?" />
       <DisciplinesSection />
       <ClosingCTASection />
     </HomeStoryShell>

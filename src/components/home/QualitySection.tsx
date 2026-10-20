@@ -244,18 +244,10 @@ function QualityScene({
   return (
     <Container className="quality-chapter__container relative w-full overflow-visible">
       <header className="quality-chapter__header mb-5 max-w-[var(--measure-wide)] md:mb-6">
-        <div className="flex items-center gap-3.5 md:gap-5">
-          <span className="rule-shimmer h-px w-10 shrink-0 origin-left md:w-16" aria-hidden />
-          <p
-            className="font-display text-[clamp(1.0625rem,0.95rem+0.45vw,1.3125rem)] italic leading-snug text-forest/78"
-          >
-            {quality.handoff}
-          </p>
-        </div>
         <SectionLabel
           index={homeSections.quality.index}
           tone="light"
-          className="mb-0 mt-3.5 md:mt-4"
+          className="mb-0"
         >
           {homeSections.quality.name}
         </SectionLabel>
