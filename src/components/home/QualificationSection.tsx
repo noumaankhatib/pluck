@@ -144,7 +144,7 @@ export function QualificationSection() {
 
           <div className="min-w-0 lg:col-span-5">
             <div data-qual-label>
-              <SectionLabel index={homeSections.qualification.index} className="mb-1.5">
+              <SectionLabel className="mb-1.5">
                 {homeSections.qualification.name}
               </SectionLabel>
             </div>

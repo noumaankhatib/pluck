@@ -4,15 +4,17 @@ export function SplitHeading({
   text,
   className,
   delay = 0,
+  as: Tag = "h2",
 }: {
   id?: string;
   text: string;
   className?: string;
   /** Extra start delay in ms. */
   delay?: number;
+  as?: "h1" | "h2" | "h3";
 }) {
   return (
-    <h2 id={id} className={className} aria-label={text}>
+    <Tag id={id} className={className} aria-label={text}>
       {text.split(" ").map((word, i) => (
         <span key={i} aria-hidden="true">
           <span className="cs-word">
@@ -20,6 +22,6 @@ export function SplitHeading({
           </span>{" "}
         </span>
       ))}
-    </h2>
+    </Tag>
   );
 }

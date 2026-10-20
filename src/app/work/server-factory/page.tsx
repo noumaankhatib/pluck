@@ -124,7 +124,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--ivory" aria-labelledby="opportunity">
         <Container className="cs-split">
           <InView>
-            <Head kicker="01 · The challenge" title={story.opportunity.headline} id="opportunity" />
+            <Head kicker="The challenge" title={story.opportunity.headline} id="opportunity" />
             <Prose paragraphs={opportunity.paragraphs} />
           </InView>
           <OpportunityVisual />
@@ -134,7 +134,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--paper" aria-labelledby="customer">
         <Container>
           <InView>
-            <Head kicker="02 · The research" title={story.customer.headline} id="customer" />
+            <Head kicker="The research" title={story.customer.headline} id="customer" />
             <div className="cs-prose-grid">
               <Prose paragraphs={customer.paragraphs} />
             </div>
@@ -148,7 +148,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--ivory" aria-labelledby="buyers">
         <Container>
           <InView>
-            <Head kicker="03 · The buyers" title={story.buyers.headline} id="buyers" />
+            <Head kicker="The buyers" title={story.buyers.headline} id="buyers" />
             <div className="cs-prose-grid">
               <Prose paragraphs={buyers.paragraphs} />
             </div>
@@ -160,7 +160,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--paper" aria-labelledby="website">
         <Container>
           <InView>
-            <Head kicker="04 · The website" title={story.website.headline} id="website" />
+            <Head kicker="The website" title={story.website.headline} id="website" />
             <div className="cs-prose-grid">
               <Prose paragraphs={website.paragraphs} />
             </div>
@@ -174,7 +174,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--ivory" aria-labelledby="paid">
         <Container>
           <InView>
-            <Head kicker="05 · Paid search" title={story.paid.headline} id="paid" />
+            <Head kicker="Paid search" title={story.paid.headline} id="paid" />
             <div className="cs-prose-grid">
               <Prose paragraphs={paid.paragraphs} />
             </div>
@@ -187,7 +187,7 @@ export default function ServerFactoryPage() {
         <Container>
           <InView>
             <header className="cs-head">
-              <p className="cs-kicker cs-rise">06 · {story.results.kicker}</p>
+              <p className="cs-kicker cs-rise">{story.results.kicker}</p>
               <SplitHeading id="results" text={results.title} className="cs-h2" />
             </header>
           </InView>
@@ -198,7 +198,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--ivory" aria-labelledby="difference">
         <Container>
           <InView>
-            <Head kicker="07 · The difference" title={story.difference.headline} id="difference" />
+            <Head kicker="The difference" title={story.difference.headline} id="difference" />
             <div className="cs-prose-grid">
               <Prose paragraphs={difference.paragraphs.slice(1)} />
             </div>
@@ -210,7 +210,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--paper cs-section--pending" aria-labelledby="next">
         <Container>
           <InView>
-            <Head kicker="08 · What comes next" title={story.next.headline} id="next" />
+            <Head kicker="What comes next" title={story.next.headline} id="next" />
             <div className="cs-prose-grid">
               <Prose paragraphs={next.paragraphs} />
             </div>
@@ -222,7 +222,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--ink" aria-labelledby="cta">
         <Container className="cs-split cs-split--cta">
           <InView>
-            <p className="cs-kicker cs-rise">09 · Your market</p>
+            <p className="cs-kicker cs-rise">Your market</p>
             <SplitHeading id="cta" text={cta.title} className="cs-h2" />
             <div className="cs-prose mt-6">
               {cta.body.map((paragraph, i) => (

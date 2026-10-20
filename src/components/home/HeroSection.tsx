@@ -218,7 +218,7 @@ export function HeroSection() {
                 >
                   <Link
                     href="/contact"
-                    className="hero-cta inline-flex min-h-11 items-center justify-center bg-ivory px-8 py-3 text-sm font-medium tracking-[0.06em] text-forest shadow-[0_6px_20px_rgb(0_0_0/0.22)] transition-[background-color,color,box-shadow,transform] duration-300 ease-out hover:-translate-y-px hover:bg-[#FFF8EC] hover:text-charcoal hover:shadow-[0_10px_28px_rgb(0_0_0/0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#D8783E] active:translate-y-0 sm:min-h-12 sm:px-9"
+                    className="hero-cta cta-glass"
                   >
                     Talk to us
                   </Link>

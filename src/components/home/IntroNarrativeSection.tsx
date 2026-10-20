@@ -311,7 +311,6 @@ export function IntroNarrativeSection() {
       <Container className="relative z-[2] py-8 md:py-9 lg:py-10">
         <div ref={labelRef} className={cn(!reduce && "will-change-transform")}>
           <SectionLabel
-            index={homeSections.intro.index}
             tone="dark"
             className="mb-5 text-[#faf9f3]/55 md:mb-6 [&_span.font-mono]:text-[#d49263]"
           >

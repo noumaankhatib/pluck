@@ -70,7 +70,7 @@ export function ClosingCTASection() {
 
       <Container className="relative z-10 py-[clamp(2.75rem,2rem+3vw,5.25rem)] md:py-[clamp(3rem,2.25rem+3.5vw,5.75rem)]">
         <div data-closing-label className="mb-3 lg:mb-4">
-          <SectionLabel index={homeSections.closing.index} tone="dark">
+          <SectionLabel tone="dark">
             {homeSections.closing.name}
           </SectionLabel>
         </div>

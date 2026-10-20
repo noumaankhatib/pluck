@@ -349,7 +349,7 @@ export function JourneySection() {
         >
           <div className="mb-6 lg:mb-8">
             <div data-journey-label>
-              <SectionLabel index={homeSections.journey.index} className="mb-2">
+              <SectionLabel className="mb-2">
                 {homeSections.journey.name}
               </SectionLabel>
             </div>

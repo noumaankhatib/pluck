@@ -131,7 +131,7 @@ export function SearchIntelligenceSection() {
         >
           <div className="search-chapter__copy flex min-w-0 flex-col overflow-visible lg:col-span-5 lg:pr-2">
             <div data-search-label>
-              <SectionLabel index={homeSections.search.index} className="mb-2">
+              <SectionLabel className="mb-2">
                 {homeSections.search.name}
               </SectionLabel>
             </div>

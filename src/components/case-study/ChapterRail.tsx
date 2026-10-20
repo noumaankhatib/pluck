@@ -38,7 +38,6 @@ export function ChapterRail({ chapters }: { chapters: Chapter[] }) {
         {chapters.map((c, i) => (
           <li key={c.id} className={i === active ? "is-active" : i < active ? "is-done" : undefined}>
             <a href={`#${c.id}`} aria-current={i === active ? "location" : undefined}>
-              <span className="cs-rail__n">{String(i + 1).padStart(2, "0")}</span>
               <span className="cs-rail__label">{c.label}</span>
             </a>
           </li>

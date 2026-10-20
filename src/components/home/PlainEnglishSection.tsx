@@ -48,7 +48,7 @@ export function PlainEnglishSection() {
 
       <Container className="plain-chapter__container relative">
         <div data-plain-label className="mb-4 lg:mb-5">
-          <SectionLabel index={homeSections.plainEnglish.index} tone="dark">
+          <SectionLabel tone="dark">
             {homeSections.plainEnglish.name}
           </SectionLabel>
         </div>

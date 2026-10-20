@@ -245,7 +245,6 @@ function QualityScene({
     <Container className="quality-chapter__container relative w-full overflow-visible">
       <header className="quality-chapter__header mb-5 max-w-[var(--measure-wide)] md:mb-6">
         <SectionLabel
-          index={homeSections.quality.index}
           tone="light"
           className="mb-0"
         >

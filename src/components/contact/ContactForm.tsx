@@ -6,9 +6,6 @@ import { site } from "@/content/site";
 
 const { fields, submit } = contactPage.form;
 
-const inputClass =
-  "w-full border border-forest/15 bg-surface px-4 py-3 text-[0.9375rem] text-charcoal outline-none transition-[border-color,box-shadow] duration-300 placeholder:text-charcoal/40 focus:border-forest/40 focus:ring-2 focus:ring-forest/10";
-
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "opened">("idle");
 
@@ -43,94 +40,60 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5" noValidate={false}>
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div className="sm:col-span-1">
-          <label htmlFor="contact-name" className="type-caption mb-2 block text-charcoal/75">
-            {fields.name.label}
-          </label>
-          <input
-            id="contact-name"
-            name="name"
-            type="text"
-            required
-            autoComplete="name"
-            className={inputClass}
-          />
-        </div>
-        <div className="sm:col-span-1">
-          <label htmlFor="contact-company" className="type-caption mb-2 block text-charcoal/75">
-            {fields.company.label}
-          </label>
-          <input
-            id="contact-company"
-            name="company"
-            type="text"
-            required
-            autoComplete="organization"
-            className={inputClass}
-          />
-        </div>
+    <form onSubmit={handleSubmit} className="ct-form" noValidate={false}>
+      <div className="ct-form__row">
+        <Field id="contact-name" label={fields.name.label} i={4}>
+          <input id="contact-name" name="name" type="text" required aria-required="true" autoComplete="name" className="ct-input" />
+        </Field>
+        <Field id="contact-company" label={fields.company.label} i={5}>
+          <input id="contact-company" name="company" type="text" required aria-required="true" autoComplete="organization" className="ct-input" />
+        </Field>
       </div>
 
-      <div>
-        <label htmlFor="contact-email" className="type-caption mb-2 block text-charcoal/75">
-          {fields.email.label}
-        </label>
-        <input
-          id="contact-email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          className={inputClass}
-        />
-      </div>
+      <Field id="contact-email" label={fields.email.label} i={6}>
+        <input id="contact-email" name="email" type="email" required aria-required="true" autoComplete="email" className="ct-input" />
+      </Field>
 
-      <div>
-        <label htmlFor="contact-website" className="type-caption mb-2 block text-charcoal/75">
-          {fields.website.label}
-        </label>
-        <input
-          id="contact-website"
-          name="website"
-          type="url"
-          autoComplete="url"
-          placeholder="https://"
-          className={inputClass}
-        />
-      </div>
+      <Field id="contact-website" label={fields.website.label} i={7}>
+        <input id="contact-website" name="website" type="url" autoComplete="url" placeholder="https://" className="ct-input" />
+      </Field>
 
-      <div>
-        <label htmlFor="contact-message" className="type-caption mb-2 block text-charcoal/75">
-          {fields.message.label}
-        </label>
-        <textarea
-          id="contact-message"
-          name="message"
-          required
-          rows={6}
-          className={`${inputClass} resize-y min-h-[9rem]`}
-        />
-      </div>
+      <Field id="contact-message" label={fields.message.label} i={8}>
+        <textarea id="contact-message" name="message" required aria-required="true" rows={6} className="ct-input ct-input--area" />
+      </Field>
 
-      <div className="pt-2">
-        <button
-          type="submit"
-          className="inline-flex min-h-12 w-full items-center justify-center bg-forest px-10 py-3 font-sans text-[0.9375rem] font-medium tracking-[0.06em] text-ivory transition-colors hover:bg-charcoal sm:w-auto"
-        >
-          {submit}
+      <div className="ct-form__actions cs-rise" style={{ ["--i" as string]: 9 }}>
+        <button type="submit" className="ct-submit">
+          <span>{submit}</span>
+          <svg width="18" height="12" viewBox="0 0 18 12" fill="none" aria-hidden="true">
+            <path d="M1 6h15M11 1l5 5-5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </button>
         {status === "opened" && (
-          <p className="mt-4 text-[0.875rem] leading-relaxed text-charcoal/65" role="status">
-            If your email app did not open, write to us at{" "}
-            <a href={`mailto:${site.contactEmail}`} className="text-forest underline-offset-4 hover:underline">
-              {site.contactEmail}
-            </a>
-            .
+          <p className="ct-success" role="status">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="10.5" stroke="currentColor" strokeWidth="1.5" pathLength={1} className="ct-success__ring" />
+              <path d="M7 12.5l3.2 3.2L17 8.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" pathLength={1} className="ct-success__tick" />
+            </svg>
+            <span>
+              If your email app did not open, write to us at{" "}
+              <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>.
+            </span>
           </p>
         )}
       </div>
     </form>
+  );
+}
+
+function Field({ id, label, i, children }: { id: string; label: string; i: number; children: React.ReactNode }) {
+  return (
+    <div className="ct-field cs-rise" style={{ ["--i" as string]: i }}>
+      <label htmlFor={id} className="ct-label">
+        {label}
+      </label>
+      {children}
+      <span className="ct-field__bar" aria-hidden="true" />
+    </div>
   );
 }

@@ -272,7 +272,7 @@ export function DisciplinesSection() {
       <Container>
         <div className="grid gap-7 lg:grid-cols-12 lg:gap-x-9 lg:gap-y-6 xl:gap-x-11">
           <div data-disc-intro className="min-w-0 lg:col-span-6 lg:row-start-1">
-            <SectionLabel index={homeSections.disciplines.index} className="mb-2.5 lg:mb-3">
+            <SectionLabel className="mb-2.5 lg:mb-3">
               {homeSections.disciplines.name}
             </SectionLabel>
             <h2

@@ -95,17 +95,12 @@ export function SiteNavBar({ variant }: SiteNavBarProps) {
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/contact"
-            className={cn(
-              "inline-flex min-h-11 items-center justify-center px-6 text-sm font-medium tracking-wide transition-colors",
-              onHero
-                ? "bg-ivory text-forest shadow-[0_4px_22px_rgb(0_0_0/0.4)] hover:bg-ivory/95 hover:text-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-copper"
-                : "bg-forest text-ivory hover:bg-charcoal",
-            )}
-          >
-            Talk to us
-          </Link>
+          {/* Over the hero the hero's own CTA is the single "Talk to us"; the nav one takes over once you scroll. */}
+          {!onHero && (
+            <Link href="/contact" className="cta-glass cta-glass--light cta-glass--sm cta-appear">
+              Talk to us
+            </Link>
+          )}
         </nav>
 
         <button

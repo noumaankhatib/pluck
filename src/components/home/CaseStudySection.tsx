@@ -90,7 +90,7 @@ export function CaseStudySection() {
         <div className="case-chapter__intro grid items-start gap-5 lg:grid-cols-12 lg:gap-x-10 xl:gap-x-12">
           <div className="min-w-0 lg:col-span-5 xl:max-w-[28rem]">
             <div data-case-label>
-              <SectionLabel index={homeSections.caseStudy.index} className="mb-1.5">
+              <SectionLabel className="mb-1.5">
                 {homeSections.caseStudy.name}
               </SectionLabel>
             </div>
