@@ -1,21 +1,16 @@
 "use client";
 
-import { useRef, useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
+import { useRef } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { journey } from "@/content/home";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { Container } from "@/components/ui/Container";
 import { homeSections } from "@/content/home-sections";
+import { Button } from "@/components/ui/Button";
 import { motionEase } from "@/lib/motion";
 import { cn } from "@/lib/cn";
+import { useJourneyActiveStep } from "@/components/home/useJourneyActiveStep";
+import { useJourneyChapterAnimation } from "@/components/home/useJourneyChapterAnimation";
 
 const FIND_QUERIES = [
   "industrial cooling systems",
@@ -23,19 +18,22 @@ const FIND_QUERIES = [
   "process cooling systems",
 ];
 
-/* Ring geometry — four stages at 12, 3, 6 and 9 o'clock */
-const R = 130;
+const STAGE_COLORS = ["#7a8b7e", "#4f7a66", "#1b3d2f", "#e5895a"] as const;
+const STAGE_COPPER = "#bd6c36";
+
+const R = 118;
 const C = 160;
+const RING_C = 2 * Math.PI * R;
 const NODE_ANGLES = [-90, 0, 90, 180];
 const pointAt = (deg: number, r = R) => ({
   x: C + r * Math.cos((deg * Math.PI) / 180),
   y: C + r * Math.sin((deg * Math.PI) / 180),
 });
-/** Label placement outside the ring, per node (percent of the 320 box). */
+
 const LABEL_POS = [
-  "left-1/2 top-0 -translate-x-1/2 -translate-y-full",
+  "left-1/2 top-0 -translate-x-1/2 -translate-y-[calc(100%+0.5rem)]",
   "left-full top-1/2 -translate-y-1/2 translate-x-3",
-  "left-1/2 top-0 -translate-x-1/2 translate-y-[35%]",
+  "left-1/2 top-full -translate-x-1/2 translate-y-3",
   "right-full top-1/2 -translate-y-1/2 -translate-x-3",
 ];
 
@@ -48,143 +46,170 @@ function SearchQueryIcon() {
   );
 }
 
-/* ─── The loop (desktop, pinned beside the stages) ─────────────── */
+function lit(i: number, active: number) {
+  return i <= active;
+}
 
 function Loop({
   active,
-  progress,
   reduce,
   onPick,
 }: {
   active: number;
-  progress: MotionValue<number>;
   reduce: boolean | null;
   onPick: (index: number) => void;
 }) {
   const stages = journey.stages;
-  const angle = useTransform(progress, (p) => -90 + p * 360);
-  const sparkX = useTransform(angle, (a) => pointAt(a).x);
-  const sparkY = useTransform(angle, (a) => pointAt(a).y);
+  const total = stages.length;
+  const ringProgress = Math.min(1, (active + 1) / total);
+  const sparkDeg = -90 + ((active + 0.5) / total) * 360;
+  const spark = pointAt(sparkDeg);
 
   return (
-    <div className="relative mx-auto aspect-square w-[min(8.75rem,30svh)] sm:w-[min(12rem,30svh)] lg:w-[min(20rem,36svh)] xl:w-[min(22rem,40svh)]">
-      <svg viewBox="0 0 320 320" className="absolute inset-0 h-full w-full overflow-visible" aria-hidden>
-        <circle cx={C} cy={C} r={R} fill="none" stroke="var(--color-forest)" strokeOpacity={0.1} strokeWidth={2} />
-        {/* The loop fills as you read, starting at 12 o'clock */}
-        <motion.circle
-          cx={C}
-          cy={C}
-          r={R}
-          fill="none"
-          stroke="var(--chapter-accent)"
-          strokeWidth={2.5}
-          strokeLinecap="round"
-          transform={`rotate(-90 ${C} ${C})`}
-          style={{ pathLength: reduce ? 1 : progress }}
-        />
-        {NODE_ANGLES.map((deg, i) => {
-          const { x, y } = pointAt(deg);
-          const lit = i <= active;
-          const isActive = i === active;
-          return (
-            <g key={i}>
-              {isActive && !reduce && (
+    <div className="journey-chapter__loop-shell relative mx-auto w-full max-w-[19rem] px-5 py-9 sm:px-6 sm:py-10">
+      <div
+        className="relative mx-auto aspect-square w-full max-w-[15.5rem] sm:max-w-[16.5rem]"
+        data-journey-loop
+      >
+        <svg
+          viewBox="0 0 320 320"
+          className="absolute inset-0 h-full w-full overflow-visible"
+          aria-hidden
+        >
+          <circle
+            cx={C}
+            cy={C}
+            r={R}
+            fill="none"
+            stroke="var(--color-forest)"
+            strokeOpacity={0.14}
+            strokeWidth={2}
+          />
+          <motion.circle
+            cx={C}
+            cy={C}
+            r={R}
+            fill="none"
+            stroke="url(#journey-copper-gradient)"
+            strokeWidth={2.75}
+            strokeLinecap="round"
+            strokeDasharray={RING_C}
+            transform={`rotate(-90 ${C} ${C})`}
+            initial={false}
+            animate={{
+              strokeDashoffset: reduce ? 0 : RING_C * (1 - ringProgress),
+            }}
+            transition={{ duration: reduce ? 0 : 0.5, ease: motionEase }}
+          />
+          <defs>
+            <linearGradient id="journey-copper-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#7a8b7e" />
+              <stop offset="45%" stopColor="#4f7a66" />
+              <stop offset="100%" stopColor="#e5895a" />
+            </linearGradient>
+          </defs>
+          {NODE_ANGLES.map((deg, i) => {
+            const { x, y } = pointAt(deg);
+            const isLit = lit(i, active);
+            const isActive = i === active;
+            const color = STAGE_COLORS[i];
+            return (
+              <g key={i}>
+                {isActive && !reduce && (
+                  <motion.circle
+                    cx={x}
+                    cy={y}
+                    r={14}
+                    fill={STAGE_COPPER}
+                    style={{ transformBox: "fill-box", transformOrigin: "center" }}
+                    initial={{ scale: 1, opacity: 0.25 }}
+                    animate={{ scale: 1.9, opacity: 0 }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+                  />
+                )}
                 <motion.circle
                   cx={x}
                   cy={y}
-                  r={14}
-                  fill="var(--chapter-accent)"
-                  style={{ transformBox: "fill-box", transformOrigin: "center" }}
-                  initial={{ scale: 1, opacity: 0.35 }}
-                  animate={{ scale: 2.2, opacity: 0 }}
-                  transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
+                  initial={false}
+                  animate={{
+                    r: isActive ? 11 : isLit ? 8 : 7,
+                    fill: isActive ? STAGE_COPPER : isLit ? color : "#f0ede4",
+                    stroke: isActive ? STAGE_COPPER : isLit ? color : "rgba(27,61,47,0.28)",
+                  }}
+                  strokeWidth={2}
+                  transition={{ duration: 0.45, ease: motionEase, delay: isActive ? 0 : i * 0.04 }}
                 />
-              )}
-              <motion.circle
-                cx={x}
-                cy={y}
-                initial={false}
-                animate={{
-                  r: isActive ? 11 : 7,
-                  fill: lit ? "#b04a63" : "#f7f4ef",
-                  stroke: lit ? "#b04a63" : "rgba(27,61,47,0.3)",
-                }}
-                strokeWidth={2}
-                transition={{ duration: 0.4, ease: motionEase }}
-              />
-            </g>
+              </g>
+            );
+          })}
+          {!reduce && (
+            <motion.circle
+              r={5}
+              fill="#e5895a"
+              initial={false}
+              animate={{ cx: spark.x, cy: spark.y }}
+              transition={{ duration: 0.55, ease: motionEase }}
+              style={{ filter: "drop-shadow(0 0 4px rgba(189,108,54,0.4))" }}
+            />
+          )}
+        </svg>
+
+        {stages.map((s, i) => {
+          const { x, y } = pointAt(NODE_ANGLES[i]);
+          return (
+            <span
+              key={s.step}
+              className="absolute h-0 w-0"
+              style={{ left: `${(x / 320) * 100}%`, top: `${(y / 320) * 100}%` }}
+            >
+              <button
+                type="button"
+                onClick={() => onPick(i)}
+                aria-current={i === active ? "step" : undefined}
+                className={cn(
+                  "absolute max-w-[5.5rem] whitespace-nowrap px-1 py-1 text-center font-mono text-[0.625rem] uppercase leading-tight tracking-[0.12em] transition-colors duration-300 hover:text-copper sm:max-w-[6.5rem] sm:text-[0.6875rem] lg:text-[0.75rem]",
+                  LABEL_POS[i],
+                  i === active
+                    ? "font-semibold text-copper"
+                    : lit(i, active)
+                      ? "text-forest"
+                      : "text-forest/62",
+                )}
+              >
+                {s.title}
+              </button>
+            </span>
           );
         })}
-        {!reduce && (
-          <motion.circle
-            r={5}
-            cx={sparkX}
-            cy={sparkY}
-            fill="#f5c6a0"
-            style={{ filter: "drop-shadow(0 0 6px rgba(176,74,99,0.8))" }}
-          />
-        )}
-      </svg>
 
-      {/* Stage names around the ring */}
-      {stages.map((s, i) => {
-        const { x, y } = pointAt(NODE_ANGLES[i]);
-        return (
-          <span
-            key={s.step}
-            className="absolute h-0 w-0"
-            style={{ left: `${(x / 320) * 100}%`, top: `${(y / 320) * 100}%` }}
+        <div className="absolute inset-[28%] flex flex-col items-center justify-center text-center">
+          <p
+            key={`step-${active}`}
+            className="font-mono text-[0.6875rem] tabular-nums text-forest/55 lg:text-[0.75rem]"
           >
-            <button
-              type="button"
-              onClick={() => onPick(i)}
-              aria-current={i === active ? "step" : undefined}
-              className={cn(
-                "absolute whitespace-nowrap px-1 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.14em] transition-colors duration-500 hover:text-accent lg:text-[0.75rem] lg:tracking-[0.16em]",
-                LABEL_POS[i],
-                i === active ? "text-accent" : i < active ? "text-forest" : "text-forest/50",
-              )}
-            >
-              {s.title}
-            </button>
-          </span>
-        );
-      })}
-
-      {/* Centre: the active stage */}
-      <div className="absolute inset-[22%] flex flex-col items-center justify-center text-center">
-        <p className="font-mono text-[0.6875rem] tabular-nums text-forest/50 lg:text-[0.75rem]">
-          <span className="text-accent">{stages[active].step}</span> / {String(stages.length).padStart(2, "0")}
-        </p>
-        <div className="relative mt-0.5 h-[1.75rem] w-full overflow-hidden lg:mt-1 lg:h-[3.25rem]">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.p
-              key={active}
-              className="font-display text-[1.125rem] leading-[1.5] text-forest lg:text-[2.25rem] lg:leading-[1.3]"
-              initial={reduce ? { opacity: 0 } : { y: "100%" }}
-              animate={reduce ? { opacity: 1 } : { y: "0%" }}
-              exit={reduce ? { opacity: 0 } : { y: "-100%" }}
-              transition={{ duration: 0.5, ease: motionEase }}
-            >
-              {stages[active].title}
-            </motion.p>
-          </AnimatePresence>
+            <span className="text-copper">{stages[active].step}</span> /{" "}
+            {String(stages.length).padStart(2, "0")}
+          </p>
+          <p
+            key={`title-${active}`}
+            className="mt-1 font-display text-[1.05rem] leading-[1.3] text-forest sm:text-[1.15rem] lg:text-[1.45rem]"
+          >
+            {stages[active].title}
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-/* ─── Stage content ───────────────────────────────────────────── */
-
 function StageBody({ stage, index }: { stage: (typeof journey.stages)[0]; index: number }) {
   if (index === 2) {
     return (
-      <ul className="mt-4 flex flex-wrap gap-2 lg:mt-6" aria-label="Reach channels">
+      <ul className="mt-4 flex flex-wrap gap-2" aria-label="Reach channels">
         {stage.prompts.map((c) => (
           <li
             key={c}
-            className="border border-accent/35 bg-surface/50 px-3.5 py-2 font-mono text-[0.8125rem] text-accent"
+            className="border border-copper/35 bg-ivory/80 px-3 py-1.5 font-mono text-[0.8125rem] text-forest"
           >
             {c}
           </li>
@@ -194,37 +219,48 @@ function StageBody({ stage, index }: { stage: (typeof journey.stages)[0]; index:
   }
 
   const learn = index === 3;
+  const outro = "outro" in stage ? stage.outro : undefined;
   return (
     <>
-      <p className="type-eyebrow mt-4 text-ink-soft lg:mt-7">{learn ? "What we measure" : "What we ask"}</p>
-      <ul className={cn("mt-2 lg:mt-3", learn ? "border-t border-forest/10" : "grid gap-1.5 lg:gap-2.5")} aria-label={`${stage.title} questions`}>
+      <ul
+        className={cn("mt-4", learn ? "border-t border-forest/10" : "grid gap-2.5")}
+        aria-label={`${stage.title} questions`}
+      >
         {stage.prompts.map((p, i) => (
           <li
             key={p}
             className={cn(
-              "flex items-start gap-3 text-[0.9375rem] leading-snug text-forest lg:text-[1.0625rem]",
-              learn && "border-b border-forest/8 py-1 sm:py-1.5 lg:py-2.5",
+              "flex items-start gap-2.5 text-[0.9375rem] leading-[1.52] text-charcoal lg:text-[1.0625rem]",
+              learn && "border-b border-forest/8 py-2 lg:py-2.5",
             )}
           >
             {learn ? (
-              <span className="mt-[3px] w-6 shrink-0 font-mono text-[0.75rem] tabular-nums text-accent">
+              <span className="mt-0.5 w-6 shrink-0 font-mono text-[0.75rem] tabular-nums text-copper">
                 {String(i + 1).padStart(2, "0")}
               </span>
             ) : (
-              <span className="mt-[0.55em] block h-1.5 w-1.5 shrink-0 rounded-full bg-accent/70" />
+              <span className="mt-[0.55em] block h-1.5 w-1.5 shrink-0 rounded-full bg-copper/75" />
             )}
             {p}
           </li>
         ))}
       </ul>
+      {outro ? (
+        <p className="mt-4 text-[0.9375rem] leading-[1.58] text-charcoal/90 lg:text-[1.0625rem]">
+          {outro}
+        </p>
+      ) : null}
       {index === 1 && (
-        <div className="mt-6 hidden gap-2 md:grid md:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3" aria-hidden>
+        <div className="mt-5 grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           {FIND_QUERIES.map((q) => (
-            <div key={q} className="flex min-w-0 items-center gap-2 border border-forest/10 bg-surface/60 px-3 py-2">
-              <span className="shrink-0 text-accent">
+            <div
+              key={q}
+              className="flex min-w-0 items-center gap-2 border border-forest/12 bg-paper/80 px-3 py-2"
+            >
+              <span className="shrink-0 text-copper">
                 <SearchQueryIcon />
               </span>
-              <span className="truncate font-mono text-[0.75rem] text-ink-soft">{q}</span>
+              <span className="font-mono text-[0.75rem] leading-snug text-charcoal/85">{q}</span>
             </div>
           ))}
         </div>
@@ -233,107 +269,140 @@ function StageBody({ stage, index }: { stage: (typeof journey.stages)[0]; index:
   );
 }
 
-/* ─── Section ─────────────────────────────────────────────────── */
+function ActiveStagePanel({
+  index,
+  total,
+}: {
+  index: number;
+  total: number;
+}) {
+  const stage = journey.stages[index];
+  const reduce = useReducedMotion();
+
+  return (
+    <motion.article
+      data-journey-panel-inner
+      id={`journey-stage-${index}`}
+      className="journey-chapter__stage overflow-visible rounded-sm border border-copper/45 bg-paper/95 p-5 shadow-[inset_0_1px_0_rgb(255_255_255/0.55),0_12px_36px_-28px_rgb(27_61_47/0.2)] sm:p-6"
+      aria-labelledby={`journey-stage-title-${index}`}
+      initial={reduce ? false : { opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={reduce ? undefined : { opacity: 0, y: -12 }}
+      transition={{ duration: 0.28, ease: motionEase }}
+    >
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-[0.75rem] tracking-[0.16em] text-copper">
+          {stage.step}
+          <span className="text-forest/40"> / {String(total).padStart(2, "0")}</span>
+        </span>
+        <span className="h-px max-w-14 flex-1 bg-forest/12" aria-hidden />
+      </div>
+
+      <h3
+        id={`journey-stage-title-${index}`}
+        className={cn(
+          "mt-2 font-display text-[clamp(1.55rem,1.1rem+1.8vw,2.35rem)] leading-[1.08] tracking-[-0.02em]",
+          index === total - 1 ? "italic text-copper" : "text-forest",
+        )}
+      >
+        <span className="text-forest/42">{index + 1}.</span> {stage.title}
+      </h3>
+
+      <p className="mt-3 text-[1rem] leading-[1.58] text-charcoal sm:text-[1.0625rem]">{stage.body}</p>
+
+      <div className="journey-chapter__detail-body mt-4 overflow-visible border-l-2 border-copper/35 pl-4 sm:pl-5">
+        <StageBody stage={stage} index={index} />
+      </div>
+    </motion.article>
+  );
+}
 
 export function JourneySection() {
   const ref = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+
   const stages = journey.stages;
   const total = stages.length;
-  const [active, setActive] = useState(0);
 
-  /* One screen, pinned: scrolling through the section walks the loop */
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
-  const progress = useTransform(scrollYProgress, [0.02, 0.96], [0, 1]);
-  const closing = useTransform(scrollYProgress, [0.8, 0.95], [0, 1]);
+  const { active, pick } = useJourneyActiveStep(ref, trackRef, total, !!reduce);
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    setActive(Math.min(total - 1, Math.max(0, Math.floor(v * total))));
-  });
-
-  /** Jump to a stage by scrolling to the middle of its stretch. */
-  const pick = (i: number) => {
-    const el = ref.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const run = el.offsetHeight - window.innerHeight;
-    window.scrollTo({ top: top + run * ((i + 0.5) / total), behavior: reduce ? "auto" : "smooth" });
-  };
-
-  const stage = stages[active];
+  useJourneyChapterAnimation(ref, !!reduce);
 
   return (
     <section
       ref={ref}
-      className="accent-rose relative h-[300svh] bg-ivory"
+      id="journey"
+      className="journey-chapter accent-copper relative scroll-mt-[var(--header-h)] overflow-visible bg-ivory text-forest"
       aria-labelledby="journey-heading"
     >
-      <div className="sticky top-[var(--header-h)] flex h-[calc(100svh-var(--header-h))] items-start overflow-hidden pt-[clamp(0.75rem,4svh,3.5rem)] lg:items-center lg:pt-0">
-        <Container>
-          <div className="grid gap-5 sm:gap-7 lg:grid-cols-12 lg:items-center lg:gap-12">
-            {/* Left: the chapter + the loop */}
-            <div className="lg:col-span-5">
-              <SectionLabel index={homeSections.journey.index} className="mb-3 lg:mb-5">
+      <div
+        ref={trackRef}
+        className="journey-chapter__track relative py-[clamp(2.25rem,1.65rem+2.5vw,4.5rem)] md:py-[clamp(2.75rem,2rem+3vw,5rem)] min-h-[min(200vh,1700px)]"
+      >
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-forest/10 to-transparent"
+          aria-hidden
+        />
+        <Container
+          className="journey-chapter__container relative overflow-visible lg:sticky lg:top-[calc(var(--header-h)+1rem)] lg:z-[1]"
+        >
+          <div className="mb-6 lg:mb-8">
+            <div data-journey-label>
+              <SectionLabel index={homeSections.journey.index} className="mb-2">
                 {homeSections.journey.name}
               </SectionLabel>
-              <h2
-                id="journey-heading"
-                className="font-display text-[clamp(1.75rem,1.2rem+2.4vw,3.25rem)] font-medium leading-[1.06] tracking-[-0.015em] text-forest"
-              >
-                Understand. Find.
-                <br />
-                Reach. <span className="italic text-accent">Learn.</span>
-              </h2>
-              <p className="type-lead mt-4 hidden max-w-[26rem] text-ink-soft lg:block">
-                A connected journey from insight to opportunity.
-              </p>
+            </div>
+            <h2
+              id="journey-heading"
+              data-journey-headline
+              className="max-w-[28rem] font-display text-balance text-[clamp(1.65rem,1.05rem+2.2vw,2.9rem)] font-medium leading-[1.1] tracking-[-0.02em] text-forest lg:max-w-none"
+            >
+              {journey.title}
+            </h2>
+          </div>
 
-              {/* Padding reserves room for the stage names that sit outside the ring */}
-              <div className="mt-6 pb-7 sm:mt-10 lg:mt-10 lg:pb-7">
-                <Loop active={active} progress={progress} reduce={reduce} onPick={pick} />
-              </div>
-              <motion.p
-                className="mt-4 hidden items-center justify-center gap-3 font-display text-[1.125rem] italic text-forest lg:flex"
-                style={{ opacity: reduce ? 1 : closing }}
+          <div className="journey-chapter__grid grid items-start gap-8 lg:grid-cols-12 lg:gap-x-10 xl:gap-x-12">
+            <div data-journey-enter className="flex min-w-0 flex-col lg:col-span-5 lg:self-start">
+              <Loop active={active} reduce={reduce} onPick={pick} />
+              <p
+                className="journey-chapter__closing mx-auto mt-2 max-w-[16rem] px-2 text-center font-display text-[0.9375rem] italic leading-snug text-forest/82 sm:mt-4 sm:max-w-[18rem] sm:text-[1rem] lg:mt-6 lg:text-[1.0625rem]"
               >
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0 text-accent" aria-hidden>
-                  <path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                …and back to {stages[0].title}, continuously.
-              </motion.p>
+                <span className="inline-flex items-center justify-center gap-2.5">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="shrink-0 text-copper"
+                    aria-hidden
+                  >
+                    <path
+                      d="M20 12a8 8 0 1 1-2.34-5.66M20 4v4h-4"
+                      stroke="currentColor"
+                      strokeWidth="1.6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  …and back to {stages[0].title}, continuously.
+                </span>
+              </p>
             </div>
 
-            {/* Right: the stage being walked — swaps in place */}
-            <div className="relative min-w-0 lg:col-span-6 lg:col-start-7">
+            <div
+              data-journey-panel
+              className="flex min-w-0 flex-col gap-5 sm:gap-6 lg:col-span-7 lg:col-start-6"
+              aria-live="polite"
+              aria-atomic="true"
+            >
               <AnimatePresence mode="wait" initial={false}>
-                <motion.article
-                  key={stage.step}
-                  initial={reduce ? { opacity: 0 } : { opacity: 0, y: 28 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reduce ? { opacity: 0 } : { opacity: 0, y: -20 }}
-                  transition={{ duration: 0.45, ease: motionEase }}
-                  aria-live="polite"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono text-[0.8125rem] tracking-[0.2em] text-accent">
-                      {stage.step} <span className="text-forest/40">/ {String(total).padStart(2, "0")}</span>
-                    </span>
-                    <span className="h-px w-10 bg-forest/15" aria-hidden />
-                  </div>
-                  <h3
-                    className={cn(
-                      "mt-2 font-display text-[clamp(2rem,1.3rem+3vw,3.75rem)] leading-[1.02] tracking-[-0.02em] lg:mt-4",
-                      active === total - 1 ? "italic text-accent" : "text-forest",
-                    )}
-                  >
-                    {stage.title}
-                  </h3>
-                  <p className="mt-2 max-w-[34rem] text-[1rem] leading-[1.5] text-ink-soft lg:mt-4 lg:text-[1.1875rem]">
-                    {stage.body}
-                  </p>
-                  <StageBody stage={stage} index={active} />
-                </motion.article>
+                <ActiveStagePanel key={active} index={active} total={total} />
               </AnimatePresence>
+
+              <div className="journey-chapter__cta rounded-sm border border-forest/10 bg-paper/90 px-5 py-5 sm:px-6">
+                <Button href={journey.ctaHref}>{journey.cta}</Button>
+              </div>
             </div>
           </div>
         </Container>

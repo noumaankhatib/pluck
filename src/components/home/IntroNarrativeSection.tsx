@@ -1,351 +1,420 @@
 "use client";
 
-import { Fragment, type ReactNode } from "react";
-import { motion, useTransform, type MotionValue } from "framer-motion";
+import Image from "next/image";
+import { useLayoutEffect, useRef, type RefObject } from "react";
+import { useReducedMotion } from "framer-motion";
 import { intro } from "@/content/home";
 import { Container } from "@/components/ui/Container";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { homeSections } from "@/content/home-sections";
-import { PinnedScene } from "@/components/motion/PinnedScene";
-import { useBeat } from "@/components/motion/useBeat";
-import { useIsDesktop } from "@/lib/useIsDesktop";
+import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 import { cn } from "@/lib/cn";
 
-/* ─── Sifting field: many leads → a few right customers ───────── */
+const PREMISE_IMAGE = "/images/premise-section-visual.jpg";
 
-const COLS = 15;
-const ROWS = 9;
-const GAP = 20;
-/** The few that matter — scattered so they read as "found", not arranged. */
-const CHOSEN = [19, 47, 71, 98, 122];
-const DOTS = Array.from({ length: COLS * ROWS }, (_, i) => ({
-  i,
-  cx: 10 + (i % COLS) * GAP,
-  cy: 10 + Math.floor(i / COLS) * GAP,
-}));
-const NOISE = DOTS.filter((d) => !CHOSEN.includes(d.i));
+const OPPORTUNITY_POINTS = [
+  { cx: 23, cy: 57 },
+  { cx: 39, cy: 33 },
+  { cx: 57, cy: 29 },
+  { cx: 76, cy: 41 },
+] as const;
 
-function NoiseGroup({
-  band,
-  sift,
-  reduce,
-}: {
-  band: number;
-  sift: MotionValue<number>;
+const NETWORK_HUB = { cx: 47, cy: 44 };
+
+function hubPathTo(point: { cx: number; cy: number }): string {
+  const { cx, cy } = point;
+  const { cx: hx, cy: hy } = NETWORK_HUB;
+  const mx = (hx + cx) / 2;
+  const my = (hy + cy) / 2 - 4;
+  return `M ${hx} ${hy} Q ${mx} ${my} ${cx} ${cy}`;
+}
+
+type PremiseNetworkOverlayProps = {
   reduce: boolean | null;
-}) {
-  /* Three bands fade at slightly different moments so the field thins organically */
-  const opacity = useTransform(sift, [band * 0.18, 0.55 + band * 0.18], [0.55, 0.08]);
-  return (
-    <motion.g style={{ opacity: reduce ? 0.07 : opacity }}>
-      {NOISE.filter((d) => d.i % 3 === band).map((d) => (
-        <circle key={d.i} cx={d.cx} cy={d.cy} r={2.2} fill="var(--color-sage-light)" />
-      ))}
-    </motion.g>
-  );
-}
+  triggerRef: RefObject<HTMLElement | null>;
+};
 
-function SiftingField({ sift, reduce }: { sift: MotionValue<number>; reduce: boolean | null }) {
-  const chosenR = useTransform(sift, [0.35, 0.85], [2.2, 5.5]);
-  const chosenFill = useTransform(sift, [0.3, 0.7], ["#b4c2b6", "#e5895a"]);
-  const ringOpacity = useTransform(sift, [0.7, 0.95], [0, 1]);
-  const beforeOpacity = useTransform(sift, [0.25, 0.5], [1, 0]);
-  const afterOpacity = useTransform(sift, [0.55, 0.85], [0, 1]);
+function PremiseNetworkOverlay({ reduce, triggerRef }: PremiseNetworkOverlayProps) {
+  const svgRef = useRef<SVGSVGElement>(null);
 
-  return (
-    <figure className="relative">
-      <svg
-        viewBox={`0 0 ${COLS * GAP} ${ROWS * GAP}`}
-        className="w-full overflow-visible"
-        aria-hidden
-      >
-        {[0, 1, 2].map((band) => (
-          <NoiseGroup key={band} band={band} sift={sift} reduce={reduce} />
-        ))}
-        {DOTS.filter((d) => CHOSEN.includes(d.i)).map((d, k) => (
-          <g key={d.i}>
-            <motion.circle
-              cx={d.cx}
-              cy={d.cy}
-              r={11}
-              fill="none"
-              stroke="#e5895a"
-              strokeWidth={1}
-              style={{ opacity: reduce ? 1 : ringOpacity }}
-            />
-            {!reduce && (
-              <motion.g style={{ opacity: ringOpacity }}>
-                <motion.circle
-                  cx={d.cx}
-                  cy={d.cy}
-                  r={11}
-                  fill="none"
-                  stroke="#e5895a"
-                  strokeWidth={1}
-                  style={{ transformBox: "fill-box", transformOrigin: "center" }}
-                  animate={{ scale: [1, 1.9], opacity: [0.6, 0] }}
-                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeOut", delay: k * 0.35 }}
-                />
-              </motion.g>
-            )}
-            <motion.circle
-              cx={d.cx}
-              cy={d.cy}
-              r={reduce ? 5.5 : chosenR}
-              fill={reduce ? "#e5895a" : chosenFill}
-            />
-          </g>
-        ))}
-      </svg>
+  useLayoutEffect(() => {
+    const trigger = triggerRef.current;
+    if (reduce || !svgRef.current || !trigger) return;
 
-      {/* Caption crossfades as the field sifts */}
-      <figcaption className="mt-6 grid font-mono text-[0.75rem] uppercase tracking-[0.16em]">
-        <motion.span
-          className="col-start-1 row-start-1 text-sage-light"
-          style={{ opacity: reduce ? 0 : beforeOpacity }}
-        >
-          Thousands of leads
-        </motion.span>
-        <motion.span
-          className="col-start-1 row-start-1 flex items-center gap-3 text-copper-soft"
-          style={{ opacity: reduce ? 1 : afterOpacity }}
-        >
-          <span className="h-px w-6 bg-copper-soft" aria-hidden />
-          A few of the right customers
-        </motion.span>
-      </figcaption>
-    </figure>
-  );
-}
+    ensureGsapPlugins();
 
-/* ─── Inline emphasis: a phrase gets struck through or underlined as it's read ─── */
+    const paths = svgRef.current.querySelectorAll<SVGPathElement>("[data-network-path]");
+    const rings = svgRef.current.querySelectorAll<SVGCircleElement>("[data-network-ring]");
+    const cores = svgRef.current.querySelectorAll<SVGCircleElement>("[data-network-core]");
 
-function markPhrase(
-  text: string,
-  phrase: string,
-  render: (phrase: string) => ReactNode,
-): ReactNode {
-  const at = text.indexOf(phrase);
-  if (at === -1) return text;
-  return (
-    <>
-      {text.slice(0, at)}
-      {render(phrase)}
-      {text.slice(at + phrase.length)}
-    </>
-  );
-}
+    const ctx = gsap.context(() => {
+      paths.forEach((path) => {
+        const len = path.getTotalLength();
+        gsap.set(path, {
+          strokeDasharray: len,
+          strokeDashoffset: len,
+          opacity: 0,
+        });
+      });
+      gsap.set(rings, { opacity: 0 });
+      gsap.set(cores, { opacity: 0 });
 
-function Marked({
-  children,
-  variant,
-  draw,
-}: {
-  children: ReactNode;
-  variant: "strike" | "underline";
-  /** 0 → 1: how much of the mark is drawn (driven by scroll). */
-  draw: MotionValue<number>;
-}) {
-  const fade = useTransform(draw, [0.4, 1], [1, 0.5]);
-  return (
-    <span className="relative inline-block whitespace-nowrap">
-      <motion.span className="inline-block" style={variant === "strike" ? { opacity: fade } : undefined}>
-        {children}
-      </motion.span>
-      <motion.span
-        className={
-          variant === "strike"
-            ? "absolute inset-x-[-2px] top-[55%] h-[2px] origin-left rounded-full bg-copper-soft"
-            : "absolute inset-x-0 bottom-[-0.08em] h-[2px] origin-left rounded-full bg-copper-soft"
-        }
-        style={{ scaleX: draw }}
-        aria-hidden
-      />
-    </span>
-  );
-}
+      const reveal = gsap.timeline({
+        scrollTrigger: {
+          trigger,
+          start: "top 70%",
+          end: "center 50%",
+          scrub: 0.3,
+        },
+      });
 
-/** One word of the payoff, rising through its own mask on cue. */
-function PayoffWord({
-  word,
-  index,
-  total,
-  progress,
-}: {
-  word: string;
-  index: number;
-  total: number;
-  progress: MotionValue<number>;
-}) {
-  const start = 0.72 + (index / total) * 0.12;
-  const y = useTransform(progress, [start, start + 0.08], ["105%", "0%"]);
-  const isPayoff = index === total - 1;
-  return (
-    <span className="inline-block overflow-hidden pb-[0.08em] align-bottom">
-      <motion.span
-        className={isPayoff ? "text-copper-metal inline-block italic" : "inline-block"}
-        style={{ y }}
-      >
-        {word}
-      </motion.span>
-    </span>
-  );
-}
+      reveal.to(
+        paths,
+        {
+          strokeDashoffset: 0,
+          opacity: 0.4,
+          duration: 1,
+          stagger: 0.16,
+          ease: "none",
+        },
+        0,
+      );
 
-/* ─── Section ─────────────────────────────────────────────────── */
+      reveal.to(
+        rings,
+        {
+          opacity: 0.48,
+          duration: 0.32,
+          stagger: 0.14,
+          ease: "power2.out",
+        },
+        0.1,
+      );
 
-const METHOD = ["Examine", "Reach"] as const;
+      reveal.to(
+        cores,
+        {
+          opacity: 0.72,
+          duration: 0.28,
+          stagger: 0.14,
+          ease: "power2.out",
+        },
+        0.18,
+      );
 
-/**
- * The premise as one pinned screen, played in beats:
- * setup (strike) → pivot (underline) + the field sifts → the method →
- * the argument lifts away and the payoff takes the screen.
- */
-function PremiseScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean }) {
-  const isDesktop = useIsDesktop();
-  const [setup, pivot, ...method] = intro.sentences;
-  const words = intro.anchor.split(" ");
+      reveal.eventCallback("onComplete", () => {
+        gsap.to(cores, {
+          opacity: 0.5,
+          duration: 2.6,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          stagger: { each: 0.5, from: "random" },
+        });
+      });
+    }, svgRef);
 
-  const label = useBeat(p, [0, 0.04]);
-  const setupIn = useBeat(p, [0, 0.06]);
-  const strike = useTransform(p, [0.06, 0.16], [0, 1]);
-  const pivotIn = useBeat(p, [0.13, 0.22]);
-  const underline = useTransform(p, [0.2, 0.3], [0, 1]);
-  const sift = useTransform(p, [0.16, 0.56], [0, 1]);
-  const m0 = useBeat(p, [0.42, 0.5]);
-  const m1 = useBeat(p, [0.47, 0.55]);
-  const methodIn = [m0, m1];
+    return () => ctx.revert();
+  }, [reduce, triggerRef]);
 
-  /* On phones the method takes the field's place; on desktop they sit side by side */
-  const fieldSwap = useTransform(p, [0.38, 0.44], [1, 0]);
-
-  /* The argument steps back as the payoff arrives */
-  const argOut = useTransform(p, [0.64, 0.72], [1, 0]);
-  const argY = useTransform(p, [0.64, 0.72], [0, -40]);
-  const fieldDim = useTransform(p, [0.64, 0.74], [1, 0.22]);
-  const fieldScale = useTransform(p, [0.64, 0.74], [1, 0.92]);
-  const rule = useTransform(p, [0.7, 0.8], [0, 1]);
+  if (reduce) return null;
 
   return (
-    <Container className="relative h-full">
-      {/* The argument + the field */}
-      <motion.div
-        className="relative flex h-full flex-col justify-center"
-        style={isStatic ? undefined : { opacity: argOut, y: argY }}
-      >
-        <motion.div style={label}>
-          <SectionLabel index={homeSections.intro.index} tone="dark" className="mb-5 lg:mb-10">
-            {homeSections.intro.name}
-          </SectionLabel>
-        </motion.div>
-
-        <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
-          <div className="lg:col-span-7">
-            <motion.p
-              className="text-[clamp(1.125rem,0.95rem+1vw,1.75rem)] leading-[1.42] text-ivory"
-              style={setupIn}
-            >
-              {markPhrase(setup, "thousands of new leads", (ph) => (
-                <Marked variant="strike" draw={strike}>
-                  {ph}
-                </Marked>
-              ))}
-            </motion.p>
-
-            <motion.p
-              className="text-copper-metal mt-4 font-display text-[clamp(1.75rem,1.1rem+3vw,3.75rem)] italic leading-[1.08] tracking-[-0.015em] lg:mt-8"
-              style={pivotIn}
-            >
-              {markPhrase(pivot, "right customers", (ph) => (
-                <Marked variant="underline" draw={underline}>
-                  {ph}
-                </Marked>
-              ))}
-            </motion.p>
-
-            {/* Desktop: the method under the argument */}
-            <ol className="mt-12 hidden gap-10 border-t border-sage-light/20 pt-8 lg:grid lg:grid-cols-2">
-              {method.map((sentence, i) => (
-                <MethodItem key={sentence} index={i} sentence={sentence} style={methodIn[i]} />
-              ))}
-            </ol>
-          </div>
-
-          {/* The field — and, on phones, the method in the same spot */}
-          <div className="relative grid lg:col-span-4 lg:col-start-9 lg:self-center">
-            <motion.div
-              className="col-start-1 row-start-1 mx-auto w-full max-w-[22rem] lg:max-w-none"
-              style={isStatic ? undefined : { opacity: isDesktop ? fieldDim : fieldSwap, scale: fieldScale }}
-            >
-              <SiftingField sift={sift} reduce={isStatic} />
-            </motion.div>
-            <ol
-              className={cn(
-                "grid content-start gap-5 border-t border-sage-light/20 pt-5 lg:hidden",
-                isStatic ? "mt-8" : "col-start-1 row-start-1",
-              )}
-            >
-              {method.map((sentence, i) => (
-                <MethodItem key={sentence} index={i} sentence={sentence} style={methodIn[i]} />
-              ))}
-            </ol>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* The payoff takes the screen */}
-      <div
-        className={cn(
-          "pointer-events-none flex flex-col justify-center",
-          isStatic ? "relative mt-16" : "absolute inset-0 px-[var(--gutter)]",
-        )}
-      >
-        <motion.span
-          className="mb-6 block h-px w-full max-w-[14rem] origin-left bg-copper/70 md:mb-8"
-          style={{ scaleX: rule }}
-          aria-hidden
+    <svg
+      ref={svgRef}
+      className="intro-chapter__network pointer-events-none absolute inset-0 z-[2] h-full w-full"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden
+    >
+      {OPPORTUNITY_POINTS.map((point, i) => (
+        <path
+          key={`path-${i}`}
+          data-network-path
+          d={hubPathTo(point)}
+          fill="none"
+          stroke="#bd6c36"
+          strokeWidth={0.22}
+          vectorEffect="non-scaling-stroke"
         />
-        <h2
-          id="intro-heading"
-          className="font-display max-w-[22ch] text-balance text-[clamp(2.5rem,1.3rem+5vw,5.75rem)] font-medium leading-[1.03] tracking-[-0.02em] text-ivory"
-        >
-          {words.map((word, i) => (
-            <Fragment key={i}>
-              <PayoffWord word={word} index={i} total={words.length} progress={p} />
-              {i < words.length - 1 ? " " : null}
-            </Fragment>
-          ))}
-        </h2>
-      </div>
-    </Container>
-  );
-}
-
-function MethodItem({
-  index,
-  sentence,
-  style,
-}: {
-  index: number;
-  sentence: string;
-  style: { opacity: MotionValue<number>; y: MotionValue<number> };
-}) {
-  return (
-    <motion.li style={style}>
-      <p className="flex items-center gap-3 font-mono text-[0.75rem] uppercase tracking-[0.18em] text-sage-light">
-        <span className="tabular-nums text-copper-soft">{String(index + 1).padStart(2, "0")}</span>
-        <span className="h-px w-6 bg-sage-light/40" aria-hidden />
-        {METHOD[index] ?? ""}
-      </p>
-      <p className="mt-2 text-[0.9375rem] leading-[1.55] text-ivory/90 lg:mt-3 lg:text-base">{sentence}</p>
-    </motion.li>
+      ))}
+      {OPPORTUNITY_POINTS.map((point, i) => (
+        <g key={`node-${i}`}>
+          <circle
+            data-network-ring
+            cx={point.cx}
+            cy={point.cy}
+            r={1.35}
+            fill="none"
+            stroke="#bd6c36"
+            strokeWidth={0.28}
+            vectorEffect="non-scaling-stroke"
+          />
+          <circle
+            data-network-core
+            cx={point.cx}
+            cy={point.cy}
+            r={0.45}
+            fill="#bd6c36"
+            vectorEffect="non-scaling-stroke"
+          />
+        </g>
+      ))}
+      <circle
+        data-network-ring
+        cx={NETWORK_HUB.cx}
+        cy={NETWORK_HUB.cy}
+        r={0.9}
+        fill="none"
+        stroke="#bd6c36"
+        strokeWidth={0.22}
+        strokeOpacity={0.4}
+        vectorEffect="non-scaling-stroke"
+      />
+      <circle
+        data-network-core
+        cx={NETWORK_HUB.cx}
+        cy={NETWORK_HUB.cy}
+        r={0.35}
+        fill="#bd6c36"
+        fillOpacity={0.6}
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
   );
 }
 
 export function IntroNarrativeSection() {
+  const reduce = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
+  const labelRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLQuoteElement>(null);
+  const mediaRef = useRef<HTMLDivElement>(null);
+  const mediaInnerRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (reduce) return;
+
+    ensureGsapPlugins();
+
+    const section = sectionRef.current;
+    const label = labelRef.current;
+    const copy = copyRef.current;
+    const close = closeRef.current;
+    const anchor = anchorRef.current;
+    const media = mediaRef.current;
+    const mediaInner = mediaInnerRef.current;
+
+    if (!section || !copy) return;
+
+    const lineInners = copy.querySelectorAll<HTMLElement>("[data-intro-line-inner]");
+    const anchorInner = anchor?.querySelector<HTMLElement>("[data-intro-anchor-inner]");
+    const copperRule = anchor?.querySelector<HTMLElement>("[data-intro-anchor-rule]");
+    const closeLine = close?.querySelector<HTMLElement>("[data-intro-close-line]");
+
+    const ctx = gsap.context(() => {
+      if (label) gsap.set(label, { opacity: 0, y: 10 });
+      gsap.set(lineInners, { yPercent: 105, opacity: 0 });
+      if (close) gsap.set(close, { opacity: 0 });
+      if (anchorInner) gsap.set(anchorInner, { y: 10, opacity: 0 });
+      if (copperRule) gsap.set(copperRule, { scaleY: 0, transformOrigin: "top center" });
+      if (closeLine) gsap.set(closeLine, { scaleX: 0, transformOrigin: "left center" });
+      if (media) gsap.set(media, { opacity: 0, y: 12 });
+      if (mediaInner) gsap.set(mediaInner, { scale: 1.03 });
+
+      const enter = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top 82%",
+          end: "top 34%",
+          toggleActions: "play none none reverse",
+        },
+        defaults: { ease: "power3.out" },
+      });
+
+      if (label) enter.to(label, { opacity: 1, y: 0, duration: 0.58 }, 0);
+
+      enter.to(
+        lineInners,
+        { yPercent: 0, opacity: 1, duration: 0.74, stagger: 0.09 },
+        0.05,
+      );
+
+      if (media) {
+        enter.to(media, { opacity: 1, y: 0, duration: 0.85 }, 0.08);
+      }
+
+      if (closeLine) {
+        enter.to(closeLine, { scaleX: 1, duration: 0.65, ease: "power2.out" }, 0.28);
+      }
+
+      if (close) {
+        enter.to(close, { opacity: 1, duration: 0.4 }, 0.3);
+      }
+
+      if (copperRule) {
+        enter.to(copperRule, { scaleY: 1, duration: 0.48, ease: "power2.out" }, 0.34);
+      }
+
+      if (anchorInner) {
+        enter.to(anchorInner, { y: 0, opacity: 1, duration: 0.68 }, 0.38);
+      }
+
+      if (mediaInner) {
+        gsap.to(mediaInner, {
+          yPercent: 3.5,
+          scale: 1,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 0.45,
+          },
+        });
+      }
+    }, section);
+
+    return () => ctx.revert();
+  }, [reduce]);
+
   return (
-    <PinnedScene length={2.5} className="surface-espresso" stageClassName="items-stretch" labelledBy="intro-heading">
-      {(p, _ref, isStatic) => <PremiseScene p={p} isStatic={isStatic} />}
-    </PinnedScene>
+    <section
+      ref={sectionRef}
+      id="intro"
+      className="intro-chapter relative overflow-hidden bg-[#14100d] text-[#faf9f3]"
+      aria-labelledby="intro-heading"
+    >
+      <div
+        className="intro-chapter__hero-bridge pointer-events-none absolute inset-x-0 top-0 z-[1] h-[clamp(2rem,5vh,3.5rem)] bg-gradient-to-b from-[#0a1210] via-[#14100d]/80 to-transparent"
+        aria-hidden
+      />
+      <div
+        className="intro-chapter__next-bridge pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[clamp(2.5rem,8vh,4.5rem)] bg-gradient-to-b from-transparent via-[#14100d]/35 to-[#faf9f3]/8"
+        aria-hidden
+      />
+
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-[#bd6c36]/25 to-transparent"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_40%_at_14%_22%,rgb(189_108_54/0.06),transparent_45%)]"
+        aria-hidden
+      />
+      <div
+        className="intro-chapter__grain pointer-events-none absolute inset-0 opacity-[0.045]"
+        aria-hidden
+      />
+
+      <Container className="relative z-[2] py-8 md:py-9 lg:py-10">
+        <div ref={labelRef} className={cn(!reduce && "will-change-transform")}>
+          <SectionLabel
+            index={homeSections.intro.index}
+            tone="dark"
+            className="mb-5 text-[#faf9f3]/55 md:mb-6 [&_span.font-mono]:text-[#d49263]"
+          >
+            {homeSections.intro.name}
+          </SectionLabel>
+        </div>
+
+        <div
+          className="intro-chapter__stage grid grid-cols-1 gap-6 md:gap-7 lg:grid-cols-12 lg:items-stretch lg:gap-x-9 xl:gap-x-10"
+        >
+          <div
+            className="intro-chapter__copy-column flex min-w-0 flex-col lg:col-span-5 lg:col-start-1 lg:border-r lg:border-[#faf9f3]/[0.08] lg:pr-9 xl:pr-10"
+          >
+            <div ref={copyRef} className="intro-chapter__copy flex flex-col justify-center">
+              <div className="intro-chapter__prose space-y-3.5 md:space-y-4">
+                {intro.sentences.map((sentence, index) => (
+                  <p
+                    key={sentence}
+                    data-intro-line
+                    className={cn(
+                      "overflow-hidden",
+                      index === 0 && "intro-chapter__lead",
+                      index === 1 && "intro-chapter__emphasis",
+                      index >= 2 && "intro-chapter__body",
+                    )}
+                  >
+                    <span data-intro-line-inner className="block">
+                      {sentence}
+                    </span>
+                  </p>
+                ))}
+              </div>
+            </div>
+
+            <div
+              ref={closeRef}
+              className="intro-chapter__close intro-chapter__close--integrated relative mt-5 pt-5 md:mt-6 md:pt-5"
+            >
+              <span
+                data-intro-close-line
+                className="absolute left-0 top-0 block h-px w-full max-w-[10rem] origin-left bg-gradient-to-r from-[#bd6c36]/60 via-[#bd6c36]/28 to-transparent"
+                aria-hidden
+              />
+              <blockquote
+                id="intro-heading"
+                ref={anchorRef}
+                className="intro-chapter__anchor relative pt-1"
+              >
+                <span
+                  data-intro-anchor-rule
+                  className="absolute left-0 top-1 bottom-1 w-[2px] origin-top rounded-full bg-[#bd6c36]/70"
+                  aria-hidden
+                />
+                <span
+                  data-intro-anchor-inner
+                  className="intro-chapter__anchor-text block pl-4 md:pl-5"
+                >
+                  <span className="text-[#d49263]">{intro.anchor}</span>
+                </span>
+              </blockquote>
+            </div>
+          </div>
+
+          <div
+            ref={mediaRef}
+            className={cn(
+              "intro-chapter__media relative min-h-[clamp(14rem,44vw,20rem)] w-full lg:col-span-7 lg:col-start-6 lg:min-h-0 lg:self-stretch",
+              "lg:-mr-[calc(var(--gutter)+max(0px,(100vw-var(--content-max))/2))]",
+              "lg:w-[calc(100%+var(--gutter)+max(0px,(100vw-var(--content-max))/2))]",
+              !reduce && "will-change-transform",
+            )}
+          >
+            <figure className="intro-chapter__figure relative h-full min-h-[inherit] w-full">
+              <div className="intro-chapter__frame relative h-full min-h-[inherit] w-full overflow-hidden rounded-sm bg-[#14100d] shadow-[inset_0_0_0_1px_rgb(250_249_243/0.08)]">
+                <div
+                  ref={mediaInnerRef}
+                  className="intro-chapter__media-inner absolute inset-0 will-change-transform"
+                >
+                  <Image
+                    src={PREMISE_IMAGE}
+                    alt="Person surveying a landscape with markers for hidden insights, potential customers, market opportunities, and the right customers"
+                    fill
+                    unoptimized
+                    className="intro-chapter__photo object-cover object-[52%_42%]"
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    priority={false}
+                  />
+                </div>
+
+                <PremiseNetworkOverlay reduce={reduce} triggerRef={sectionRef} />
+
+                <div className="intro-chapter__scrim-left pointer-events-none absolute inset-0 z-[3]" aria-hidden />
+                <div className="intro-chapter__scrim-edge pointer-events-none absolute inset-y-0 right-0 z-[3] w-[5%]" aria-hidden />
+                <div className="intro-chapter__scrim-foot pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[14%]" aria-hidden />
+              </div>
+              <figcaption className="sr-only">
+                From broad landscape to specific commercial opportunities: hidden insights,
+                potential customers, market opportunities, and the right customers
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </Container>
+    </section>
   );
 }

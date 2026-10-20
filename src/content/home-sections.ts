@@ -9,5 +9,5 @@ export const homeSections = {
   qualification: { index: "07", name: "Fit" },
   plainEnglish: { index: "08", name: "Plain English" },
   disciplines: { index: "09", name: "Three disciplines" },
-  closing: { index: "10", name: "Let's see what's out there" },
+  closing: { index: "10", name: "How we work" },
 } as const;

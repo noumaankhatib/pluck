@@ -1,16 +1,13 @@
 "use client";
 
-import { motion, useTransform, type MotionValue } from "framer-motion";
+import { useRef } from "react";
+import { useReducedMotion } from "framer-motion";
 import { qualification } from "@/content/home";
 import { Container } from "@/components/ui/Container";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { homeSections } from "@/content/home-sections";
-import { PinnedScene } from "@/components/motion/PinnedScene";
-import { useBeat } from "@/components/motion/useBeat";
-import { useIsDesktop } from "@/lib/useIsDesktop";
-import { cn } from "@/lib/cn";
+import { useQualificationChapterAnimation } from "@/components/home/useQualificationChapterAnimation";
 
-/** Simple SVG icon paths — keyed by criteria index */
 function CriterionIcon({ index }: { index: number }) {
   return (
     <svg
@@ -18,48 +15,40 @@ function CriterionIcon({ index }: { index: number }) {
       height="20"
       viewBox="0 0 24 24"
       fill="none"
-      stroke="var(--chapter-accent)"
+      stroke="var(--color-copper)"
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden
     >
       {index === 0 && (
-        /* High-value customers — person */
         <>
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
           <circle cx="12" cy="7" r="4" />
         </>
       )}
       {index === 1 && (
-        /* Active search demand — magnify */
         <>
           <circle cx="11" cy="11" r="7" />
           <path d="m21 21-4.35-4.35" />
         </>
       )}
       {index === 2 && (
-        /* Specialist / complex — settings cog */
         <>
           <circle cx="12" cy="12" r="3" />
           <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
         </>
       )}
       {index === 3 && (
-        /* Quality over volume — diamond */
         <>
           <polygon points="12 2 19 9 12 16 5 9" />
           <line x1="12" y1="16" x2="12" y2="22" />
         </>
       )}
       {index === 4 && (
-        /* Meaningful sales conversation — speech */
-        <>
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </>
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       )}
       {index === 5 && (
-        /* Potentially missed opportunities — eye */
         <>
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
           <circle cx="12" cy="12" r="3" />
@@ -69,165 +58,152 @@ function CriterionIcon({ index }: { index: number }) {
   );
 }
 
-const CRITERION_DESCRIPTIONS = [
-  "Businesses where each customer carries meaningful value.",
-  "People are actively searching for what you offer.",
-  "Products or services that require research or expertise.",
-  "Fewer, better enquiries beat volume every time.",
-  "Opportunities that can become real business conversations.",
-  "Commercial opportunity being left on the table.",
-];
-
-/** A criterion checks in: rises, then a copper tick draws beside it. */
-function Criterion({
-  item,
-  index,
-  progress,
-}: {
-  item: string;
-  index: number;
-  progress: MotionValue<number>;
-}) {
-  const start = 0.06 + index * 0.06;
-  const beat = useBeat(progress, [start, start + 0.05], undefined, 18);
-  const tick = useTransform(progress, [start + 0.03, start + 0.08], [0, 1]);
+function Criterion({ item, index }: { item: string; index: number }) {
   return (
-    <motion.li className="flex gap-3 border-b border-forest/12 py-2 max-lg:[@media(max-height:760px)]:py-1.5 sm:py-4 lg:gap-4 lg:py-5" style={beat}>
-      <span className="relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center">
+    <li
+      data-qual-criterion
+      data-qual-criterion-index={index}
+      className="qual-chapter__criterion relative flex gap-3 border-b border-forest/10 py-3 pl-1 sm:gap-3.5 sm:py-3.5 lg:py-4"
+    >
+      <span
+        data-qual-icon
+        className="relative mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-forest/10 bg-paper/90"
+      >
         <CriterionIcon index={index} />
-        <svg viewBox="0 0 24 24" className="absolute -bottom-1.5 -right-1.5 h-3.5 w-3.5" aria-hidden>
+        <svg viewBox="0 0 24 24" className="absolute -bottom-1 -right-1 h-4 w-4" aria-hidden>
           <circle cx="12" cy="12" r="11" fill="var(--color-ivory)" />
-          <motion.path
+          <path
+            data-qual-check-path
             d="M6.5 12.5l3.5 3.5 7.5-8"
             fill="none"
-            stroke="var(--chapter-accent)"
+            stroke="var(--color-copper)"
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ pathLength: tick }}
           />
         </svg>
       </span>
-      <div className="min-w-0">
-        <p className="font-display text-[1.0625rem] leading-snug text-forest lg:text-[1.3125rem]">{item}</p>
-        <p className="mt-0.5 text-[0.8125rem] leading-[1.4] text-ink-soft sm:text-[0.9375rem] lg:mt-1.5">
-          {CRITERION_DESCRIPTIONS[index]}
-        </p>
-      </div>
-    </motion.li>
+      <p className="min-w-0 pt-0.5 text-[0.98rem] leading-[1.58] text-charcoal sm:text-base lg:text-[1.0625rem]">
+        {item}
+      </p>
+    </li>
   );
 }
 
-/**
- * 07 — a pinned checklist. The criteria check in one by one, the industries
- * follow, then everything lifts away and the question takes the screen —
- * the bridge into Plain English.
- */
-function FitScene({ p, isStatic }: { p: MotionValue<number>; isStatic: boolean }) {
-  const isDesktop = useIsDesktop();
-  const swap = !isDesktop && !isStatic;
-
-  const head = useBeat(p, [0, 0.05]);
-  const industries = useBeat(p, [0.46, 0.54]);
-  /* Phones: the industries take the criteria's place */
-  const criteriaOut = useTransform(p, [0.42, 0.48], [1, 0]);
-  /* Then the question takes the screen */
-  const allOut = useTransform(p, [0.64, 0.72], [1, 0]);
-  const allY = useTransform(p, [0.64, 0.72], [0, -36]);
-  const question = useBeat(p, [0.7, 0.8], undefined, 40);
-  const questionScale = useTransform(p, [0.7, 0.82], [0.94, 1]);
-  const drop = useTransform(p, [0.82, 0.95], [0, 1]);
-
-  const words = qualification.centerStatement.split(" ");
-  const questionLast = words.pop();
-  const questionLead = words.join(" ");
-
-  const industriesBlock = (
-    <motion.div style={industries} className={cn(swap && "col-start-1 row-start-1 self-start")}>
-      <p className="max-w-[34rem] text-[0.9375rem] leading-[1.5] text-ink-soft lg:text-base">
-        {qualification.industriesIntro}
-      </p>
-      <ul className="mt-3 flex flex-wrap gap-2 lg:mt-5" aria-label="Example industries">
-        {qualification.industries.map((industry) => (
-          <li
-            key={industry}
-            className="border border-forest/20 bg-surface/50 px-3 py-1.5 font-mono text-[0.75rem] text-forest lg:py-2"
-          >
-            {industry}
-          </li>
-        ))}
-      </ul>
-    </motion.div>
-  );
-
+function IndustryTags() {
   return (
-    <Container className="relative h-full">
-      <motion.div
-        className="flex h-full flex-col justify-center"
-        style={isStatic ? undefined : { opacity: allOut, y: allY }}
-      >
-        <div className="grid gap-4 sm:gap-8 lg:grid-cols-12 lg:gap-14">
-          <motion.div className="md:max-w-[36rem] lg:col-span-5 lg:max-w-none" style={head}>
-            <SectionLabel index={homeSections.qualification.index} className="mb-3 lg:mb-5">
-              {homeSections.qualification.name}
-            </SectionLabel>
-            <h2
-              id="qual-heading"
-              className="font-display text-[clamp(1.75rem,1.1rem+2.8vw,3.75rem)] font-medium leading-[1.06] tracking-[-0.015em] text-balance text-forest max-lg:[@media(max-height:760px)]:text-[1.5rem]"
-            >
-              {qualification.headline}
-            </h2>
-            <p className="mt-2 max-w-[30rem] text-[0.9375rem] leading-[1.5] text-ink-soft sm:text-base lg:mt-6 lg:text-[1.1875rem]">
-              {qualification.intro}
-            </p>
-            {/* Desktop: the industries under the claim */}
-            <div className="mt-10 hidden lg:block">{industriesBlock}</div>
-          </motion.div>
-
-          <div className={cn("lg:col-span-7", swap && "grid")}>
-            <motion.ul
-              className={cn(
-                "grid grid-cols-1 border-t border-forest/12 sm:grid-cols-2 sm:gap-x-8 lg:gap-x-10",
-                swap && "col-start-1 row-start-1",
-              )}
-              style={swap ? { opacity: criteriaOut } : undefined}
-              aria-label="Qualification criteria"
-            >
-              {qualification.criteria.map((item, i) => (
-                <Criterion key={item} item={item} index={i} progress={p} />
-              ))}
-            </motion.ul>
-            {/* Phones/tablets: the industries in the criteria's place (or below, when static) */}
-            <div className={cn("lg:hidden", swap ? "col-start-1 row-start-1 grid" : "mt-8")}>{industriesBlock}</div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* The question takes the screen */}
-      <motion.div
-        className={cn(
-          "pointer-events-none flex flex-col items-center justify-center text-center",
-          isStatic ? "relative mt-16" : "absolute inset-0 px-[var(--gutter)]",
-        )}
-        style={isStatic ? undefined : { ...question, scale: questionScale }}
-      >
-        <p className="font-display text-[clamp(2.5rem,1.3rem+5vw,5.5rem)] font-medium leading-[1.03] tracking-[-0.02em] text-balance text-forest">
-          {questionLead} <span className="italic text-accent">{questionLast}</span>
-        </p>
-        <motion.span
-          className="mt-8 block h-16 w-px origin-top bg-accent md:h-24"
-          style={{ scaleY: isStatic ? 1 : drop }}
-          aria-hidden
-        />
-      </motion.div>
-    </Container>
+    <ul className="mt-3 flex flex-wrap gap-2" aria-label="Example industries">
+      {qualification.industries.map((industry) => (
+        <li key={industry} data-qual-industry-tag>
+          <span className="qual-chapter__industry-tag inline-block border border-forest/16 bg-paper/85 px-3 py-1.5 font-mono text-[0.75rem] tracking-[0.02em] text-forest sm:px-3.5 sm:py-2 sm:text-[0.8125rem]">
+            {industry}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
 export function QualificationSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  useQualificationChapterAnimation(sectionRef, Boolean(reduce));
+
   return (
-    <PinnedScene length={2.5} className="accent-saffron bg-ivory" stageClassName="items-stretch" labelledBy="qual-heading">
-      {(p, _ref, isStatic) => <FitScene p={p} isStatic={isStatic} />}
-    </PinnedScene>
+    <section
+      ref={sectionRef}
+      id="qualification"
+      className="qual-chapter accent-copper relative scroll-mt-[var(--header-h)] overflow-x-clip bg-ivory pb-[clamp(1.75rem,1.35rem+1.6vw,3.25rem)] pt-[clamp(1.75rem,1.35rem+1.6vw,3.25rem)] text-forest md:pb-[clamp(2rem,1.55rem+1.8vw,3.75rem)] md:pt-[clamp(2.1rem,1.65rem+2vw,4rem)]"
+      aria-labelledby="qual-heading"
+    >
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-forest/10 to-transparent"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_38%_at_0%_0%,rgb(189_108_54/0.04),transparent_55%)]"
+        aria-hidden
+      />
+      <div
+        className="qual-chapter__foot-fade pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-b from-transparent to-forest/[0.04]"
+        aria-hidden
+      />
+
+      <Container className="qual-chapter__container relative">
+        <div className="qual-chapter__story relative lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-10">
+          <div
+            className="qual-chapter__signal-bridge-wrap pointer-events-none absolute left-[38%] right-[58%] top-[42%] hidden h-px lg:block"
+            aria-hidden
+          >
+            <div className="absolute inset-0 bg-forest/10" />
+            <div
+              data-qual-signal-bridge
+              className="absolute inset-0 origin-left bg-gradient-to-r from-copper/70 to-copper/35"
+            />
+          </div>
+
+          <div className="min-w-0 lg:col-span-5">
+            <div data-qual-label>
+              <SectionLabel index={homeSections.qualification.index} className="mb-1.5">
+                {homeSections.qualification.name}
+              </SectionLabel>
+            </div>
+
+            <h2
+              id="qual-heading"
+              data-qual-headline
+              className="font-display text-balance text-[clamp(1.6rem,1rem+2vw,2.85rem)] font-medium leading-[1.14] tracking-[-0.02em] text-forest"
+            >
+              {qualification.headline}
+            </h2>
+            <p
+              data-qual-intro
+              className="mt-2.5 font-mono text-[0.75rem] uppercase tracking-[0.14em] text-copper"
+            >
+              {qualification.intro}
+            </p>
+
+            <div
+              data-qual-industries-block
+              className="mt-5 rounded-sm border border-forest/10 bg-paper/40 px-4 py-4 sm:mt-6 sm:px-5"
+            >
+              <p
+                data-qual-industries-intro
+                className="text-[0.98rem] leading-[1.58] text-charcoal sm:text-base lg:max-w-[26rem] lg:text-[1.0625rem]"
+              >
+                {qualification.industriesIntro}
+              </p>
+              <IndustryTags />
+            </div>
+          </div>
+
+          <div className="relative mt-6 min-w-0 lg:col-span-6 lg:col-start-7 lg:mt-0 lg:pt-1">
+            <div
+              data-qual-criteria-panel
+              className="qual-chapter__criteria-panel relative border border-forest/12 bg-paper/35"
+            >
+              <div
+                className="pointer-events-none absolute bottom-3 left-[1.65rem] top-3 w-px bg-forest/10"
+                aria-hidden
+              />
+              <div
+                data-qual-signal-criteria
+                className="pointer-events-none absolute bottom-3 left-[1.65rem] top-3 w-[2px] origin-top bg-gradient-to-b from-copper via-copper/75 to-copper/25"
+                aria-hidden
+              />
+
+              <ul
+                className="qual-chapter__criteria relative grid grid-cols-1 sm:grid-cols-2"
+                aria-label="When this approach works well"
+              >
+                {qualification.criteria.map((item, i) => (
+                  <Criterion key={item} item={item} index={i} />
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </section>
   );
 }

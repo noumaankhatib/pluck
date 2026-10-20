@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { HeroSection } from "@/components/home/HeroSection";
 import { IntroNarrativeSection } from "@/components/home/IntroNarrativeSection";
 import { QualitySection } from "@/components/home/QualitySection";
@@ -10,21 +11,40 @@ import { DisciplinesSection } from "@/components/home/DisciplinesSection";
 import { ClosingCTASection } from "@/components/home/ClosingCTASection";
 import { StoryHandoff } from "@/components/home/StoryHandoff";
 import { HomeStoryShell } from "@/components/home/HomeStoryShell";
+import { homeSeo, site } from "@/content/site";
+
+export const metadata: Metadata = {
+  title: homeSeo.title,
+  description: homeSeo.description,
+  keywords: homeSeo.keywords,
+  openGraph: {
+    title: homeSeo.title,
+    description: homeSeo.description,
+    url: site.domain,
+    siteName: site.name,
+  },
+  twitter: {
+    title: homeSeo.title,
+    description: homeSeo.description,
+  },
+  alternates: {
+    canonical: site.domain,
+  },
+};
 
 export default function HomePage() {
   return (
     <HomeStoryShell>
       <HeroSection />
       <IntroNarrativeSection />
-      <StoryHandoff label="So why is it being missed?" />
       <QualitySection />
       <StoryHandoff label="Then where are the right ones?" tone="paper" />
       <SearchIntelligenceSection />
       <StoryHandoff label="How do clues become customers?" />
       <JourneySection />
-      <StoryHandoff label="Does it actually work?" />
+      <StoryHandoff label="Does it actually work?" tone="light" />
       <CaseStudySection />
-      <StoryHandoff label="Is Pluck right for you?" />
+      <StoryHandoff label="Is Pluck right for you?" tone="light" />
       <QualificationSection />
       <PlainEnglishSection />
       <StoryHandoff label="Who does the work?" />

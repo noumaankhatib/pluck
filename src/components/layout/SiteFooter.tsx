@@ -1,64 +1,93 @@
+"use client";
+
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import { navigation, site } from "@/content/site";
+import { intro } from "@/content/home";
 import { Container } from "@/components/ui/Container";
+import { PluckLogo } from "@/components/brand/PluckLogo";
+import { Reveal, stagger } from "@/components/motion/Reveal";
+import { motionEase, motionDurations } from "@/lib/motion";
+import { cn } from "@/lib/cn";
+
+const linkClass =
+  "site-footer__link inline-flex min-h-11 items-center text-[0.9375rem] leading-snug outline-none";
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
+  const reduce = useReducedMotion();
 
   return (
-    <footer className="surface-espresso relative text-ivory">
-      {/* Spectrum hairline ties the footer to the chapter accents */}
-      <div className="h-px bg-gradient-to-r from-copper via-saffron to-teal opacity-70" aria-hidden />
+    <footer className="site-footer relative isolate w-full bg-[#003D32] text-[#F7F3EA]">
+      <motion.div
+        className="site-footer__rule pointer-events-none absolute inset-x-0 top-0 h-px origin-left"
+        aria-hidden
+        initial={reduce ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0.6 }}
+        whileInView={{ scaleX: 1, opacity: 1 }}
+        viewport={{ once: true, margin: "-4% 0px" }}
+        transition={{ duration: motionDurations.base, ease: motionEase }}
+      />
 
-      {/* Main footer body */}
-      <Container className="grid items-end gap-8 py-10 md:grid-cols-2 md:py-12 lg:grid-cols-12 lg:gap-12">
+      <Container className="site-footer__main relative">
+        <div className="grid gap-8 sm:gap-9 md:grid-cols-2 lg:grid-cols-12 lg:items-start lg:gap-x-12 lg:gap-y-6 xl:gap-x-14">
+          <Reveal as="div" className="min-w-0 lg:col-span-5">
+            <Link
+              href="/"
+              className="site-footer__brand-link inline-block rounded-sm outline-none"
+            >
+              <PluckLogo variant="footer" />
+            </Link>
+            <p className="site-footer__tagline mt-3 max-w-[22rem] font-tagline text-[1.02rem] italic leading-[1.45] sm:mt-3.5 sm:text-[1.0625rem]">
+              {intro.anchor}
+            </p>
+            <p className="site-footer__description mt-3.5 max-w-[26rem] text-[0.9375rem] leading-[1.62] sm:mt-4 sm:text-[0.95rem]">
+              {site.description}
+            </p>
+          </Reveal>
 
-        {/* Brand block */}
-        <div className="lg:col-span-5">
-          <p className="font-display text-[1.5rem] font-medium tracking-[-0.02em] text-ivory">
-            {site.name}
-          </p>
-          <p className="mt-1 font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-ivory/55">
-            Commercial intelligence
-          </p>
-          <p className="mt-4 max-w-xs text-[0.9375rem] leading-relaxed text-ivory/70">
-            {site.description}
-          </p>
-        </div>
+          <Reveal as="div" delay={stagger(1, 0.05)} className="min-w-0 lg:col-span-3 lg:col-start-7">
+            <nav aria-label="Footer navigation">
+              <ul className="flex flex-col gap-0.5">
+                {navigation.map((item) => (
+                  <li key={item.href}>
+                    <Link href={item.href} className={linkClass}>
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </Reveal>
 
-        {/* Nav + CTA */}
-        <div className="flex flex-col justify-between gap-6 lg:col-span-7 lg:flex-row lg:items-end">
-          <nav aria-label="Footer navigation">
-            <ul className="flex flex-wrap gap-x-7 gap-y-1">
-              {navigation.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="inline-flex min-h-11 items-center text-[0.9375rem] text-ivory/75 transition-colors hover:text-ivory"
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          <Link
-            href="/contact"
-            className="inline-flex min-h-[2.75rem] items-center border border-ivory/20 px-7 text-sm font-medium tracking-wide text-ivory transition-all hover:-translate-y-0.5 hover:border-copper hover:bg-copper hover:text-ivory"
+          <Reveal
+            as="div"
+            delay={stagger(2, 0.05)}
+            className="min-w-0 md:col-span-2 lg:col-span-4 lg:col-start-10"
           >
-            Talk to us
-          </Link>
+            <div className="flex flex-col gap-4 md:items-start lg:items-end">
+              <Link
+                href="/contact"
+                className={cn(
+                  "site-footer__cta inline-flex min-h-[2.75rem] w-full items-center justify-center px-7 text-sm font-medium tracking-[0.04em] sm:w-auto",
+                  "bg-[#F7F3EA] text-[#003D32] transition-[color,background-color,transform,box-shadow] duration-300",
+                  "hover:bg-[#FFF8EC] hover:shadow-[0_10px_28px_-14px_rgb(0_0_0/0.55)]",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D8783F] focus-visible:ring-offset-2 focus-visible:ring-offset-[#003D32]",
+                  "active:scale-[0.99]",
+                )}
+              >
+                Talk to us
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </Container>
 
-      {/* Copyright strip */}
-      <div className="border-t border-ivory/10">
-        <Container className="flex flex-wrap items-center justify-between gap-2 py-4">
-          <p className="font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-ivory/50">
+      <div className="site-footer__bar">
+        <Container className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <p className="site-footer__meta font-mono text-[0.6875rem] uppercase tracking-[0.22em]">
             &copy; {year} {site.name}.media
           </p>
-          <p className="font-mono text-[0.6875rem] uppercase tracking-[0.2em] text-ivory/50">
+          <p className="site-footer__meta font-mono text-[0.6875rem] uppercase tracking-[0.22em] sm:text-right">
             Finding business others miss
           </p>
         </Container>

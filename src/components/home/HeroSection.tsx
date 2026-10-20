@@ -1,221 +1,261 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import {
-  motion,
-  useInView,
-  useReducedMotion,
-  useScroll,
-  useSpring,
-  useTransform,
-  useMotionValueEvent,
-} from "framer-motion";
+import Link from "next/link";
+import { useLayoutEffect, useRef, useState } from "react";
+import { useMotionValue, useReducedMotion } from "framer-motion";
+import { motion } from "motion/react";
 import { hero } from "@/content/home";
-import { Button } from "@/components/ui/Button";
-import { SectionLabel } from "@/components/ui/SectionLabel";
-import { KeywordMarquee } from "@/components/home/KeywordMarquee";
-import { HeroDiscoveryPath } from "@/components/home/HeroDiscoveryPath";
-import { homeSections } from "@/content/home-sections";
-import { motionEase, motionDurations } from "@/lib/motion";
+import { SiteNavBar } from "@/components/layout/SiteNavBar";
+import { HeroJourneyTimeline } from "@/components/home/HeroJourneyTimeline";
+import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
-const HERO_IMAGE = "/images/hero-discovery.png";
-
-function splitHeadline(text: string): [string, string] {
-  const dot = text.indexOf(". ");
-  if (dot === -1) return [text, ""];
-  return [text.slice(0, dot + 1), text.slice(dot + 2)];
-}
-
-function splitHeadlineLead(lead: string): [string, string] | null {
-  const breakAt = lead.indexOf(" you're ");
-  if (breakAt === -1) return null;
-  return [lead.slice(0, breakAt), lead.slice(breakAt + 1)];
-}
-
-const DESKTOP_QUERY = "(min-width: 1024px)";
-
-function subscribeDesktop(onChange: () => void) {
-  const mql = window.matchMedia(DESKTOP_QUERY);
-  mql.addEventListener("change", onChange);
-  return () => mql.removeEventListener("change", onChange);
-}
-
-/** Desktop gets the sticky, scroll-driven hero; smaller screens scroll straight past it. */
-function useIsDesktop() {
-  return useSyncExternalStore(
-    subscribeDesktop,
-    () => window.matchMedia(DESKTOP_QUERY).matches,
-    () => false,
-  );
-}
-
-function scrollProgressToStep(progress: number, stepCount: number): number {
-  if (stepCount <= 1) return 0;
-  const scaled = progress * (stepCount + 0.08);
-  return Math.min(stepCount - 1, Math.max(0, Math.floor(scaled)));
-}
+const HERO_VIDEO = "/videos/hero-background-pluck.mp4";
 
 export function HeroSection() {
-  const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
-  const [activeStep, setActiveStep] = useState(0);
 
-  const [headlineLead, headlineClose] = useMemo(
-    () => splitHeadline(hero.headline),
-    [],
-  );
-  const headlineLeadLines = useMemo(
-    () => splitHeadlineLead(headlineLead),
-    [headlineLead],
-  );
+  const sectionRef = useRef<HTMLElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const subRef = useRef<HTMLParagraphElement>(null);
+  const accentRef = useRef<HTMLDivElement>(null);
+  const sublineRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const scrollCueRef = useRef<HTMLDivElement>(null);
 
-  const stepCount = hero.journey.length;
+  const pathProgress = useMotionValue(reduce ? 1 : 0);
+  const [activeStep, setActiveStep] = useState(reduce ? hero.journey.length - 1 : 0);
 
-  const isDesktop = useIsDesktop();
-  const inView = useInView(ref, { amount: 0.35 });
+  useLayoutEffect(() => {
+    if (reduce) {
+      pathProgress.set(1);
+      setActiveStep(hero.journey.length - 1);
+      return;
+    }
 
-  /* Progress runs across the sticky phase only, so the last step lands as the hero releases */
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
+    ensureGsapPlugins();
 
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.04]);
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "-2%"]);
-  /* Fill reaches each node exactly as its step activates */
-  const pathProgress = useTransform(scrollYProgress, (v) =>
-    Math.min(1, (v * (stepCount + 0.08)) / Math.max(1, stepCount - 1)),
-  );
+    const section = sectionRef.current;
+    const headline = headlineRef.current;
+    const sub = subRef.current;
+    const accent = accentRef.current;
+    const subline = sublineRef.current;
+    const cta = ctaRef.current;
+    const timeline = timelineRef.current;
+    const scrollCue = scrollCueRef.current;
 
-  /* Mobile/tablet: no sticky phase to scroll through, so the path plays itself while visible */
-  const stepFill = useSpring(0, { stiffness: 90, damping: 22 });
+    if (!section || !headline || !sub || !subline || !cta) return;
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    if (isDesktop) setActiveStep(scrollProgressToStep(v, stepCount));
-  });
+    const headlineInners = headline.querySelectorAll<HTMLElement>("[data-hero-line-inner]");
+    const subInner = sub.querySelector<HTMLElement>("[data-hero-sub-inner]");
+    const progressProxy = { p: 0 };
+    const stepDuration = 1.28;
 
-  useEffect(() => {
-    if (isDesktop || reduce || !inView) return;
-    const id = window.setInterval(
-      () => setActiveStep((s) => (s + 1) % stepCount),
-      2600,
-    );
-    return () => window.clearInterval(id);
-  }, [isDesktop, reduce, inView, stepCount]);
+    const ctx = gsap.context(() => {
+      gsap.set([subline, cta, timeline, scrollCue, accent], { opacity: 0 });
+      gsap.set(headlineInners, { yPercent: 108, opacity: 0 });
+      if (subInner) gsap.set(subInner, { yPercent: 110, opacity: 0 });
+      gsap.set([subline], { y: 12 });
+      gsap.set(cta, { y: 10 });
+      if (accent) gsap.set(accent, { scaleX: 0, opacity: 0, transformOrigin: "left center" });
+      if (timeline) gsap.set(timeline, { y: 8, opacity: 0 });
+      if (scrollCue) gsap.set(scrollCue, { opacity: 0 });
 
-  useEffect(() => {
-    stepFill.set(activeStep / Math.max(1, stepCount - 1));
-  }, [activeStep, stepCount, stepFill]);
+      const open = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.12 });
+
+      open.to(headlineInners, {
+        yPercent: 0,
+        opacity: 1,
+        duration: 0.92,
+        stagger: 0.12,
+      });
+
+      if (subInner) {
+        open.to(
+          subInner,
+          { yPercent: 0, opacity: 1, duration: 0.78, ease: "power3.out" },
+          "-=0.35",
+        );
+      } else {
+        open.to(sub, { opacity: 1, duration: 0.5 }, "-=0.3");
+      }
+
+      if (accent) {
+        open.to(accent, { opacity: 1, scaleX: 1, duration: 0.55, ease: "power2.inOut" }, "-=0.2");
+      }
+
+      open.to(subline, { y: 0, opacity: 1, duration: 0.72 }, "-=0.28");
+      open.to(cta, { y: 0, opacity: 1, duration: 0.58 }, "-=0.42");
+
+      if (timeline) {
+        open.to(timeline, { y: 0, opacity: 1, duration: 0.62 }, "-=0.38");
+      }
+
+      if (scrollCue) {
+        open.to(scrollCue, { opacity: 1, duration: 0.35 }, "-=0.32");
+      }
+
+      const journeyDuration = hero.journey.length * stepDuration;
+      const pauseAtEnd = 1.75;
+      const stepCount = hero.journey.length;
+
+      const syncJourneyProgress = (p: number) => {
+        const clamped = Math.min(1, Math.max(0, p));
+        pathProgress.set(clamped);
+        const idx =
+          clamped >= 1
+            ? stepCount - 1
+            : Math.min(stepCount - 1, Math.floor(clamped * stepCount));
+        setActiveStep(idx);
+      };
+
+      const runJourneyCycle = () => {
+        progressProxy.p = 0;
+        syncJourneyProgress(0);
+
+        gsap.to(progressProxy, {
+          p: 1,
+          duration: journeyDuration,
+          ease: "none",
+          onUpdate: () => syncJourneyProgress(progressProxy.p),
+          onComplete: () => {
+            syncJourneyProgress(1);
+            gsap.delayedCall(pauseAtEnd, runJourneyCycle);
+          },
+        });
+      };
+
+      gsap.delayedCall(1.05, runJourneyCycle);
+    }, section);
+
+    return () => ctx.revert();
+  }, [reduce, pathProgress]);
 
   return (
     <section
-      ref={ref}
-      className="relative bg-ivory lg:h-[calc(100svh-var(--header-h)+55vh)] lg:min-h-[calc(640px+55vh)]"
+      ref={sectionRef}
+      className="hero-chapter hero-viewport relative isolate flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden bg-forest"
       aria-labelledby="hero-heading"
     >
-      {/*
-        Layout
-        - Mobile: copy → photo → path
-        - Tablet: copy → full, uncropped photo → path
-        - Desktop: copy left; full, uncropped photo right at mid-height with the
-          path set beneath it — nothing covers the objects
-      */}
-      <div className="relative flex min-h-[calc(100svh-var(--header-h))] flex-col justify-center pb-[clamp(0.75rem,3svh,3rem)] md:grid md:grid-cols-12 md:content-center md:gap-x-6 lg:sticky lg:top-[var(--header-h)] lg:h-[calc(100svh-var(--header-h))] lg:min-h-[640px] lg:grid-cols-[minmax(0,52fr)_minmax(0,48fr)] xl:grid-cols-[minmax(0,44fr)_minmax(0,56fr)] lg:grid-rows-[1fr_auto_auto_1fr] lg:gap-x-0 lg:overflow-hidden lg:pb-12">
-        <div className="hero-plate relative order-2 mx-[var(--gutter)] aspect-[21/10] overflow-hidden sm:aspect-[16/9] md:col-span-12 md:row-start-2 md:mt-10 md:aspect-[1024/516] lg:col-start-2 lg:row-start-2 lg:mx-0 lg:mt-0">
-          <motion.div
-            className="pointer-events-none absolute inset-0"
-            style={reduce ? undefined : { scale: imageScale, y: imageY }}
+      <div className="absolute inset-0 z-0">
+        {!reduce ? (
+          <video
+            ref={videoRef}
+            className="hero-video hero-video-focal h-full w-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
             aria-hidden
           >
-            <Image
-              src={HERO_IMAGE}
-              alt=""
-              fill
-              priority
-              className="object-cover object-[58%_45%] md:object-center"
-              sizes="(min-width: 1280px) 56vw, (min-width: 1024px) 48vw, calc(100vw - 2.5rem)"
-            />
-          </motion.div>
-        </div>
+            <source src={HERO_VIDEO} type="video/mp4" />
+          </video>
+        ) : (
+          <div className="h-full w-full bg-forest" aria-hidden />
+        )}
+      </div>
 
-        <div className="relative z-10 order-1 flex w-full flex-col justify-center px-[var(--gutter)] pb-5 pt-[clamp(0.75rem,3svh,3rem)] sm:pb-8 md:col-span-12 md:row-start-1 md:pb-0 lg:col-start-1 lg:row-span-4 lg:row-start-1 lg:py-12 lg:pl-[max(var(--gutter),calc((100vw-var(--content-max))/2+var(--gutter)))] lg:pr-[clamp(2rem,4vw,4.5rem)]">
-          <SectionLabel index={homeSections.hero.index} className="mb-3 sm:mb-5 lg:mb-7">
-            {homeSections.hero.name}
-          </SectionLabel>
-          <motion.h1
-            id="hero-heading"
-            className="type-display-xl text-forest max-sm:text-[2.125rem]"
-            initial={reduce ? false : { opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: motionDurations.slow, ease: motionEase }}
-          >
-            {headlineLeadLines ? (
-              <>
-                <span className="block">{headlineLeadLines[0]}</span>
-                <span className="block">{headlineLeadLines[1]}</span>
-              </>
-            ) : (
-              <span className="block">{headlineLead}</span>
-            )}
-            {headlineClose ? (
-              <span className="mt-1 block italic text-copper lg:mt-2">
-                {headlineClose}
-              </span>
-            ) : null}
-          </motion.h1>
+      <div className="pointer-events-none absolute inset-0 z-[1]" aria-hidden>
+        <div className="hero-scrim-left hero-scrim-left--viewport absolute inset-y-0 left-0 w-[min(100%,32rem)] sm:w-[min(100%,38rem)] lg:w-[min(52%,42rem)]" />
+        <div className="hero-scrim-top hero-scrim-top--viewport absolute inset-x-0 top-0 h-[min(18vh,8rem)]" />
+        <div className="hero-scrim-timeline hero-scrim-timeline--viewport absolute inset-x-0 bottom-0" />
+      </div>
 
-          <motion.p
-            className="type-lead mt-3 max-w-[30rem] text-ink-soft sm:mt-5 lg:mt-7"
-            initial={reduce ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: motionDurations.base,
-              ease: motionEase,
-              delay: 0.08,
-            }}
-          >
-            {hero.subline}
-          </motion.p>
+      <SiteNavBar variant="hero" />
 
-          <motion.div
-            className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-0 sm:mt-7 lg:mt-9"
-            initial={reduce ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.16, duration: motionDurations.base }}
-          >
-            <Button href="/contact" className="min-h-12 px-8 tracking-[0.04em]">
-              Talk to us
-            </Button>
-            <a
-              href="#quality"
-              className="group inline-flex min-h-11 items-center justify-center gap-2 text-[0.9375rem] font-medium text-forest/80 transition-colors hover:text-forest sm:justify-start"
-            >
-              Why the right leads matter
-              <span
-                className="transition-transform duration-300 group-hover:translate-y-0.5"
-                aria-hidden
+      <div className="relative z-[2] mx-auto flex min-h-0 w-full max-w-[var(--content-max)] flex-1 flex-col px-[var(--gutter)]">
+        <div className="h-[var(--header-h)] shrink-0" aria-hidden />
+
+        <div className="hero-copy-zone grid min-h-0 flex-1 grid-cols-1 items-center lg:grid-cols-12 lg:gap-x-8">
+          <div className="min-w-0 lg:col-span-5 lg:col-start-1 xl:col-span-5">
+            <div className="hero-copy-stack">
+              <h1
+                ref={headlineRef}
+                id="hero-heading"
+                className="hero-headline hero-headline--viewport font-display font-normal"
               >
-                ↓
-              </span>
-            </a>
-          </motion.div>
+                <span className="sr-only">{hero.headline}</span>
+                <span data-hero-line className="block overflow-hidden">
+                  <span data-hero-line-inner className="block">
+                    There&apos;s{" "}
+                    <span className="hero-headline__emphasis">business</span>
+                  </span>
+                </span>
+                <span data-hero-line className="block overflow-hidden">
+                  <span data-hero-line-inner className="block">
+                    you&apos;re{" "}
+                    <span className="hero-headline__emphasis">missing.</span>
+                  </span>
+                </span>
+              </h1>
+
+              <p
+                ref={subRef}
+                className="hero-subheading hero-subheading--viewport mt-2 font-display font-medium sm:mt-2.5"
+              >
+                <span className="block overflow-hidden">
+                  <span data-hero-sub-inner className="block">
+                    {hero.subheading}
+                  </span>
+                </span>
+              </p>
+
+              <div
+                ref={accentRef}
+                data-hero-accent
+                className="hero-accent-rule mt-3 h-px w-14 origin-left bg-gradient-to-r from-[#D8783E] via-[#D8783E]/70 to-transparent sm:mt-3.5 sm:w-16"
+                aria-hidden
+              />
+
+              <p
+                ref={sublineRef}
+                className="hero-body-copy hero-body-copy--viewport mt-3 sm:mt-3.5"
+              >
+                {hero.subline}
+              </p>
+
+              <div ref={ctaRef} className="mt-4 sm:mt-5">
+                <motion.div
+                  whileHover={reduce ? undefined : { y: -2 }}
+                  whileTap={reduce ? undefined : { scale: 0.992 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 26 }}
+                >
+                  <Link
+                    href="/contact"
+                    className="hero-cta inline-flex min-h-11 items-center justify-center bg-ivory px-8 py-3 text-sm font-medium tracking-[0.06em] text-forest shadow-[0_6px_20px_rgb(0_0_0/0.22)] transition-[background-color,color,box-shadow,transform] duration-300 ease-out hover:-translate-y-px hover:bg-[#FFF8EC] hover:text-charcoal hover:shadow-[0_10px_28px_rgb(0_0_0/0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[#D8783E] active:translate-y-0 sm:min-h-12 sm:px-9"
+                  >
+                    Talk to us
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
+          </div>
+          <div className="hidden min-h-0 lg:col-span-7 lg:block" aria-hidden />
         </div>
 
-        {/* Discovery path — set into the page, not boxed: beneath the photo (a thread
-            drops out of it into the first stage) at every size */}
-        <div className="relative z-10 order-3 mt-5 px-[var(--gutter)] sm:mt-8 md:col-span-12 md:mt-10 md:row-start-3 lg:col-start-2 lg:row-start-3 lg:mt-10 lg:self-start lg:pl-[clamp(1.5rem,3vw,3rem)]">
-          <HeroDiscoveryPath
-            activeStep={activeStep}
-            pathProgress={isDesktop ? pathProgress : stepFill}
-            reduce={reduce}
-            leadIn
-            className="w-full"
-          />
-        </div>
-
-        {/* Keyword strip — the foot of the first screen, so hero + strip read as one view */}
-        <KeywordMarquee className="order-4 mt-5 md:col-span-12 md:mt-8 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0" />
+        <footer
+          ref={timelineRef}
+          className="hero-viewport__footer mt-1 shrink-0 px-2 py-1.5 sm:mt-2 sm:px-3 sm:py-2"
+        >
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div className="min-w-0 flex-1">
+              <HeroJourneyTimeline
+                activeStep={activeStep}
+                progress={pathProgress}
+                reduce={reduce}
+              />
+            </div>
+            <p
+              ref={scrollCueRef}
+              className="shrink-0 text-center font-mono text-[0.5625rem] uppercase tracking-[0.26em] text-ivory/45 sm:pb-0.5 sm:text-right sm:text-[0.625rem]"
+              aria-hidden
+            >
+              Scroll
+            </p>
+          </div>
+        </footer>
       </div>
     </section>
   );

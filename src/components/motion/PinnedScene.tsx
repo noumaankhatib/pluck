@@ -59,7 +59,7 @@ export function PinnedScene({
         className={cn(
           isStatic
             ? "relative py-[var(--section-space-loose)]"
-            : "screen sticky top-[var(--header-h)] flex items-center overflow-hidden",
+            : "screen sticky top-[var(--header-h)] flex items-center overflow-x-hidden",
           !isStatic && stageClassName,
         )}
       >

@@ -1,5 +1,6 @@
 export const hero = {
-  headline: "There's business you're missing. We'll find it.",
+  headline: "There's business you're missing.",
+  subheading: "We'll find it.",
   subline:
     "Pluck finds commercially valuable opportunities businesses are currently missing.",
   journey: [
@@ -38,30 +39,39 @@ export const intro = {
 };
 
 export const quality = {
-  statement: "You don't just need more leads. You need the right ones.",
-  more: "More",
-  right: "Right",
-  narrative:
-    "Volume without relevance is noise. The work is to filter signals until what remains is commercially meaningful.",
-  moreSignals: [
-    "traffic",
-    "impressions",
-    "clicks",
-    "leads",
-    "noise",
+  handoff: "So why is it being missed?",
+  headlineLead: "You don't just need more leads.",
+  headlineTurn: "You need the right ones.",
+  subheading:
+    "For many B2B companies, one good customer can be worth a great deal.",
+  paragraphs: [
+    "Much digital marketing is still built around volume.",
+    "More traffic. More impressions. More clicks. More leads.",
+    "Those numbers only matter if they eventually become business.",
+    "If your sales depend on valuable contracts, specialist equipment, enterprise technology or complex services, a handful of the right customers may be worth far more than hundreds of irrelevant enquiries.",
+    "The challenge is finding them. This is where we come in.",
   ],
+  volumeSignals: ["traffic", "impressions", "clicks", "leads"],
   rightSignals: [
     "relevant customer",
     "commercial opportunity",
     "qualified enquiry",
     "business",
   ],
+  cta: "Talk to us",
+  ctaHref: "/contact",
 };
 
 export const searchIntelligence = {
   headline: "Search leaves clues.",
-  intro:
-    "Search behaviour reveals needs, demand, competitors, and opportunities — if you know how to read it.",
+  lead: "The way potential customers search tells you what they need.",
+  body: [
+    "Some search for a particular product.",
+    "Others search for a specification, a supplier or a problem they need to solve.",
+    "The keywords and phrases they use leave clues.",
+    "They tell us what people are looking for, where demand exists, what competitors are doing and where opportunities may have been left open.",
+    "Before we design any advertising campaign, we begin by asking where there is an opportunity worth pursuing.",
+  ],
   stages: [
     { label: "Search", description: "Behaviour leaves a trail." },
     { label: "Demand", description: "Need becomes visible in the data." },
@@ -72,51 +82,59 @@ export const searchIntelligence = {
 };
 
 export const journey = {
-  title: "How we find business",
+  title: "How we find the business",
+  cta: "Talk to us",
+  ctaHref: "/contact",
   stages: [
     {
       step: "01",
       title: "Understand",
-      body:
-        "The business, customers, proposition, and commercial objectives — so every decision has context.",
+      body: "Before we think about advertising, we look at your business.",
       prompts: [
         "What do you sell?",
         "Who buys it?",
         "Why do they choose you?",
         "What is a new customer worth?",
+        "Where might there be room to grow?",
       ],
     },
     {
       step: "02",
       title: "Find",
-      body:
-        "Markets, search behaviour, competitors, and opportunities — researched with commercial discipline.",
+      body: "Then we investigate the market.",
       prompts: [
         "What are potential customers searching for?",
         "Where are they searching?",
-        "Which searches suggest intent?",
-        "Where are opportunities?",
+        "How many people are searching?",
+        "Which searches suggest genuine buying interest?",
+        "Where are competitors strong?",
+        "Where might competitors be leaving opportunities open?",
       ],
     },
     {
       step: "03",
       title: "Reach",
       body:
-        "Channels and methods chosen because they make commercial sense — not because they're fashionable.",
-      prompts: ["Search", "Social", "SEO", "Landing pages", "Other appropriate channels"],
+        "When we find a worthwhile opportunity, we work out the best way to reach it. Depending on the opportunity, that may include targeted search or social advertising, SEO, dedicated landing pages or other approaches designed to reach the right people.",
+      prompts: [
+        "Search advertising",
+        "Social advertising",
+        "SEO",
+        "Landing pages",
+        "Other approaches",
+      ],
     },
     {
       step: "04",
       title: "Learn",
-      body:
-        "Measure what happens and use evidence to improve decisions — continuously.",
+      body: "Then we follow what happens. Not simply who clicked. We want to know:",
+      outro: "Then we do more of what works and less of what doesn't.",
       prompts: [
         "Did they enquire?",
-        "Were they good?",
-        "Did they become customers?",
+        "Was the enquiry any good?",
         "Did it become a quotation?",
         "Did it become a customer?",
-        "Did it become a result?",
+        "Did it make money?",
       ],
     },
   ],
@@ -126,17 +144,21 @@ export const caseStudy = {
   client: "Server Factory",
   headline: "What does success look like?",
   supporting: "It isn't a dashboard full of green arrows. It's business.",
-  context:
+  body: [
     "For Server Factory, a UK enterprise IT infrastructure company, the opportunity was to reach organisations actively searching for high-value enterprise hardware.",
-  workDescription:
-    "The work went beyond simply running Google Ads. It included understanding the business and its customers, researching the market and competitors, identifying valuable searches, developing landing pages and continually learning from what happened.",
+    "The work went beyond simply running Google Ads.",
+    "It included understanding the business and its customers, researching the market and competitors, identifying valuable searches, developing landing pages and continually learning from what happened.",
+  ],
   timeline: "3 months",
   metrics: [
-    { label: "Media spend", value: "$15k" },
+    { label: "Media spend", value: "$15,000" },
     { label: "Qualified leads", value: "100+" },
     { label: "Quoted", value: "$4.7m" },
-    { label: "Sales", value: "$1.2m" },
-    { label: "Return", value: "$80 sales per $1 ad spend" },
+    { label: "In sales", value: "$1.2m" },
+    {
+      label: "Return",
+      value: "$80 in sales for every $1 of advertising spend",
+    },
   ],
   flow: ["Spend", "Leads", "Quotes", "Sales"],
   link: "/work/server-factory",
@@ -144,17 +166,15 @@ export const caseStudy = {
 };
 
 export const qualification = {
-  headline: "Pluck is not right for every business.",
-  centerStatement: "Is there an opportunity?",
-  intro:
-    "We work with organisations where search, positioning, and commercial conversation matter.",
+  headline: "This approach isn't right for every business.",
+  intro: "It works particularly well when:",
   criteria: [
-    "High-value customers",
-    "Active search demand",
-    "Specialist, technical, or complex offering",
-    "Quality over volume",
-    "Meaningful sales conversation",
-    "Potentially missed commercial opportunities",
+    "one new customer is worth a significant amount to your business",
+    "potential customers actively search online for what you sell or the problems you solve",
+    "your product or service is specialist, technical or complex",
+    "quality matters more than lead volume",
+    "a sales conversation normally follows an enquiry",
+    "you suspect there are customers, markets or opportunities you're currently missing",
   ],
   industriesIntro:
     "We work especially well with businesses selling things people think carefully about before they buy.",
@@ -163,51 +183,69 @@ export const qualification = {
     "Specialist equipment",
     "Infrastructure",
     "Engineering",
-    "Scientific & medical equipment",
+    "Scientific and medical equipment",
     "High-value services",
   ],
 };
 
 export const plainEnglish = {
   headline: "Plain English",
+  intro: [
+    "You shouldn't need to become a PPC expert.",
+    "You should be able to ask much simpler questions.",
+  ],
   questions: [
-    "Where are potential customers?",
+    "Where are our potential customers?",
     "What are they looking for?",
     "Can we reach them?",
     "What will it cost?",
-    "Are the enquiries good?",
-    "Do they become customers?",
-    "Does it make money?",
+    "Are the enquiries any good?",
+    "Are they becoming customers?",
+    "Is this making us money?",
   ],
+  bridge: "Those are the questions we care about too.",
   climax: "The technical complexity sits with us.",
 };
 
 export const disciplines = {
   headline: "Three disciplines. One commercial objective.",
-  intro:
-    "Finding new customers online requires more than knowing how to operate Google Ads. We bring together three different ways of looking at the same problem.",
+  subheading:
+    "Finding new customers online requires more than knowing how to operate Google Ads.",
+  body: "We bring together three different ways of looking at the same problem.",
   people: [
     {
       name: "Michael Simkin",
-      role: "Commercial strategy, positioning & customer understanding.",
+      discipline: "Commercial strategy, positioning & customer understanding",
+      bio:
+        "Michael works with businesses to understand their market, their customers, what makes them valuable and where commercial opportunities may lie.",
     },
     {
       name: "Junaid Kazi",
-      role: "Paid search & performance.",
+      discipline: "Paid search & performance",
+      bio:
+        "Junaid identifies how prospective customers search and builds tightly targeted campaigns designed to reach them at the right moment.",
     },
     {
       name: "Noumaan Khatib",
-      role: "Search, technology & conversion.",
+      discipline: "Search, technology & conversion",
+      bio:
+        "Noumaan brings more than ten years of experience across development, SEO and landing-page optimisation, connecting customer acquisition with the technology needed to turn interest into enquiries.",
     },
   ],
   objective: "One commercial objective",
-  collective:
-    "Together, we connect commercial thinking with the expertise needed to identify, reach and convert worthwhile opportunities.",
+  closingLine: "Find the business you're missing.",
 };
 
 export const closing = {
-  howWeWork: "How we work",
-  headline: "Let's see what's out there.",
+  title: "How we work",
+  body: [
+    "If you have a valuable product or service and suspect you're missing customers, we'll be glad to talk.",
+    "We'll start by discussing your business, your customers, what you're doing now and where there may be opportunities worth investigating.",
+    "We won't begin by trying to sell you a package. And we won't pretend to know the answer before we've looked.",
+    "Sometimes we may conclude that paid search isn't actually the right opportunity.",
+    "That's useful to know too.",
+    "Let's see what's out there.",
+  ],
   cta: "Talk to us",
   ctaHref: "/contact",
 };
