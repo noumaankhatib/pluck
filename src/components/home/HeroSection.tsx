@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { useLayoutEffect, useRef, useState } from "react";
-import { useMotionValue, useReducedMotion } from "framer-motion";
-import { motion } from "motion/react";
+import { motion, useMotionValue, useReducedMotion } from "framer-motion";
 import { hero } from "@/content/home";
 import { SiteNavBar } from "@/components/layout/SiteNavBar";
 import { HeroJourneyTimeline } from "@/components/home/HeroJourneyTimeline";
