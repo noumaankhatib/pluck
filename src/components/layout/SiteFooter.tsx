@@ -47,6 +47,7 @@ export function SiteFooter() {
 
           <Reveal as="div" delay={stagger(1, 0.05)} className="min-w-0 lg:col-span-3 lg:col-start-7">
             <nav aria-label="Footer navigation">
+              <p className="site-footer__heading" aria-hidden="true">Explore</p>
               <ul className="flex flex-col gap-0.5">
                 {navigation.map((item) => (
                   <li key={item.href}>
@@ -65,6 +66,7 @@ export function SiteFooter() {
             className="min-w-0 md:col-span-2 lg:col-span-4 lg:col-start-10"
           >
             <div className="flex flex-col gap-4 md:items-start lg:items-end">
+              <p className="site-footer__heading !mb-0" aria-hidden="true">Start a conversation</p>
               <Link
                 href="/contact"
                 className={cn(

@@ -100,3 +100,93 @@ export const serverFactoryCaseStudy = {
     href: "/contact",
   },
 };
+
+/** Presentation copy for the redesigned case-study page. No new claims or figures. */
+export const serverFactoryStory = {
+  heroMeta: ["B2B customer acquisition", "3-month paid search campaign"],
+  heroPath: ["Discovery", "Enquiry", "Opportunity"],
+  opportunity: {
+    headline: "The opportunity",
+    crowded: "A crowded field of generic choices",
+    resolved: "A clear path to the right supplier",
+  },
+  customer: {
+    headline: "Start with the customer, not the campaign.",
+    steps: [
+      { title: "Understand the business", text: "Conversations with the Server Factory team." },
+      { title: "Interview and survey customers", text: "A questionnaire sent to existing clients." },
+      { title: "Analyse competitors", text: "How others present, communicate and help buyers decide." },
+      { title: "Identify what builds confidence", text: "What customers value and where they are frustrated." },
+      { title: "Translate insights into positioning", text: "Direction for the website and campaigns." },
+    ],
+  },
+  buyers: {
+    headline: "Two buyers. Two different journeys.",
+    cards: [
+      {
+        tag: "Buyer one",
+        title: "The specification-led buyer",
+        text: "Knows what they need and wants the right hardware, availability and price.",
+        path: ["Knows the specification", "Finds the hardware", "Checks availability and price"],
+      },
+      {
+        tag: "Buyer two",
+        title: "The guidance-seeking buyer",
+        text: "Knows the outcome they need but wants advice on the best system for the job.",
+        path: ["Knows the outcome", "Looks for advice", "Gets expert guidance"],
+      },
+    ],
+    converge: "One website that makes it easier to find products or get expert advice",
+  },
+  website: {
+    headline: "A website designed around how people buy.",
+    items: [
+      "Clearer positioning and messaging",
+      "A more considered website structure",
+      "Stronger trust signals",
+      "Helpful buying guides",
+      "SEO strategy and technical search implementation",
+    ],
+    status: "Scheduled to launch in autumn 2026. Organic performance not yet measured.",
+  },
+  paid: {
+    headline: "Find demand that matters.",
+    signals: ["Looking for specific hardware", "Comparing suppliers", "Needs advice on a system"],
+    highlighted: 0,
+    flow: [
+      "Relevant search intent",
+      "Targeted Google Ads",
+      "Dedicated landing pages",
+      "Qualified enquiries",
+      "Quotations",
+      "Sales",
+    ],
+    note: "A conceptual view of the journey. Search terms shown are illustrative, not campaign data.",
+  },
+  results: {
+    kicker: "Commercial impact",
+    inputLabel: "What went in",
+    outputLabel: "What came out",
+    ratioLead: "Reported sales per advertising dollar",
+  },
+  difference: {
+    headline: "The campaign didn't begin with a list of keywords.",
+    disciplines: [
+      { title: "Commercial research and communication", text: "Understand the business, customers and buying decisions." },
+      { title: "Paid-search expertise", text: "Identify and reach commercially relevant demand." },
+      { title: "SEO and technical development", text: "Build a stronger website and customer-acquisition foundation." },
+    ],
+    outcome: "Better-informed customer acquisition",
+  },
+  next: {
+    headline: "The next opportunity is still unfolding.",
+    status: "Not yet established",
+    steps: [
+      "Establish the new website baseline",
+      "Measure search visibility and organic traffic",
+      "Track qualified enquiries",
+      "Evaluate subsequent commercial outcomes",
+      "Update the case study when sufficient evidence is available",
+    ],
+  },
+};

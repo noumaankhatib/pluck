@@ -123,7 +123,7 @@ export function HeroJourneyTimeline({
                 </span>
                 <span
                   className={cn(
-                    "mt-1 w-full px-0.5 font-sans text-[0.5rem] font-semibold uppercase leading-tight tracking-[0.08em] sm:text-[0.5625rem] md:text-[0.625rem]",
+                    "hero-journey-step-label mt-1 w-full px-0.5 font-sans font-semibold uppercase",
                     isActive && "text-[#FFF8EC]",
                     !isActive && lit && "text-[#FFF8EC]/82",
                     !isActive && !lit && "text-[#FFF8EC]/52",

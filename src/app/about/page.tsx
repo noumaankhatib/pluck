@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
+import { InView } from "@/components/case-study/InView";
+import {
+  AdviceLine,
+  ApproachSteps,
+  BeliefDiagram,
+  CtaTopography,
+  HeroLandscape,
+  HeroPathway,
+  TeamGrid,
+  TogetherDiagram,
+} from "@/components/about/visuals";
 import { aboutSeo, site } from "@/content/site";
 import {
   aboutIntro,
@@ -9,6 +20,7 @@ import {
   aboutTeam,
   aboutBeliefs,
   aboutCta,
+  aboutStory as story,
 } from "@/content/about";
 
 export const metadata: Metadata = {
@@ -30,178 +42,159 @@ export const metadata: Metadata = {
   },
 };
 
-function SplitSection({
-  title,
-  body,
-}: {
-  title: string;
-  body: string[];
-}) {
+function Prose({ paragraphs, start = 2 }: { paragraphs: readonly string[]; start?: number }) {
   return (
-    <section className="bg-ivory py-[var(--section-space-loose)]">
-      <Container>
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-          <div className="lg:col-span-4">
-            <h2 className="font-display text-[clamp(1.875rem,3.8vw,2.75rem)] font-medium leading-[1.1] tracking-[-0.02em] text-forest">
-              {title}
-            </h2>
-          </div>
-          <div className="space-y-5 lg:col-span-6 lg:col-start-6">
-            {body.map((paragraph) => (
-              <p
-                key={paragraph}
-                className="text-base leading-relaxed text-charcoal/78 md:text-[1.0625rem]"
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </div>
-      </Container>
-    </section>
+    <div className="cs-prose">
+      {paragraphs.map((p, i) => (
+        <p key={p} className="cs-rise" style={{ ["--i" as string]: i + start }}>
+          {p}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function Head({ kicker, title, id }: { kicker: string; title: string; id: string }) {
+  return (
+    <header className="cs-head">
+      <p className="cs-kicker cs-rise">{kicker}</p>
+      <h2 id={id} className="cs-h2 cs-rise" style={{ ["--i" as string]: 1 }}>
+        {title}
+      </h2>
+    </header>
   );
 }
 
 export default function AboutPage() {
   return (
-    <main aria-label="About Pluck">
-      <section className="bg-forest py-20 text-ivory md:py-28">
-        <Container>
-          <p className="mb-4 font-mono text-[0.6rem] uppercase tracking-[0.28em] text-copper">
-            About
-          </p>
-          <h1 className="font-display max-w-3xl text-[clamp(2.5rem,6vw,4.5rem)] font-medium leading-[1.06] tracking-[-0.03em] text-ivory">
-            {aboutIntro.headline}
-          </h1>
-          <div className="mt-8 max-w-2xl space-y-5 text-[0.9375rem] leading-relaxed text-ivory/80 md:text-base">
-            {aboutIntro.body.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      <SplitSection title={aboutWhyTogether.title} body={aboutWhyTogether.body} />
-
-      <section className="border-t border-forest/10 bg-ivory pb-[var(--section-space-loose)] pt-0">
-        <Container>
-          <div className="grid gap-10 border-t border-forest/10 pt-[var(--section-space-loose)] lg:grid-cols-12 lg:gap-14">
-            <div className="lg:col-span-4">
-              <h2 className="font-display text-[clamp(1.875rem,3.8vw,2.75rem)] font-medium leading-[1.1] tracking-[-0.02em] text-forest">
-                {aboutUnderstanding.title}
-              </h2>
-            </div>
-            <div className="space-y-5 lg:col-span-6 lg:col-start-6">
-              {aboutUnderstanding.body.map((paragraph) => (
-                <p
-                  key={paragraph}
-                  className="text-base leading-relaxed text-charcoal/78 md:text-[1.0625rem]"
-                >
-                  {paragraph}
+    <main aria-label="About Pluck" className="cs ab">
+      <section className="cs-hero ab-hero" aria-labelledby="ab-title">
+        <HeroLandscape />
+        <Container className="cs-hero__grid ab-hero__grid">
+          <div>
+            <p className="cs-kicker cs-hero-in" style={{ ["--i" as string]: 0, color: "var(--color-copper-soft)" }}>
+              {story.hero.kicker}
+            </p>
+            <h1 id="ab-title" className="cs-hero__title mt-6">
+              <span className="cs-hero-in" style={{ ["--i" as string]: 1 }}>We look beyond</span>
+              <span className="cs-hero-in" style={{ ["--i" as string]: 2 }}>
+                the <span className="cs-hero__accent">obvious.</span>
+              </span>
+            </h1>
+            <div className="ab-hero__body">
+              {aboutIntro.body.map((p, i) => (
+                <p key={p} className="cs-hero-in" style={{ ["--i" as string]: i + 4 }}>
+                  {p}
                 </p>
               ))}
             </div>
-          </div>
-        </Container>
-      </section>
-
-      <section className="bg-ivory pb-[var(--section-space-loose)] pt-0">
-        <Container>
-          <div className="border-t border-forest/10 pt-14 mb-14">
-            <h2 className="font-display text-[clamp(1.875rem,3.8vw,2.75rem)] font-medium leading-[1.1] tracking-[-0.02em] text-forest">
-              {aboutTeam.headline}
-            </h2>
-          </div>
-          <ul className="grid gap-12 md:grid-cols-3 md:gap-10">
-            {aboutTeam.people.map((person) => (
-              <li key={person.name} className="border-t border-forest/10 pt-8">
-                <h3 className="font-display text-xl font-medium text-forest">
-                  {person.name}
-                </h3>
-                <p className="mb-5 mt-1 font-mono text-[0.6rem] uppercase tracking-[0.24em] text-copper">
-                  {person.role}
-                </p>
-                <div className="space-y-4">
-                  {person.body.map((paragraph) => (
-                    <p
-                      key={paragraph}
-                      className="text-[0.9375rem] leading-relaxed text-charcoal/75"
-                    >
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Container>
-      </section>
-
-      <section className="bg-forest py-[var(--section-space-loose)] text-ivory">
-        <Container className="max-w-3xl">
-          <h2 className="font-display text-[clamp(1.875rem,3.8vw,2.75rem)] font-medium leading-[1.1] tracking-[-0.02em] text-ivory">
-            {aboutBeliefs.title}
-          </h2>
-          <div className="mt-8 space-y-5">
-            {aboutBeliefs.intro.map((paragraph, i) => (
-              <p
-                key={paragraph}
-                className={
-                  i === 0
-                    ? "font-display text-[clamp(1.35rem,2.5vw,1.875rem)] font-medium leading-[1.15] tracking-[-0.02em] text-ivory"
-                    : "text-[0.9375rem] leading-relaxed text-ivory/78 md:text-base"
-                }
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
-          <ul
-            className="my-10 space-y-0 border-y border-ivory/12"
-            aria-label="The questions we care about"
-          >
-            {aboutBeliefs.questions.map((q) => (
-              <li
-                key={q}
-                className="border-b border-ivory/12 py-4 font-display text-[clamp(1rem,2vw,1.25rem)] leading-snug text-ivory last:border-b-0"
-              >
-                {q}
-              </li>
-            ))}
-          </ul>
-          <div className="space-y-5">
-            {aboutBeliefs.closing.map((paragraph) => (
-              <p
-                key={paragraph}
-                className="text-[0.9375rem] leading-relaxed text-ivory/78 md:text-base"
-              >
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      <section className="bg-ivory py-[var(--section-space-loose)]">
-        <Container>
-          <div className="max-w-2xl">
-            <h2 className="font-display text-[clamp(1.875rem,3.8vw,2.75rem)] font-medium leading-[1.1] tracking-[-0.02em] text-forest">
-              {aboutCta.title}
-            </h2>
-            <div className="mt-6 space-y-5">
-              {aboutCta.body.map((paragraph) => (
-                <p
-                  key={paragraph}
-                  className="text-base leading-relaxed text-charcoal/78 md:text-[1.0625rem]"
-                >
-                  {paragraph}
-                </p>
-              ))}
+            <div className="cs-hero-in mt-8" style={{ ["--i" as string]: 8 }}>
+              <Button href={aboutCta.ctaHref} className="cs-cta">
+                {aboutCta.cta}
+                <span aria-hidden="true" className="ml-3">→</span>
+              </Button>
             </div>
+          </div>
+          <HeroPathway />
+        </Container>
+      </section>
+
+      <section className="cs-section cs-section--ivory" aria-labelledby="belief">
+        <Container className="cs-split ab-split-top">
+          <InView>
+            <Head kicker={story.belief.kicker} title={story.belief.headline} id="belief" />
             <div className="mt-8">
-              <Button href={aboutCta.ctaHref}>{aboutCta.cta}</Button>
+              <Prose paragraphs={aboutBeliefs.intro} />
             </div>
+            <ol className="ab-questions" aria-label="The questions we care about">
+              {aboutBeliefs.questions.map((q, i) => (
+                <li key={q} className="cs-rise" style={{ ["--i" as string]: i + 5 }}>
+                  <span aria-hidden="true">0{i + 1}</span>
+                  {q}
+                </li>
+              ))}
+            </ol>
+          </InView>
+          <BeliefDiagram />
+        </Container>
+      </section>
+
+      <section className="cs-section cs-section--paper" aria-labelledby="approach">
+        <Container>
+          <InView>
+            <Head kicker={story.approach.kicker} title={story.approach.headline} id="approach" />
+            <div className="mt-8">
+              <Prose paragraphs={aboutWhyTogether.body} />
+            </div>
+          </InView>
+          <div className="mt-14">
+            <ApproachSteps />
           </div>
+        </Container>
+      </section>
+
+      <section className="cs-section cs-section--ivory ab-people" aria-labelledby="people">
+        <Container>
+          <InView>
+            <Head kicker={story.people.kicker} title={story.people.headline} id="people" />
+          </InView>
+          <div className="mt-9">
+            <TeamGrid people={aboutTeam.people} />
+          </div>
+        </Container>
+      </section>
+
+      <section className="cs-section cs-section--forest" aria-labelledby="together">
+        <Container className="cs-split ab-split-top">
+          <InView>
+            <Head kicker={story.together.kicker} title={story.together.headline} id="together" />
+            <p className="ab-sub cs-rise" style={{ ["--i" as string]: 2 }}>{aboutIntro.headline}</p>
+            <div className="mt-6 ab-prose-dark">
+              <Prose paragraphs={aboutBeliefs.closing} start={3} />
+            </div>
+          </InView>
+          <TogetherDiagram />
+        </Container>
+      </section>
+
+      <section className="cs-section cs-section--ivory ab-advice" aria-labelledby="advice">
+        <AdviceLine />
+        <Container className="relative">
+          <InView>
+            <p className="cs-kicker cs-rise">{story.advice.kicker}</p>
+            <h2 id="advice" className="ab-advice__title cs-rise" style={{ ["--i" as string]: 1 }}>
+              {story.advice.headline}
+            </h2>
+            <div className="ab-advice__body">
+              <h3 className="sr-only">{aboutUnderstanding.title}</h3>
+              <Prose paragraphs={aboutUnderstanding.body} start={3} />
+            </div>
+          </InView>
+        </Container>
+      </section>
+
+      <section className="cs-section cs-section--ink ab-cta" aria-labelledby="about-cta">
+        <CtaTopography />
+        <Container className="relative">
+          <InView>
+            <p className="cs-kicker cs-rise">{story.cta.kicker}</p>
+            <h2 id="about-cta" className="ab-cta__title cs-rise" style={{ ["--i" as string]: 1 }}>
+              {story.cta.headline}
+            </h2>
+            <div className="cs-prose mt-8">
+              {aboutCta.body.map((p, i) => (
+                <p key={p} className="cs-rise" style={{ ["--i" as string]: i + 2 }}>
+                  {p}
+                </p>
+              ))}
+            </div>
+            <div className="mt-10 cs-rise" style={{ ["--i" as string]: 6 }}>
+              <Button href={aboutCta.ctaHref} className="cs-cta">
+                {aboutCta.cta}
+                <span aria-hidden="true" className="ml-3">→</span>
+              </Button>
+            </div>
+          </InView>
         </Container>
       </section>
     </main>

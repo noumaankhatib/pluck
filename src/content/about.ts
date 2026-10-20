@@ -32,7 +32,7 @@ export const aboutTeam = {
   headline: "The people behind Pluck",
   people: [
     {
-      name: "Michael Jack Simkin",
+      name: "Michael Simkin",
       role: "Commercial strategy, positioning & customer understanding",
       body: [
         "Michael has more than a decade of experience helping businesses understand their markets and customers. He identifies what makes propositions valuable and where commercial opportunities may lie. His work includes research, positioning, communication, copywriting, art direction and the commercial conversations that turn opportunities into projects.",
@@ -92,4 +92,60 @@ export const aboutCta = {
   ],
   cta: "Talk to us",
   ctaHref: "/contact",
+};
+
+/** Presentation copy for the redesigned About page. Supporting labels only; no new claims. */
+export const aboutStory = {
+  hero: {
+    kicker: "About Pluck",
+    markers: ["Customer insight", "Untapped demand", "Business growth"],
+  },
+  belief: {
+    kicker: "Our belief",
+    headline: "Good growth starts with better questions.",
+    nodes: [
+      { label: "Business", text: "What you sell and why customers choose you." },
+      { label: "Customer", text: "Who buys, and how they search." },
+      { label: "Market", text: "Where competitors are strong and room is left to grow." },
+    ],
+    centre: "Opportunity",
+  },
+  approach: {
+    kicker: "Our approach",
+    headline: "Curiosity, connected to commercial thinking.",
+    disciplines: [
+      {
+        label: "Research",
+        role: "Commercial strategy, positioning & customer understanding",
+        text: "Understand the business and what matters to its customers.",
+      },
+      {
+        label: "Search",
+        role: "Paid search & performance",
+        text: "Know how people search, where competitors are strong and where opportunities are open.",
+      },
+      {
+        label: "Technology",
+        role: "Search, technology & conversion",
+        text: "Turn that knowledge into campaigns, websites and landing pages that work.",
+      },
+    ],
+  },
+  people: {
+    kicker: "The team",
+    headline: "Specialist expertise. A shared perspective.",
+  },
+  together: {
+    kicker: "How we work together",
+    headline: "One objective. Different disciplines.",
+    objective: "Finding the business customers are missing",
+  },
+  advice: {
+    kicker: "Our advice",
+    headline: "Find the opportunity hiding in plain sight.",
+  },
+  cta: {
+    kicker: "Let's see what we might find.",
+    headline: "What could you be missing?",
+  },
 };

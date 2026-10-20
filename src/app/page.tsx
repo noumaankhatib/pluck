@@ -11,6 +11,7 @@ import { DisciplinesSection } from "@/components/home/DisciplinesSection";
 import { ClosingCTASection } from "@/components/home/ClosingCTASection";
 import { StoryHandoff } from "@/components/home/StoryHandoff";
 import { HomeStoryShell } from "@/components/home/HomeStoryShell";
+import { HeroVideoPreload } from "@/components/home/HeroVideoPreload";
 import { homeSeo, site } from "@/content/site";
 
 export const metadata: Metadata = {
@@ -34,7 +35,9 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <HomeStoryShell>
+    <>
+      <HeroVideoPreload />
+      <HomeStoryShell>
       <HeroSection />
       <IntroNarrativeSection />
       <QualitySection />
@@ -51,5 +54,6 @@ export default function HomePage() {
       <DisciplinesSection />
       <ClosingCTASection />
     </HomeStoryShell>
+    </>
   );
 }

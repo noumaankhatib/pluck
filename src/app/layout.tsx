@@ -11,6 +11,8 @@ const bodoniModa = Bodoni_Moda({
   subsets: ["latin"],
   display: "swap",
   weight: "variable",
+  // Load the real italic cut too; without it the browser slants the upright (faux italic).
+  style: ["normal", "italic"],
   axes: ["opsz"],
 });
 
@@ -18,14 +20,14 @@ const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
   display: "swap",
-  weight: "400",
+  weight: ["400", "500", "600"],
 });
 
 const manrope = Manrope({
   variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
-  weight: "400",
+  weight: ["400", "500", "600"],
 });
 
 const libreBaskerville = Libre_Baskerville({

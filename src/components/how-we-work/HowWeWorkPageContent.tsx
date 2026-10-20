@@ -43,13 +43,13 @@ export function HowWeWorkPageContent() {
 
           <h1 className="font-display max-w-3xl text-[clamp(2.5rem,6vw,4.75rem)] font-medium leading-[1.05] tracking-[-0.028em] text-ivory">
             {HEADING_WORDS.map((word) => (
-              <span key={word} className="mr-[0.28em] inline-block overflow-hidden">
+              <span key={word} className="text-mask text-mask--gap">
                 <span data-hww-heading-word className="inline-block">
                   {word}
                 </span>
               </span>
             ))}
-            <span className="inline-block overflow-hidden">
+            <span className="text-mask">
               <span data-hww-heading-word className="inline-block text-copper-soft italic">
                 {howWeWorkHero.titleEmphasis}
               </span>

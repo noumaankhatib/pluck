@@ -30,7 +30,7 @@ export default function ContactPage() {
     <main aria-label="Contact Pluck">
       <section className="bg-forest py-20 text-ivory md:py-28">
         <Container>
-          <p className="mb-4 font-mono text-[0.6rem] uppercase tracking-[0.28em] text-copper">
+          <p className="mb-4 type-eyebrow text-copper">
             Contact
           </p>
           <h1 className="font-display text-[clamp(2.75rem,6vw,4.5rem)] font-medium leading-[1.04] tracking-[-0.03em] text-ivory">
@@ -79,7 +79,7 @@ export default function ContactPage() {
             </div>
 
             <aside className="lg:col-span-4 lg:col-start-9 lg:pt-2">
-              <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-charcoal/65">
+              <p className="type-caption text-charcoal/72">
                 {contactPage.form.preferDirect}
               </p>
               <ul className="mt-6 space-y-5 text-[0.9375rem] leading-relaxed text-charcoal/85 md:text-base">

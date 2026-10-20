@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useReducedMotion } from "framer-motion";
 import { hero } from "@/content/home";
-import { SiteNavBar } from "@/components/layout/SiteNavBar";
 import { HeroJourneyTimeline } from "@/components/home/HeroJourneyTimeline";
+import { HeroVideoLoader } from "@/components/home/HeroVideoLoader";
 import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
-const HERO_VIDEO = "/videos/hero-background-pluck.mp4";
+/** Web delivery encode (~3MB, faststart). Master: hero-background-pluck.mp4 */
+const HERO_VIDEO = "/videos/hero-background-pluck.web.mp4";
 
 export function HeroSection() {
   const reduce = useReducedMotion();
 
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoReady, setVideoReady] = useState(false);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const accentRef = useRef<HTMLDivElement>(null);
@@ -26,6 +28,50 @@ export function HeroSection() {
   const pathProgress = useMotionValue(reduce ? 1 : 0);
   const [activeStep, setActiveStep] = useState(reduce ? hero.journey.length - 1 : 0);
 
+  useEffect(() => {
+    if (reduce) return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    const markReady = () => setVideoReady(true);
+
+    const syncReadyState = () => {
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        markReady();
+      }
+    };
+
+    const tryPlay = () => {
+      syncReadyState();
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Autoplay blocked — still show the loaded frame.
+          syncReadyState();
+        });
+      }
+    };
+
+    video.addEventListener("loadeddata", markReady);
+    video.addEventListener("canplay", markReady);
+    video.addEventListener("playing", markReady);
+    video.addEventListener("error", markReady);
+
+    syncReadyState();
+    tryPlay();
+
+    const revealFallback = window.setTimeout(markReady, 1500);
+
+    return () => {
+      window.clearTimeout(revealFallback);
+      video.removeEventListener("loadeddata", markReady);
+      video.removeEventListener("canplay", markReady);
+      video.removeEventListener("playing", markReady);
+      video.removeEventListener("error", markReady);
+    };
+  }, [reduce]);
+
   useLayoutEffect(() => {
     if (reduce) {
       pathProgress.set(1);
@@ -36,65 +82,14 @@ export function HeroSection() {
     ensureGsapPlugins();
 
     const section = sectionRef.current;
-    const headline = headlineRef.current;
-    const sub = subRef.current;
-    const accent = accentRef.current;
-    const subline = sublineRef.current;
-    const cta = ctaRef.current;
     const timeline = timelineRef.current;
-    const scrollCue = scrollCueRef.current;
 
-    if (!section || !headline || !sub || !subline || !cta) return;
+    if (!section) return;
 
-    const headlineInners = headline.querySelectorAll<HTMLElement>("[data-hero-line-inner]");
-    const subInner = sub.querySelector<HTMLElement>("[data-hero-sub-inner]");
     const progressProxy = { p: 0 };
     const stepDuration = 1.28;
 
     const ctx = gsap.context(() => {
-      gsap.set([subline, cta, timeline, scrollCue, accent], { opacity: 0 });
-      gsap.set(headlineInners, { yPercent: 108, opacity: 0 });
-      if (subInner) gsap.set(subInner, { yPercent: 110, opacity: 0 });
-      gsap.set([subline], { y: 12 });
-      gsap.set(cta, { y: 10 });
-      if (accent) gsap.set(accent, { scaleX: 0, opacity: 0, transformOrigin: "left center" });
-      if (timeline) gsap.set(timeline, { y: 8, opacity: 0 });
-      if (scrollCue) gsap.set(scrollCue, { opacity: 0 });
-
-      const open = gsap.timeline({ defaults: { ease: "power3.out" }, delay: 0.12 });
-
-      open.to(headlineInners, {
-        yPercent: 0,
-        opacity: 1,
-        duration: 0.92,
-        stagger: 0.12,
-      });
-
-      if (subInner) {
-        open.to(
-          subInner,
-          { yPercent: 0, opacity: 1, duration: 0.78, ease: "power3.out" },
-          "-=0.35",
-        );
-      } else {
-        open.to(sub, { opacity: 1, duration: 0.5 }, "-=0.3");
-      }
-
-      if (accent) {
-        open.to(accent, { opacity: 1, scaleX: 1, duration: 0.55, ease: "power2.inOut" }, "-=0.2");
-      }
-
-      open.to(subline, { y: 0, opacity: 1, duration: 0.72 }, "-=0.28");
-      open.to(cta, { y: 0, opacity: 1, duration: 0.58 }, "-=0.42");
-
-      if (timeline) {
-        open.to(timeline, { y: 0, opacity: 1, duration: 0.62 }, "-=0.38");
-      }
-
-      if (scrollCue) {
-        open.to(scrollCue, { opacity: 1, duration: 0.35 }, "-=0.32");
-      }
-
       const journeyDuration = hero.journey.length * stepDuration;
       const pauseAtEnd = 1.75;
       const stepCount = hero.journey.length;
@@ -137,20 +132,22 @@ export function HeroSection() {
       className="hero-chapter hero-viewport relative isolate flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden bg-forest"
       aria-labelledby="hero-heading"
     >
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 overflow-hidden bg-[#002a23]">
         {!reduce ? (
-          <video
-            ref={videoRef}
-            className="hero-video hero-video-focal h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            aria-hidden
-          >
-            <source src={HERO_VIDEO} type="video/mp4" />
-          </video>
+          <>
+            <video
+              ref={videoRef}
+              className={`hero-video hero-video-focal absolute inset-0 h-full w-full object-cover ${videoReady ? "hero-video--ready" : ""}`}
+              src={HERO_VIDEO}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden
+            />
+            <HeroVideoLoader show={!videoReady} />
+          </>
         ) : (
           <div className="h-full w-full bg-forest" aria-hidden />
         )}
@@ -161,8 +158,6 @@ export function HeroSection() {
         <div className="hero-scrim-top hero-scrim-top--viewport absolute inset-x-0 top-0 h-[min(18vh,8rem)]" />
         <div className="hero-scrim-timeline hero-scrim-timeline--viewport absolute inset-x-0 bottom-0" />
       </div>
-
-      <SiteNavBar variant="hero" />
 
       <div className="relative z-[2] mx-auto flex min-h-0 w-full max-w-[var(--content-max)] flex-1 flex-col px-[var(--gutter)]">
         <div className="h-[var(--header-h)] shrink-0" aria-hidden />
@@ -176,13 +171,13 @@ export function HeroSection() {
                 className="hero-headline hero-headline--viewport font-display font-normal"
               >
                 <span className="sr-only">{hero.headline}</span>
-                <span data-hero-line className="block overflow-hidden">
+                <span data-hero-line className="block">
                   <span data-hero-line-inner className="block">
                     There&apos;s{" "}
                     <span className="hero-headline__emphasis">business</span>
                   </span>
                 </span>
-                <span data-hero-line className="block overflow-hidden">
+                <span data-hero-line className="block">
                   <span data-hero-line-inner className="block">
                     you&apos;re{" "}
                     <span className="hero-headline__emphasis">missing.</span>
@@ -194,7 +189,7 @@ export function HeroSection() {
                 ref={subRef}
                 className="hero-subheading hero-subheading--viewport mt-2 font-display font-medium sm:mt-2.5"
               >
-                <span className="block overflow-hidden">
+                <span className="block">
                   <span data-hero-sub-inner className="block">
                     {hero.subheading}
                   </span>
@@ -231,7 +226,6 @@ export function HeroSection() {
               </div>
             </div>
           </div>
-          <div className="hidden min-h-0 lg:col-span-7 lg:block" aria-hidden />
         </div>
 
         <footer
@@ -248,7 +242,7 @@ export function HeroSection() {
             </div>
             <p
               ref={scrollCueRef}
-              className="shrink-0 text-center font-mono text-[0.5625rem] uppercase tracking-[0.26em] text-ivory/45 sm:pb-0.5 sm:text-right sm:text-[0.625rem]"
+              className="type-caption shrink-0 text-center tracking-[0.2em] text-ivory/58 sm:pb-0.5 sm:text-right"
               aria-hidden
             >
               Scroll

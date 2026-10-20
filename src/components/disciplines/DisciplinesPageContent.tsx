@@ -39,7 +39,7 @@ export function DisciplinesPageContent() {
             <div className="min-w-0 lg:col-span-5 xl:col-span-5">
               <p
                 data-disc-page-eyebrow
-                className="mb-3 font-mono text-[0.625rem] uppercase tracking-[0.26em] text-[#D8783F]"
+                className="type-eyebrow mb-3 text-[#D8783F]"
               >
                 {disciplinesPageHero.eyebrow}
               </p>
@@ -112,13 +112,13 @@ export function DisciplinesPageContent() {
                       className="disc-page__profile-bar absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0"
                       aria-hidden
                     />
-                    <p className="mb-3 font-mono text-[0.625rem] uppercase tracking-[0.24em] text-[#D8783F]">
+                    <p className="type-eyebrow mb-3 text-[#D8783F]">
                       {person.label}
                     </p>
                     <h2 className="font-display text-[1.4rem] font-medium leading-[1.15] text-[#003D32] sm:text-[1.5rem]">
                       {person.name}
                     </h2>
-                    <p className="mt-2 font-mono text-[0.625rem] uppercase leading-snug tracking-[0.2em] text-[#A8B9AC]">
+                    <p className="mt-2 text-[0.8125rem] font-medium leading-snug tracking-[0.02em] text-[#5f7268]">
                       {person.role}
                     </p>
                     <p className="mt-4 flex-1 text-[0.95rem] leading-[1.68] text-[#1a1a18]/82 sm:mt-5 sm:text-[0.97rem]">

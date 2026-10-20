@@ -1,6 +1,6 @@
 "use client";
 
-import { type RefObject, useEffect } from "react";
+import { type RefObject, useLayoutEffect } from "react";
 import { ensureGsapPlugins, gsap, ScrollTrigger } from "@/lib/gsap/register";
 
 const PROFILE_COUNT = 3;
@@ -68,7 +68,7 @@ export function useDisciplinesPageAnimation(
   rootRef: RefObject<HTMLElement | null>,
   reducedMotion: boolean,
 ) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;
 
@@ -132,10 +132,10 @@ export function useDisciplinesPageAnimation(
         return;
       }
 
-      gsap.set(heroEyebrow, { opacity: 0, y: 10 });
-      gsap.set(heroHeadline, { opacity: 0, y: 14 });
-      gsap.set(heroBody, { opacity: 0, y: 12 });
-      gsap.set(heroDiagram, { opacity: 0, y: 8 });
+      gsap.set(heroEyebrow, { y: 10 });
+      gsap.set(heroHeadline, { y: 14 });
+      gsap.set(heroBody, { y: 12 });
+      gsap.set(heroDiagram, { y: 10 });
       gsap.set(profileCards, { opacity: 0, y: 12 });
       gsap.set(profileBars, { scaleX: 0, transformOrigin: "left center" });
       gsap.set(conclusionParas, { opacity: 0, y: 12 });
@@ -157,21 +157,16 @@ export function useDisciplinesPageAnimation(
       emit(0, false);
 
       if (hero) {
+        // Hero is in view on load — do not gate entrance on scroll.
         const heroTl = gsap.timeline({
-          scrollTrigger: {
-            id: "disc-page-hero",
-            trigger: hero,
-            start: "top 88%",
-            toggleActions: "play none none none",
-            once: true,
-          },
           defaults: { ease: "power3.out" },
+          delay: 0.06,
         });
-        if (heroEyebrow) heroTl.to(heroEyebrow, { opacity: 1, y: 0, duration: 0.4 }, 0);
-        if (heroHeadline) heroTl.to(heroHeadline, { opacity: 1, y: 0, duration: 0.52 }, 0.08);
-        if (heroBody) heroTl.to(heroBody, { opacity: 1, y: 0, duration: 0.5 }, 0.18);
+        if (heroEyebrow) heroTl.to(heroEyebrow, { y: 0, duration: 0.4 }, 0);
+        if (heroHeadline) heroTl.to(heroHeadline, { y: 0, duration: 0.52 }, 0.06);
+        if (heroBody) heroTl.to(heroBody, { y: 0, duration: 0.5 }, 0.14);
         if (heroDiagram) {
-          heroTl.to(heroDiagram, { opacity: 1, y: 0, duration: 0.48 }, 0.12);
+          heroTl.to(heroDiagram, { y: 0, duration: 0.48 }, 0.08);
           heroTl.to(hubRing, { opacity: 1, scale: 1, duration: 0.45 }, 0.3);
           heroTl.to(hubCore, { opacity: 1, scale: 1, duration: 0.4 }, 0.36);
           lines.forEach((line, i) => {
@@ -256,8 +251,10 @@ export function useDisciplinesPageAnimation(
       }
     }, root);
 
+    ScrollTrigger.refresh();
+
     return () => {
-      ["disc-page-hero", "disc-page-profiles-scrub", "disc-page-conclusion"].forEach((id) =>
+      ["disc-page-profiles-scrub", "disc-page-conclusion"].forEach((id) =>
         ScrollTrigger.getById(id)?.kill(),
       );
       ctx.revert();

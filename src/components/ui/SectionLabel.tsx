@@ -17,7 +17,7 @@ export function SectionLabel({
     <p
       className={cn(
         "type-eyebrow flex items-center",
-        tone === "light" ? "text-ink-soft" : "text-ivory/70",
+        tone === "light" ? "text-ink-soft" : "text-ivory/78",
         className,
       )}
     >

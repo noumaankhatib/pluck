@@ -199,7 +199,7 @@ export function HeroDiscoveryPath({
             </span>
           </p>
 
-          <div className="relative mt-2 overflow-hidden pb-0.5">
+          <div className="relative mt-2 overflow-hidden pb-2 pt-1">
             <AnimatePresence mode="wait" initial={false}>
               <motion.p
                 key={step.id}
@@ -308,7 +308,7 @@ export function HeroDiscoveryPath({
               {" "}/ {String(total).padStart(2, "0")}
             </span>
           </span>
-          <span className="relative overflow-hidden">
+          <span className="relative overflow-hidden py-1">
             <AnimatePresence mode="wait" initial={false}>
               <motion.span
                 key={`row-${step.id}`}
