@@ -338,7 +338,7 @@ export function JourneySection() {
     >
       <div
         ref={trackRef}
-        className="journey-chapter__track relative py-[clamp(2.25rem,1.65rem+2.5vw,4.5rem)] md:py-[clamp(2.75rem,2rem+3vw,5rem)] min-h-[min(200vh,1700px)]"
+        className="journey-chapter__track relative py-[clamp(2.25rem,1.65rem+2.5vw,4.5rem)] md:py-[clamp(2.75rem,2rem+3vw,5rem)] lg:min-h-[min(200vh,1700px)]"
       >
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-forest/10 to-transparent"

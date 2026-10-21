@@ -1565,6 +1565,27 @@
     letter-spacing: var(--tracking-caps);
   }
 
+  /* Five labels share one row: tighten type so CONNECTION / DISCOVERY never collide. */
+  @media (max-width: 479px) {
+    .hero-journey-rail .hero-journey-step-label {
+      font-size: 0.5625rem;
+      letter-spacing: 0.03em;
+      padding-inline: 0;
+    }
+  }
+
+  @media (max-width: 359px) {
+    .hero-journey-rail .hero-journey-step-label {
+      font-size: 0.5625rem;
+      letter-spacing: 0.02em;
+    }
+
+    /* Too narrow for five labels: the dots keep the sequence, only the current step is named. */
+    .hero-journey-rail .hero-journey-step-label:not([data-active]) {
+      visibility: hidden;
+    }
+  }
+
   .hero-subheading {
     max-width: 18em;
     font-size: clamp(1.45rem, 3.2vw, 2.15rem);
@@ -2566,7 +2587,8 @@ footer.site-footer .site-footer__meta { color: #d3dcd5; }
 .cs-rail__label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 1023px) {
   .cs-rail__label { display: none; }
-  .cs-rail li.is-active { flex: 3 1 0; }
+  .cs-rail li.is-active { flex: 6 1 0; }
+  .cs-rail a { letter-spacing: 0.06em; }
   .cs-rail li.is-active .cs-rail__label { display: inline; }
 }
 

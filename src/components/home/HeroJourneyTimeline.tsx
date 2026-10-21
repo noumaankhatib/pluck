@@ -122,6 +122,7 @@ export function HeroJourneyTimeline({
                   />
                 </span>
                 <span
+                  data-active={isActive || undefined}
                   className={cn(
                     "hero-journey-step-label mt-1 w-full px-0.5 font-sans font-semibold uppercase",
                     isActive && "text-[#FFF8EC]",
