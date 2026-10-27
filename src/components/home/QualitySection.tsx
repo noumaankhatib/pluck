@@ -1,302 +1,226 @@
 "use client";
 
-import { useRef, useState, type RefObject } from "react";
+import Image from "next/image";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { useReducedMotion } from "framer-motion";
 import { quality } from "@/content/home";
-import { Container } from "@/components/ui/Container";
-import { SectionLabel } from "@/components/ui/SectionLabel";
 import { homeSections } from "@/content/home-sections";
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/cn";
-import {
-  FLOW_EDGES,
-  SCATTER,
-  useQualitySignalAnimation,
-} from "@/components/home/useQualitySignalAnimation";
+import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
-function SignalStage({
-  sectionRef,
-  staticDone,
-}: {
-  sectionRef: RefObject<HTMLElement | null>;
-  staticDone: boolean;
-}) {
-  const signalRootRef = useRef<HTMLDivElement>(null);
-  useQualitySignalAnimation(sectionRef, signalRootRef, staticDone);
+const IMAGE = "/images/right-leads-target.webp";
 
-  return (
-    <div ref={signalRootRef} className="quality-chapter__signal relative w-full">
-      <div
-        className="quality-chapter__signal-panel relative flex flex-col rounded-sm border border-forest/12 bg-paper shadow-[inset_0_1px_0_rgb(255_255_255/0.55)]"
-      >
-        <div
-          className="quality-chapter__volume relative h-[8rem] shrink-0 overflow-hidden rounded-t-sm border-b border-forest/10 bg-ivory sm:h-[8.5rem]"
-          aria-hidden
-        >
-          <div
-            className="pointer-events-none absolute inset-0 bg-forest"
-            data-quality-volume-wash
-            aria-hidden
-          />
-          <p className="absolute left-3.5 top-3 z-[2] font-mono text-[0.625rem] font-medium uppercase tracking-[0.18em] text-forest/80 sm:left-4 sm:top-3.5 sm:text-[0.6875rem]">
-            Volume
-          </p>
+const iconProps = {
+  viewBox: "0 0 48 48",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 2,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+};
 
-          <svg
-            className="pointer-events-none absolute inset-0 z-[1] h-full w-full text-forest/22"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
-            aria-hidden
-          >
-            {FLOW_EDGES.map(([a, b]) => (
-              <line
-                key={`${a}-${b}`}
-                data-quality-flow-line
-                x1={SCATTER[a].x}
-                y1={SCATTER[a].y}
-                x2={SCATTER[b].x}
-                y2={SCATTER[b].y}
-                stroke="currentColor"
-                strokeWidth="0.35"
-                vectorEffect="non-scaling-stroke"
-              />
-            ))}
-            {SCATTER.map((point, i) => (
-              <circle
-                key={`p-${i}`}
-                data-quality-flow-particle
-                cx={point.x}
-                cy={point.y}
-                r="0.55"
-                fill="currentColor"
-                className="text-copper/45"
-              />
-            ))}
-          </svg>
+/** Node offsets (rem) that sit each dot on the connecting arc. */
+const NODE_LEFT = ["-0.58rem", "-1.56rem", "-1.56rem", "-0.58rem"];
 
-          <div className="quality-chapter__volume-metrics relative z-[2] h-full w-full">
-            {quality.volumeSignals.map((word, index) => (
-              <div
-                key={word}
-                data-quality-metric-wrap
-                className="quality-chapter__volume-metric-wrap absolute will-change-transform"
-              >
-                <span
-                  data-quality-metric-label
-                  className="quality-chapter__volume-metric block font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-forest sm:text-[0.8125rem]"
-                >
-                  {word}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+const benefits: { title: string; text: string; icon: ReactNode }[] = [
+  {
+    title: "Higher Relevance",
+    text: "Reach people who truly match what you offer.",
+    icon: (
+      <svg {...iconProps}>
+        <rect x="6" y="28" width="9" height="14" rx="1" />
+        <rect x="19.5" y="12" width="9" height="30" rx="1" />
+        <rect x="33" y="22" width="9" height="20" rx="1" />
+      </svg>
+    ),
+  },
+  {
+    title: "Qualified Enquiries",
+    text: "Conversations with genuine business interest.",
+    icon: (
+      <svg {...iconProps}>
+        <circle cx="24" cy="15" r="6" />
+        <path d="M12 40v-3a8 8 0 0 1 8-8h8a8 8 0 0 1 8 8v3" />
+        <circle cx="9" cy="21" r="4" />
+        <circle cx="39" cy="21" r="4" />
+      </svg>
+    ),
+  },
+  {
+    title: "Real Opportunities",
+    text: "Leads that can convert into measurable revenue.",
+    icon: (
+      <svg {...iconProps}>
+        <circle cx="22" cy="26" r="15" />
+        <circle cx="22" cy="26" r="8" />
+        <circle cx="22" cy="26" r="1.5" />
+        <path d="M23 25l15-15M33 10h5v5" />
+      </svg>
+    ),
+  },
+  {
+    title: "Business Value",
+    text: "Fewer, better leads that drive long-term growth.",
+    icon: (
+      <svg {...iconProps}>
+        <path d="M24 7l17 9-17 9-17-9 17-9z" />
+        <path d="M7 24l17 9 17-9" />
+        <path d="M7 32l17 9 17-9" />
+      </svg>
+    ),
+  },
+];
 
-        <div className="shrink-0 px-3.5 py-1.5 sm:px-5 sm:py-2" aria-hidden>
-          <p className="mb-1 font-mono text-[0.625rem] font-medium uppercase tracking-[0.18em] text-copper sm:text-[0.6875rem]">
-            Relevance
-          </p>
-          <div className="relative h-px w-full">
-            <div className="absolute inset-0 bg-forest/14" />
-            <div
-              data-quality-copper-fill
-              className="absolute inset-0 origin-left bg-gradient-to-r from-forest/25 via-copper/80 to-copper/60"
-            />
-            <div
-              data-quality-copper-dot
-              className="absolute top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-copper shadow-[0_0_0_2px_rgb(250_249_243/0.9)]"
-            />
-          </div>
-        </div>
-
-        <div className="quality-chapter__relevance shrink-0 border-t border-forest/8 px-3.5 pb-3 pt-1.5 sm:px-5 sm:pb-3.5 sm:pt-2">
-          <div className="quality-chapter__relevance-head grid grid-cols-[1.5rem_1fr] items-end gap-x-2.5 md:gap-x-3">
-            <p
-              data-quality-right-label
-              className="col-span-2 font-display text-[clamp(1.45rem,1rem+1.65vw,2.05rem)] font-semibold leading-none tracking-[-0.02em] text-forest"
-            >
-              Right
-            </p>
-            <span
-              className="col-span-2 mb-0.5 mt-1 hidden h-px bg-forest/10 sm:block"
-              aria-hidden
-            />
-          </div>
-          <ol
-            className="quality-chapter__relevance-list relative mt-1 md:mt-1.5"
-            aria-label="Signals that matter"
-          >
-            {quality.rightSignals.map((label, index) => {
-              const isPayoff = index === quality.rightSignals.length - 1;
-              return (
-                <li
-                  key={label}
-                  data-quality-stage
-                  className="quality-chapter__stage relative"
-                >
-                  <div className="grid grid-cols-[1.5rem_1fr] grid-rows-[auto_auto] items-baseline gap-x-2.5 py-0.5 md:gap-x-3 md:py-1">
-                    <span
-                      data-quality-stage-number
-                      className="row-start-1 font-mono text-[0.6875rem] tabular-nums text-copper md:text-[0.75rem]"
-                    >
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span
-                      className={cn(
-                        "row-start-1 min-w-0 font-display leading-snug tracking-[-0.01em]",
-                        isPayoff
-                          ? "text-[clamp(1.15rem,0.9rem+1vw,1.65rem)] italic text-copper"
-                          : "text-[clamp(1rem,0.94rem+0.35vw,1.2rem)] text-forest",
-                      )}
-                    >
-                      {label}
-                    </span>
-                    <span
-                      data-quality-stage-rule
-                      className={cn(
-                        "col-start-2 row-start-2 mt-0.5 h-px origin-left",
-                        isPayoff ? "bg-copper/55" : "bg-forest/14",
-                      )}
-                      aria-hidden
-                    />
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function CopyColumn({ onDetailToggle }: { onDetailToggle: (open: boolean) => void }) {
-  return (
-    <div className="quality-chapter__copy flex min-w-0 flex-col justify-start overflow-visible">
-      <h2
-        id="quality-heading"
-        className="font-display text-balance text-[clamp(1.65rem,1rem+2.35vw,3.1rem)] font-medium leading-[1.12] tracking-[-0.018em] text-forest"
-      >
-        <span className="block">{quality.headlineLead}</span>
-        <span className="mt-2 block italic text-copper">{quality.headlineTurn}</span>
-      </h2>
-
-      <p
-        className="quality-chapter__sub mt-3 max-w-[32rem] text-[clamp(1.02rem,0.98rem+0.3vw,1.15rem)] leading-[1.58] text-ink-soft md:mt-3.5 lg:max-w-[34rem]"
-      >
-        {quality.subheading}
-      </p>
-
-      <details
-        className="quality-chapter__details group mt-4 w-full max-w-[36rem] md:mt-5"
-        onToggle={(e) => onDetailToggle(e.currentTarget.open)}
-      >
-        <summary
-          className="flex min-h-9 cursor-pointer list-none items-center gap-2 rounded-sm py-1 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-forest transition-colors duration-300 hover:text-copper focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper/70 [&::-webkit-details-marker]:hidden sm:text-[0.75rem]"
-        >
-          <span
-            className="inline-block text-copper transition-transform duration-300 group-open:rotate-90"
-            aria-hidden
-          >
-            →
-          </span>
-          <span className="group-open:hidden">Read more</span>
-          <span className="hidden group-open:inline">Hide detail</span>
-        </summary>
-        <div
-          className="quality-chapter__detail-body mt-3 space-y-3.5 border-l-2 border-copper/35 pl-4 pr-0 sm:pr-1 md:mt-3.5 md:space-y-4 md:pl-5"
-        >
-          {quality.paragraphs.map((paragraph, i) => (
-            <p
-              key={paragraph}
-              className={cn(
-                "text-pretty text-[clamp(0.96rem,0.92rem+0.18vw,1.06rem)] leading-[1.65]",
-                i === 1
-                  ? "font-mono text-[0.68rem] font-medium uppercase leading-[1.55] tracking-[0.08em] text-forest/62 sm:text-[0.72rem]"
-                  : "text-charcoal/88",
-                i === quality.paragraphs.length - 1 && "font-medium text-forest",
-              )}
-            >
-              {paragraph}
-            </p>
-          ))}
-        </div>
-      </details>
-
-      <div className="mt-5 md:mt-6">
-        <Button href={quality.ctaHref}>{quality.cta}</Button>
-      </div>
-    </div>
-  );
-}
-
-function QualityScene({
-  sectionRef,
-  isStatic,
-  detailOpen,
-  onDetailToggle,
-}: {
-  sectionRef: RefObject<HTMLElement | null>;
-  isStatic: boolean;
-  detailOpen: boolean;
-  onDetailToggle: (open: boolean) => void;
-}) {
-  return (
-    <Container className="quality-chapter__container relative w-full overflow-visible">
-      <header className="quality-chapter__header mb-5 max-w-[var(--measure-wide)] md:mb-6">
-        <SectionLabel
-          tone="light"
-          className="mb-0"
-        >
-          {homeSections.quality.name}
-        </SectionLabel>
-      </header>
-
-      <div
-        className={cn(
-          "quality-chapter__grid grid items-start gap-7 md:gap-8 lg:grid-cols-12 lg:gap-x-9 xl:gap-x-10",
-          detailOpen && "quality-chapter__grid--expanded",
-        )}
-      >
-        <div className="min-w-0 overflow-visible lg:col-span-5 lg:col-start-1 lg:min-h-0">
-          <CopyColumn onDetailToggle={onDetailToggle} />
-        </div>
-        <div
-          className="min-w-0 lg:col-span-7 lg:col-start-6 lg:min-h-0 lg:border-l lg:border-forest/10 lg:pl-9 lg:self-start xl:pl-10"
-        >
-          <div className="border-t border-forest/10 pt-5 lg:border-t-0 lg:pt-0">
-            <SignalStage sectionRef={sectionRef} staticDone={isStatic} />
-          </div>
-        </div>
-      </div>
-    </Container>
-  );
-}
-
-const sectionClass =
-  "quality-chapter relative accent-copper scroll-mt-[var(--header-h)] overflow-visible bg-ivory text-forest";
-
-/** 03 — GSAP ScrollTrigger scrubs volume → relevance signal stage. */
 export function QualitySection() {
   const reduce = useReducedMotion();
-  const [detailOpen, setDetailOpen] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
+
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    if (!section || reduce) return;
+    ensureGsapPlugins();
+    const q = (s: string) => Array.from(section.querySelectorAll<HTMLElement>(s));
+    const ctx = gsap.context(() => {
+      const media = q("[data-rl-media]");
+      const bg = q("[data-rl-bg]");
+      const img = q("[data-rl-img]");
+      const copy = q("[data-rl-copy]");
+      const lines = q("[data-rl-line]");
+      const cards = q("[data-rl-card]");
+      const icons = q("[data-rl-icon]");
+      const nodes = q("[data-rl-node]");
+      const path = q("[data-rl-path]");
+
+      gsap.set(bg, { opacity: 0 });
+      gsap.set(media, { clipPath: "inset(0 100% 0 0)" });
+      gsap.set(img, { scale: 1.03 });
+      gsap.set(copy, { opacity: 0, y: 12 });
+      gsap.set(lines, { opacity: 0, y: 18 });
+      gsap.set(cards, { opacity: 0, x: 28 });
+      gsap.set(icons, { scale: 0.8, opacity: 0 });
+      gsap.set(nodes, { scale: 0, transformOrigin: "50% 50%" });
+      path.forEach((p) => {
+        const el = p as unknown as SVGGeometryElement;
+        const len = el.getTotalLength?.() ?? 0;
+        gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
+      });
+
+      gsap
+        .timeline({
+          defaults: { ease: "power2.out" },
+          scrollTrigger: { trigger: section, start: "top 70%", once: true },
+        })
+        .to(bg, { opacity: 1, duration: 0.8, ease: "power1.out" }, 0)
+        .to(media, { clipPath: "inset(0 0% 0 0)", duration: 0.8, ease: "power2.inOut" }, 0)
+        .to(img, { scale: 1, duration: 0.9 }, 0)
+        .to(copy, { opacity: 1, y: 0, duration: 0.5, stagger: 0.06 }, 0.15)
+        .to(lines, { opacity: 1, y: 0, duration: 0.55, stagger: 0.14 }, 0.25)
+        .to(path, { strokeDashoffset: 0, duration: 0.8, ease: "power1.inOut" }, 0.35)
+        .to(cards, { opacity: 1, x: 0, duration: 0.55, stagger: 0.08 }, 0.35)
+        .to(icons, { opacity: 1, scale: 1, duration: 0.45, stagger: 0.08 }, 0.45)
+        .to(nodes, { scale: 1, duration: 0.4, stagger: 0.08, ease: "back.out(2)" }, 0.4);
+    }, section);
+    return () => ctx.revert();
+  }, [reduce]);
 
   return (
     <section
       ref={sectionRef}
       id="quality"
       aria-labelledby="quality-heading"
-      className={sectionClass}
-      data-detail-open={detailOpen ? "true" : "false"}
+      className="rl scroll-mt-[var(--header-h)]"
     >
-      <div className="quality-chapter__inner relative overflow-visible pt-6 pb-10 md:pt-7 md:pb-11 lg:pb-12">
-        <QualityScene
-          sectionRef={sectionRef}
-          isStatic={!!reduce}
-          detailOpen={detailOpen}
-          onDetailToggle={setDetailOpen}
-        />
+      <div data-rl-bg className="rl__glow" aria-hidden />
+      <figure data-rl-media className="rl__media" aria-hidden>
+        <div data-rl-img className="rl__img">
+          <Image
+            src={IMAGE}
+            alt=""
+            width={1060}
+            height={819}
+            sizes="(max-width: 1024px) 100vw, 56vw"
+            className="rl__photo"
+          />
+        </div>
+      </figure>
+
+      <div className="rl__inner">
+        <div className="rl__copy">
+          <p data-rl-copy className="rl__eyebrow">
+            <i aria-hidden />
+            {homeSections.quality.name}
+          </p>
+          <h2 id="quality-heading" className="rl__title">
+            <span data-rl-line className="block">{quality.headlineLead}</span>
+            <span data-rl-line className="rl__em block">{quality.headlineTurn}</span>
+          </h2>
+          <p data-rl-copy className="rl__sub">
+            {quality.subheading}
+          </p>
+          <details data-rl-copy className="rl__details group">
+            <summary className="rl__more">
+              <span className="rl__arrow" aria-hidden>
+                →
+              </span>
+              <span className="group-open:hidden">Read more</span>
+              <span className="hidden group-open:inline">Hide detail</span>
+            </summary>
+            <div className="rl__detail-body">
+              {quality.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </details>
+        </div>
+
+        <div className="rl__cards">
+          <div className="rl__stack">
+          <svg
+            className="rl__path"
+            viewBox="0 0 40 362"
+            preserveAspectRatio="none"
+            aria-hidden
+          >
+            <path
+              data-rl-path
+              d="M40.0 0.0 L34.7 18.1 L29.5 36.2 L24.6 54.3 L20.0 72.4 L16.0 90.5 L12.5 108.6 L9.7 126.7 L7.7 144.8 L6.4 162.9 L6.0 181.0 L6.4 199.1 L7.7 217.2 L9.7 235.3 L12.5 253.4 L16.0 271.5 L20.0 289.6 L24.6 307.7 L29.5 325.8 L34.7 343.9 L40.0 362.0"
+              fill="none"
+              stroke="rgb(230 154 97 / 0.55)"
+              strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+          <ol className="rl__list" aria-label="What the right leads bring">
+            {benefits.map((b, i) => (
+              <li key={b.title} data-rl-card className="rl__card">
+                <span
+                  data-rl-node
+                  className="rl__node"
+                  style={{ left: NODE_LEFT[i] }}
+                  aria-hidden
+                />
+                <span data-rl-icon className="rl__icon">
+                  {b.icon}
+                </span>
+                <span className="rl__divider" aria-hidden />
+                <span className="rl__text">
+                  <strong>{b.title}</strong>
+                  <span>{b.text}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
+          </div>
+          <div data-rl-copy className="rl__cta">
+            <Button href={quality.ctaHref} className="rl__btn">
+              {quality.cta}
+              <span className="rl__btn-arrow" aria-hidden>
+                →
+              </span>
+            </Button>
+          </div>
+        </div>
       </div>
     </section>
   );

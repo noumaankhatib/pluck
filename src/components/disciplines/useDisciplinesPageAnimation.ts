@@ -122,7 +122,7 @@ export function useDisciplinesPageAnimation(
     const ctx = gsap.context(() => {
       const showAll = () => {
         gsap.set(
-          [heroEyebrow, heroHeadline, heroBody, heroDiagram, conclusionRule, conclusionCta, bridge],
+          [heroEyebrow, heroHeadline, heroBody, heroDiagram, conclusionRule, conclusionCta, bridge].filter(Boolean),
           { opacity: 1, y: 0, scaleX: 1, scaleY: 1 },
         );
         gsap.set(conclusionParas, { opacity: 1, y: 0 });

@@ -76,27 +76,27 @@ export function SearchIntelligenceSection() {
   const query = SEARCH_QUERIES[active] ?? "";
   const doneTyping = reduce || typed >= query.length;
 
+  // 0 → first node centre, 1 → last node centre
   const stageProgress = Math.min(
     1,
-    (active + (doneTyping ? 1 : 0.42)) / total,
+    Math.max(0, (active - (doneTyping ? 0 : 0.55)) / (total - 1)),
   );
-
-  useEffect(() => {
-    setTyped(0);
-  }, [active]);
+  // trail pulse sits on the centre of the active row
+  const trailPulse = ((active + 0.5) / total) * 100;
 
   useEffect(() => {
     if (!runSequence || reduce) return;
     if (!doneTyping) {
       const id = window.setTimeout(
         () => setTyped((t) => Math.min(t + 1, query.length)),
-        typingDelay(query[typed] ?? "", manualStage),
+        typed === 0 ? 320 : typingDelay(query[typed] ?? "", manualStage),
       );
       return () => window.clearTimeout(id);
     }
     if (active === total - 1) return;
     const id = window.setTimeout(() => {
       setManualStage(false);
+      setTyped(0);
       setStep((s) => Math.min(s + 1, total - 1));
     }, HOLD_MS);
     return () => window.clearTimeout(id);
@@ -104,6 +104,7 @@ export function SearchIntelligenceSection() {
 
   const jumpTo = (index: number) => {
     setManualStage(true);
+    setTyped(0);
     setStep(index);
   };
 
@@ -159,16 +160,28 @@ export function SearchIntelligenceSection() {
                 className="search-chapter__rail-grid relative w-full border-y border-forest/10 py-3.5 sm:py-4"
               >
                 <div
-                  className="pointer-events-none absolute left-[2%] right-[2%] top-[0.6rem] h-px bg-forest/16"
+                  className="pointer-events-none absolute left-[10%] right-[10%] top-[0.6rem] h-px bg-forest/16"
                   aria-hidden
                 />
-                <motion.div
-                  className="pointer-events-none absolute left-[2%] top-[0.52rem] h-[2px] w-[96%] origin-left rounded-full bg-gradient-to-r from-[#a7b49d] via-[#e69a61] to-[#b65320]"
-                  initial={false}
-                  animate={{ scaleX: reduce ? 1 : stageProgress }}
-                  transition={{ duration: 0.48, ease: motionEase }}
+                <div
+                  className="pointer-events-none absolute left-[10%] right-[10%] top-[0.52rem] h-[2px]"
                   aria-hidden
-                />
+                >
+                  <motion.div
+                    className="h-full w-full origin-left rounded-full bg-gradient-to-r from-[#a7b49d] via-[#e69a61] to-[#b65320]"
+                    initial={false}
+                    animate={{ scaleX: reduce ? 1 : stageProgress }}
+                    transition={{ duration: 0.7, ease: motionEase }}
+                  />
+                  {!reduce && (
+                    <motion.span
+                      className="absolute top-1/2 h-1.5 w-6 -translate-x-full -translate-y-1/2 rounded-full bg-gradient-to-r from-transparent to-[#e69a61] blur-[1px]"
+                      initial={false}
+                      animate={{ left: `${stageProgress * 100}%`, opacity: doneTyping ? 0.35 : 0.95 }}
+                      transition={{ duration: 0.7, ease: motionEase }}
+                    />
+                  )}
+                </div>
                 <ol
                   className="relative grid grid-cols-5 gap-0.5 sm:gap-1"
                   aria-label="Investigation stages"
@@ -186,7 +199,7 @@ export function SearchIntelligenceSection() {
                           aria-label={`${String(i + 1).padStart(2, "0")} ${s.label}`}
                           className={cn(
                             "group flex w-full flex-col items-center justify-center gap-1.5 rounded-sm px-0.5 py-1 text-center transition-colors duration-300",
-                            isActive && "bg-forest/[0.05]",
+                            isActive && "bg-[#a7b49d]/25",
                           )}
                         >
                           <span className="relative flex h-3.5 w-3.5 items-center justify-center">
@@ -202,8 +215,11 @@ export function SearchIntelligenceSection() {
                               className="relative z-[1] block shrink-0 rounded-full border-2"
                               initial={false}
                               animate={{
-                                width: isActive ? 10 : 7,
-                                height: isActive ? 10 : 7,
+                                width: isActive ? 11 : 7,
+                                height: isActive ? 11 : 7,
+                                boxShadow: isActive
+                                  ? "0 0 0 4px rgb(230 154 97 / 0.2), 0 0 12px 2px rgb(230 154 97 / 0.55)"
+                                  : "0 0 0 0 rgb(230 154 97 / 0)",
                                 backgroundColor: isActive
                                   ? STAGE_COPPER
                                   : lit
@@ -231,9 +247,6 @@ export function SearchIntelligenceSection() {
                                 isActive && "border-[#e69a61] font-medium text-forest",
                                 lit && !isActive && "text-forest/88",
                               )}
-                              style={
-                                isActive ? undefined : lit ? { color } : undefined
-                              }
                             >
                               {s.label}
                             </span>
@@ -281,10 +294,10 @@ export function SearchIntelligenceSection() {
           >
             <div
               data-search-board
-              className="search-chapter__board relative overflow-visible rounded-sm border border-forest/12 bg-ivory/75 p-3.5 sm:p-4"
+              className="search-chapter__board relative overflow-visible rounded-2xl border border-forest/12 bg-ivory/85 p-3.5 shadow-[0_24px_50px_-26px_rgb(18_61_50/0.35),0_0_60px_-20px_rgb(230_154_97/0.35)] sm:p-4"
             >
               <div
-                className="search-chapter__search-bar flex gap-3 border border-forest/12 bg-paper px-3.5 py-2.5 sm:px-4 sm:py-3"
+                className="search-chapter__search-bar flex gap-3 rounded-xl border border-copper/45 bg-paper shadow-[0_0_0_3px_rgb(230_154_97/0.12),0_0_22px_rgb(230_154_97/0.18)] px-3.5 py-2.5 sm:px-4 sm:py-3"
               >
                 <span className="mt-1 shrink-0 text-copper sm:mt-0.5">
                   <SearchIcon size={16} />
@@ -296,7 +309,7 @@ export function SearchIntelligenceSection() {
                     aria-atomic="true"
                   >
                     {shown}
-                    {!reduce && !doneTyping && (
+                    {!reduce && runSequence && (
                       <motion.span
                         className="ml-0.5 inline-block h-[1.05em] w-[2px] translate-y-[0.1em] bg-copper"
                         animate={{ opacity: [1, 1, 0, 0] }}
@@ -323,6 +336,17 @@ export function SearchIntelligenceSection() {
                   transition={{ duration: 0.45, ease: motionEase }}
                   aria-hidden
                 />
+                {!reduce && runSequence && (
+                  <motion.span
+                    key={`clue-pulse-${active}`}
+                    className="pointer-events-none absolute -left-px w-[3px] rounded-full bg-gradient-to-b from-transparent via-[#e69a61] to-transparent"
+                    style={{ height: "28%" }}
+                    initial={{ top: "-28%", opacity: 0 }}
+                    animate={{ top: "100%", opacity: [0, 1, 1, 0] }}
+                    transition={{ duration: 1.1, ease: motionEase }}
+                    aria-hidden
+                  />
+                )}
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={storyBeat}
@@ -380,6 +404,15 @@ export function SearchIntelligenceSection() {
                     style={{ height: "calc(100% - 0.5rem)" }}
                     aria-hidden
                   />
+                  {!reduce && runSequence && (
+                    <motion.span
+                      className="pointer-events-none absolute -left-[1px] z-[1] h-8 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-transparent via-[#e69a61] to-transparent"
+                      initial={false}
+                      animate={{ top: `${trailPulse}%`, opacity: doneTyping ? 1 : 0.5 }}
+                      transition={{ duration: 0.7, ease: motionEase }}
+                      aria-hidden
+                    />
+                  )}
                   <ol className="search-chapter__trail relative">
                     {SEARCH_QUERIES.map((q, i) => {
                       const logged = i < active || (i === active && doneTyping);
@@ -414,6 +447,10 @@ export function SearchIntelligenceSection() {
                             animate={{
                               scale: logged ? 1 : 0.75,
                               backgroundColor: logged ? stageColor : "#cdd5c3",
+                              boxShadow:
+                                isActive && logged
+                                  ? "0 0 0 3px rgb(230 154 97 / 0.25), 0 0 10px 2px rgb(230 154 97 / 0.55)"
+                                  : "0 0 0 0 rgb(230 154 97 / 0)",
                             }}
                             transition={{ duration: 0.32 }}
                             aria-hidden
@@ -422,7 +459,9 @@ export function SearchIntelligenceSection() {
                             <span
                               className={cn(
                                 "shrink-0 pt-0.5 sm:pt-0",
+                                "transition-[color,transform] duration-300",
                                 logged ? "text-copper" : "text-forest/50",
+                                isActive && logged && "scale-110",
                               )}
                             >
                               <SearchIcon />

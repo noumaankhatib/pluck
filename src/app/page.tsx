@@ -3,14 +3,12 @@ import { HeroSection } from "@/components/home/HeroSection";
 import { IntroNarrativeSection } from "@/components/home/IntroNarrativeSection";
 import { QualitySection } from "@/components/home/QualitySection";
 import { SearchIntelligenceSection } from "@/components/home/SearchIntelligenceSection";
-import { JourneySection } from "@/components/home/JourneySection";
+import { HowWeFindSection } from "@/components/home/HowWeFindSection";
 import { CaseStudySection } from "@/components/home/CaseStudySection";
 import { QualificationSection } from "@/components/home/QualificationSection";
-import { PlainEnglishSection } from "@/components/home/PlainEnglishSection";
 import { DisciplinesSection } from "@/components/home/DisciplinesSection";
 import { ClosingCTASection } from "@/components/home/ClosingCTASection";
 import { DisciplinesPageContent } from "@/components/disciplines/DisciplinesPageContent";
-import { HowWeWorkPageContent } from "@/components/how-we-work/HowWeWorkPageContent";
 import { AboutContent } from "@/components/about/AboutContent";
 import { ContactContent } from "@/components/contact/ContactContent";
 import { HomeStoryShell } from "@/components/home/HomeStoryShell";
@@ -45,15 +43,11 @@ export default function HomePage() {
       <IntroNarrativeSection />
       <QualitySection />
       <SearchIntelligenceSection />
-      <JourneySection />
       <QualificationSection />
-      <PlainEnglishSection />
       <DisciplinesSection />
       <DisciplinesPageContent embedded />
-      <div id="how-we-work" className="scroll-mt-[var(--header-h)]">
-        <HowWeWorkPageContent embedded />
-        <ClosingCTASection />
-      </div>
+      <HowWeFindSection />
+      <ClosingCTASection />
       <CaseStudySection />
       <AboutContent />
       <ContactContent />

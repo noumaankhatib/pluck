@@ -1,10 +1,11 @@
 import Image from "next/image";
 import { cn } from "@/lib/cn";
 
-const LOGO_PAGE = "/images/pluck-hero-logo.png";
+/** Same approved artwork, with the blank margins around it trimmed so it fills the navbar height. */
+const LOGO_PAGE = "/images/pluck-logo-trimmed.png";
 const LOGO_HERO_VIDEO = "/brand/pluck-nav-hero-lockup.svg";
-const LOGO_WIDTH = 1024;
-const LOGO_HEIGHT = 819;
+const LOGO_WIDTH = 880;
+const LOGO_HEIGHT = 760;
 
 type PluckLogoProps = {
   variant: "nav" | "footer";
@@ -63,8 +64,8 @@ export function PluckLogo({
       height={LOGO_HEIGHT}
       priority={priority}
       className={cn(
-        "w-auto max-w-[10rem] object-contain object-left",
-        "h-[3.4rem] lg:h-[3.8rem]",
+        "w-auto max-w-[10rem] object-contain object-left transition-transform duration-300 ease-out hover:scale-[1.03]",
+        "h-[3.3rem] lg:h-[3.75rem]",
         className,
       )}
       sizes="(max-width: 1024px) 160px, 200px"
