@@ -172,7 +172,7 @@ export function ClosingCTASection() {
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1/3 bg-gradient-to-b from-[#e5e9dd]/35 to-transparent" aria-hidden />
           <div data-closing-bg className="absolute -inset-y-[10%] inset-x-0 will-change-transform">
             <Image
-              src="/images/hero-infrastructure.png"
+              src="/images/how-we-work-section-infrastructure.png"
               alt=""
               fill
               className="object-cover object-[62%_42%]"

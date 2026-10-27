@@ -8,7 +8,7 @@ import { homeSections } from "@/content/home-sections";
 import { Button } from "@/components/ui/Button";
 import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
-const IMAGE = "/images/right-leads-target.webp";
+const IMAGE = "/images/right-leads-section-target.webp";
 
 const iconProps = {
   viewBox: "0 0 48 48",

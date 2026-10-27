@@ -8,4 +8,4 @@ Place vector masters here (see `docs/PLUCK_VECTOR_MASTER.md`):
 - `png/` — 4000×3200 PNG exports
 - `fonts/` — font files + SIL Open Font License copies
 
-Until SVG masters are added, the site header falls back to `/images/pluck-logo.webp`.
+Until SVG masters are added, the site header falls back to `/images/navbar-logo-fallback.webp`.

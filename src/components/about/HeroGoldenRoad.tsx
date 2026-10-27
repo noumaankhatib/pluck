@@ -117,7 +117,7 @@ export function HeroGoldenRoad() {
       aria-label={`A golden road winding past three milestones: ${story.hero.markers.join(", ")}`}
     >
       <Image
-        src="/images/about-golden-road.webp"
+        src="/images/about-hero-golden-road.webp"
         alt=""
         width={1672}
         height={941}

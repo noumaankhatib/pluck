@@ -159,9 +159,9 @@ export function ApproachSteps() {
 /* ─── Team ─── */
 
 const PHOTOS: Record<string, { src: string; position: string }> = {
-  "Michael Jack Simkin": { src: "/images/team/michael-simkin.webp", position: "50% 6%" },
-  "Junaid Kazi": { src: "/images/team/junaid-kazi.webp", position: "50% 6%" },
-  "Noumaan Khatib": { src: "/images/team/noumaan-khatib.webp", position: "50% 6%" },
+  "Michael Jack Simkin": { src: "/images/team/disciplines-about-michael-simkin.webp", position: "50% 6%" },
+  "Junaid Kazi": { src: "/images/team/disciplines-about-junaid-kazi.webp", position: "50% 6%" },
+  "Noumaan Khatib": { src: "/images/team/disciplines-about-noumaan-khatib.webp", position: "50% 6%" },
 };
 
 export function TeamGrid({ people }: { people: readonly { name: string; role: string; body: readonly string[] }[] }) {

@@ -28,7 +28,7 @@ export function CtaIllustration() {
   return (
     <div ref={ref} className="ab-cta-art" aria-hidden="true">
       <Image
-        src="/images/about-cta-guided.webp"
+        src="/images/about-cta-section-guided.webp"
         alt=""
         width={1677}
         height={938}

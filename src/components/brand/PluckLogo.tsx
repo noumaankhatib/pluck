@@ -2,8 +2,8 @@ import Image from "next/image";
 import { cn } from "@/lib/cn";
 
 /** Same approved artwork, with the blank margins around it trimmed so it fills the navbar height. */
-const LOGO_PAGE = "/images/pluck-logo-trimmed.png";
-const LOGO_HERO_VIDEO = "/brand/pluck-nav-hero-lockup.svg";
+const LOGO_PAGE = "/images/navbar-logo.png";
+const LOGO_HERO_VIDEO = "/brand/navbar-hero-lockup.svg";
 const LOGO_WIDTH = 880;
 const LOGO_HEIGHT = 760;
 

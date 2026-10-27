@@ -25,7 +25,7 @@ export function HeroJourney() {
     <div className="sfh" aria-hidden={false}>
       <div className="sfh__stage" role="img" aria-label="Network of search signals resolving into a path from discovery to enquiry to commercial opportunity">
         <Image
-          src="/images/server-factory-hero.webp"
+          src="/images/case-study-hero-server-factory.webp"
           alt=""
           width={W}
           height={H}

@@ -3,7 +3,7 @@ export function HeroVideoPreload() {
   return (
     <link
       rel="preload"
-      href="/videos/hero-background-pluck.web.mp4"
+      href="/videos/hero-section-background.web.mp4"
       as="fetch"
       type="video/mp4"
       crossOrigin="anonymous"

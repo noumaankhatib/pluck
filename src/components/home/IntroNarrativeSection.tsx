@@ -8,7 +8,7 @@ import { Container } from "@/components/ui/Container";
 import { homeSections } from "@/content/home-sections";
 import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
-const PREMISE_IMAGE = "/images/premise-valley.webp";
+const PREMISE_IMAGE = "/images/premise-section-valley.webp";
 const EMPHASIS = "right customers.";
 
 export function IntroNarrativeSection() {

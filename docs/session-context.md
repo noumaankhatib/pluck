@@ -4,7 +4,7 @@ Saved for later reference. Stack: Next.js 16 (App Router, `src/app`), React 19, 
 
 ## Brand and decisions
 - Palette: Forest `#123D32`, Cream `#FAF9F3`, Pale Sage `#E5E9DD`, Muted Sage `#A7B49D`, Olive `#545C3B`, Burnt Orange `#B65320`, Light Copper `#E69A61`, Soft Gold `#F5DDA5`. Global CSS variables in `src/app/globals.css` were re-pointed to these.
-- Hero video is preserved (`public/videos/hero-background-pluck.web.mp4`); do not replace.
+- Hero video is preserved (`public/videos/hero-section-background.web.mp4`); do not replace.
 - **Sales figure is $1.2m** (client brief's $1.5m is NOT used). $80 per $1 and ~25.5% depend on it.
 - **"KKS"** appears only in the client creative brief; undefined. Website keeps **Pluck**.
 - Michael's name: "Michael Jack Simkin" on About; "Michael Simkin" on Home and /disciplines (as in the source document).
@@ -15,12 +15,12 @@ Saved for later reference. Stack: Next.js 16 (App Router, `src/app`), React 19, 
 - Navbar/footer: `components/layout/SiteNavBar.tsx`, `SiteFooter.tsx`.
 - Home: `components/home/*` (HeroSection, IntroNarrativeSection, SearchIntelligenceSection, JourneySection, CaseStudySection, ClosingCTASection…), copy in `content/home.ts`, `home-sections.ts`.
 - About: `app/about/page.tsx`, `components/about/` (HeroGoldenRoad, BeliefSection, ApproachSection, TogetherSection, AdviceSection, CtaIllustration, visuals), copy in `content/about.ts`.
-- /disciplines: `components/disciplines/*`, image `public/images/three-disciplines-3d-v2.png` (text and chart removed from the original; chart is live SVG).
+- /disciplines: `components/disciplines/*`, image `public/images/disciplines-section-3d-illustration.png` (text and chart removed from the original; chart is live SVG).
 - /how-we-work: `components/how-we-work/*`, `content/how-we-work.ts`.
 - Case study: `app/work/server-factory/page.tsx`, `components/case-study/*`, `content/server-factory-case-study.ts`.
 - Contact: `app/contact/page.tsx`, `content/contact.ts`.
 - SEO/nav copy: `content/site.ts`; title template in `app/layout.tsx` (`%s`, pages carry their own "| Pluck").
-- Assets added: `public/images/about-golden-road.webp`, `about-cta-guided.webp` (about-cta-signpost.webp now unused), `three-disciplines-3d-v2.png`.
+- Assets added: `public/images/about-hero-golden-road.webp`, `about-cta-section-guided.webp` (about-cta-section-signpost.webp now unused), `disciplines-section-3d-illustration.png`.
 
 ## Content governance
 - `docs/content-governance-review.md` – KEEP / DUPLICATE / VERIFY classification (draft, decisions recorded at the bottom).

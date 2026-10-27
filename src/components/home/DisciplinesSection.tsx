@@ -11,9 +11,9 @@ import { cn } from "@/lib/cn";
 import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
 const PORTRAITS: Record<string, string> = {
-  "Michael Simkin": "/images/team/michael-simkin.webp",
-  "Junaid Kazi": "/images/team/junaid-kazi.webp",
-  "Noumaan Khatib": "/images/team/noumaan-khatib.webp",
+  "Michael Simkin": "/images/team/disciplines-about-michael-simkin.webp",
+  "Junaid Kazi": "/images/team/disciplines-about-junaid-kazi.webp",
+  "Noumaan Khatib": "/images/team/disciplines-about-noumaan-khatib.webp",
 };
 
 const EMPHASIS = "commercial objective.";

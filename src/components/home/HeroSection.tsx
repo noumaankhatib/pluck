@@ -6,8 +6,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { hero } from "@/content/home";
 import { HeroVideoLoader } from "@/components/home/HeroVideoLoader";
 
-/** Web delivery encode (~3MB, faststart). Master: hero-background-pluck.mp4 */
-const HERO_VIDEO = "/videos/hero-background-pluck.web.mp4";
+/** Web delivery encode (~3MB, faststart). Master: hero-section-background-master.mp4 */
+const HERO_VIDEO = "/videos/hero-section-background.web.mp4";
 
 export function HeroSection() {
   const reduce = useReducedMotion();
