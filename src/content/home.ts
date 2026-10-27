@@ -207,6 +207,22 @@ export const plainEnglish = {
   climax: "The technical complexity sits with us.",
 };
 
+/** Column copy for the three disciplines (supplied in the approved layout reference). */
+export const disciplineColumns = [
+  {
+    heading: "Understand the opportunity.",
+    text: "We help you understand the market, your customers and the commercial opportunity, so you can focus on what will make a difference.",
+  },
+  {
+    heading: "Capture relevant demand.",
+    text: "We identify and reach people actively searching for what you sell, using paid search to generate high-quality enquiries and commercial results.",
+  },
+  {
+    heading: "Build the right foundations.",
+    text: "We use search, data and technology to support performance, improve visibility and make it easier for the right customers to find and enquire.",
+  },
+] as const;
+
 export const disciplines = {
   headline: "Three disciplines. One commercial objective.",
   subheading:

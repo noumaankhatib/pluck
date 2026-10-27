@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { useReducedMotion } from "framer-motion";
 import { caseStudy } from "@/content/home";
 import { Container } from "@/components/ui/Container";
@@ -48,6 +48,7 @@ function MetricCardBody({
       </p>
       {index < 3 && (
         <div
+          data-case-arrow
           className="case-chapter__metric-arrow pointer-events-none absolute -right-[6px] top-1/2 z-10 hidden -translate-y-1/2 text-copper/70 lg:flex"
           aria-hidden
         >
@@ -106,11 +107,20 @@ export function CaseStudySection() {
               data-case-headline
               className="mt-1.5 font-display text-balance text-[clamp(1.65rem,1.02rem+2vw,2.85rem)] font-medium leading-[1.14] tracking-[-0.02em] text-forest"
             >
-              {caseStudy.headline}
+              {caseStudy.headline.split(" ").map((w, i, all) => (
+                <Fragment key={`${w}-${i}`}>
+                  <span className="case-chapter__wm">
+                    <span data-case-word className="inline-block">
+                      {w}
+                    </span>
+                  </span>
+                  {i < all.length - 1 ? " " : ""}
+                </Fragment>
+              ))}
             </h2>
             <p
               data-case-supporting
-              className="mt-2.5 font-display text-[clamp(1.06rem,0.96rem+0.5vw,1.5rem)] italic leading-[1.38] text-forest/88"
+              className="case-chapter__supporting mt-2.5 font-display text-[clamp(1.06rem,0.96rem+0.5vw,1.5rem)] italic leading-[1.38]"
             >
               {caseStudy.supporting}
             </p>
@@ -120,7 +130,10 @@ export function CaseStudySection() {
             data-case-narrative
             className="min-w-0 lg:col-span-6 lg:col-start-7 lg:pt-[1.55rem] xl:pt-[1.7rem]"
           >
-            <div className="border-l-2 border-copper/30 pl-4 sm:pl-5">
+            <div className="relative pl-4 sm:pl-5">
+              <span className="absolute inset-y-0 left-0 w-[2px] bg-copper/25" aria-hidden>
+                <span data-case-narrative-line className="block h-full w-full origin-top bg-copper/70" />
+              </span>
               <div className="space-y-2.5 sm:space-y-3">
                 {caseStudy.body.map((paragraph) => (
                   <p

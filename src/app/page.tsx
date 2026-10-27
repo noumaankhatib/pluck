@@ -8,7 +8,6 @@ import { CaseStudySection } from "@/components/home/CaseStudySection";
 import { QualificationSection } from "@/components/home/QualificationSection";
 import { DisciplinesSection } from "@/components/home/DisciplinesSection";
 import { ClosingCTASection } from "@/components/home/ClosingCTASection";
-import { DisciplinesPageContent } from "@/components/disciplines/DisciplinesPageContent";
 import { AboutContent } from "@/components/about/AboutContent";
 import { ContactContent } from "@/components/contact/ContactContent";
 import { HomeStoryShell } from "@/components/home/HomeStoryShell";
@@ -45,7 +44,6 @@ export default function HomePage() {
       <SearchIntelligenceSection />
       <QualificationSection />
       <DisciplinesSection />
-      <DisciplinesPageContent embedded />
       <HowWeFindSection />
       <ClosingCTASection />
       <CaseStudySection />

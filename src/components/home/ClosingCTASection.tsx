@@ -13,6 +13,8 @@ import { cn } from "@/lib/cn";
 
 const bodyLead = closing.body.slice(0, -1);
 const bodyClimax = closing.body[closing.body.length - 1];
+const CLIMAX_EM = "out there.";
+const [climaxLead] = bodyClimax.split(CLIMAX_EM);
 
 const ctaClass = "closing-chapter__cta group";
 
@@ -41,7 +43,7 @@ export function ClosingCTASection() {
           <SectionLabel className="!text-[#123d32]/70">{homeSections.closing.name}</SectionLabel>
         </div>
 
-        <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16">
+        <div className="grid items-start gap-10 lg:grid-cols-12 lg:items-stretch lg:gap-x-12 xl:gap-x-16">
           <div className="min-w-0 lg:col-span-6">
             <h2
               id="closing-heading"
@@ -84,13 +86,51 @@ export function ClosingCTASection() {
             </div>
           </div>
 
-          <div className="flex min-w-0 flex-col lg:col-span-5 lg:col-start-8 lg:border-l lg:border-[#123d32]/15 lg:pl-12 lg:pt-1">
+          <div className="relative flex min-w-0 flex-col lg:col-span-5 lg:col-start-8 lg:justify-center lg:border-l lg:border-[#123d32]/15 lg:pl-12 lg:pt-1">
+            <div className="closing-chapter__glow" aria-hidden />
+            <svg className="closing-chapter__orbit" viewBox="0 0 420 400" preserveAspectRatio="none" aria-hidden>
+              <path
+                id="closing-orbit-path"
+                data-closing-arc
+                d="M 175 283 C 270 283, 370 250, 414 160"
+                fill="none"
+                stroke="rgb(182 83 32 / 0.4)"
+                strokeWidth="1"
+                vectorEffect="non-scaling-stroke"
+              />
+              <g data-closing-node>
+                <circle cx="260" cy="273" r="3" fill="#b65320" />
+                <circle cx="361" cy="226" r="3" fill="#b65320" />
+                <circle cx="414" cy="160" r="3" fill="#b65320" />
+              </g>
+              <g data-closing-node className="closing-chapter__runner">
+                <circle r="10" fill="rgb(230 154 97 / 0.35)">
+                  <animateMotion dur="14s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.45 0 0.55 1">
+                    <mpath href="#closing-orbit-path" />
+                  </animateMotion>
+                </circle>
+                <circle r="3.2" fill="#b65320">
+                  <animateMotion dur="14s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.45 0 0.55 1">
+                    <mpath href="#closing-orbit-path" />
+                  </animateMotion>
+                </circle>
+              </g>
+            </svg>
             <span className="mb-5 block h-px w-12 bg-[#b65320]" aria-hidden />
             <p
               data-closing-climax
               className="closing-chapter__climax font-display text-balance text-[clamp(2.25rem,1.4rem+3.4vw,4rem)] font-medium leading-[1.02] tracking-[-0.025em] text-[#123d32]"
             >
-              {bodyClimax}
+              <span className="closing-chapter__mask">
+                <span data-closing-climax-part className="inline-block">
+                  {climaxLead}
+                </span>
+              </span>
+              <span className="closing-chapter__mask">
+                <span data-closing-climax-part className="closing-chapter__em inline-block italic">
+                  {CLIMAX_EM}
+                </span>
+              </span>
             </p>
 
             <div data-closing-cta className="mt-8">
@@ -128,7 +168,8 @@ export function ClosingCTASection() {
       </Container>
 
       <Container className="pb-[clamp(3rem,2rem+3vw,5.5rem)]">
-        <div className="relative h-[clamp(11rem,22vw,18rem)] overflow-hidden bg-[#123d32]" aria-hidden>
+        <div data-closing-media className="relative h-[clamp(11rem,22vw,18rem)] overflow-hidden bg-[#123d32]" aria-hidden>
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1/3 bg-gradient-to-b from-[#e5e9dd]/35 to-transparent" aria-hidden />
           <div data-closing-bg className="absolute -inset-y-[10%] inset-x-0 will-change-transform">
             <Image
               src="/images/hero-infrastructure.png"

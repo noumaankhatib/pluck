@@ -67,6 +67,9 @@ export function useCaseStudyChapterAnimation(
     const returnSweep = section.querySelector<HTMLElement>("[data-case-return-sweep]");
     const returnRule = section.querySelector<HTMLElement>("[data-case-return-rule]");
     const returnText = section.querySelector<HTMLElement>("[data-case-return-text]");
+    const words = section.querySelectorAll<HTMLElement>("[data-case-word]");
+    const nLine = section.querySelector<HTMLElement>("[data-case-narrative-line]");
+    const arrows = section.querySelectorAll<HTMLElement>("[data-case-arrow]");
     const link = section.querySelector<HTMLElement>("[data-case-link]");
 
     const ctx = gsap.context(() => {
@@ -97,6 +100,10 @@ export function useCaseStudyChapterAnimation(
           { opacity: 1, y: 0, scaleX: 1, scaleY: 1, x: 0 },
         );
         gsap.set(paragraphs, { opacity: 1, y: 0 });
+        gsap.set(words, { yPercent: 0 });
+        gsap.set(arrows, { opacity: 1 });
+        if (nLine) gsap.set(nLine, { scaleY: 1 });
+        if (supporting) supporting.style.setProperty("--sx", "100%");
         gsap.set(pipelineCols, { opacity: 1, y: 0 });
         pipelineCols.forEach((col) => {
           const labelEl = col.querySelector<HTMLElement>("[data-case-metric-label]");
@@ -118,7 +125,11 @@ export function useCaseStudyChapterAnimation(
         return;
       }
 
-      gsap.set([label, client, headline, supporting], { opacity: 0, y: 12 });
+      gsap.set([label, client, supporting], { opacity: 0, y: 12 });
+      gsap.set(words, { yPercent: 115 });
+      gsap.set(arrows, { opacity: 0 });
+      if (nLine) gsap.set(nLine, { scaleY: 0, transformOrigin: "top center" });
+      if (supporting) supporting.style.setProperty("--sx", "100%");
       gsap.set(paragraphs, { opacity: 0, y: 10 });
       gsap.set(outcomes, { opacity: 0, y: 8 });
       gsap.set([bridge, timeline], { opacity: 0, y: 6 });
@@ -151,8 +162,13 @@ export function useCaseStudyChapterAnimation(
 
       if (label) intro.to(label, { opacity: 1, y: 0, duration: 0.4 }, 0);
       if (client) intro.to(client, { opacity: 1, y: 0, duration: 0.38 }, 0.04);
-      if (headline) intro.to(headline, { opacity: 1, y: 0, duration: 0.52 }, 0.07);
-      if (supporting) intro.to(supporting, { opacity: 1, y: 0, duration: 0.46 }, 0.12);
+      if (words.length) intro.to(words, { yPercent: 0, duration: 0.6, stagger: 0.07 }, 0.07);
+      if (supporting) {
+        intro.to(supporting, { opacity: 1, y: 0, duration: 0.46 }, 0.3);
+        intro.to(supporting, { "--sx": "0%", duration: 1.4, ease: "power1.inOut" }, 0.5);
+        intro.to(supporting, { "--sx": "100%", duration: 0.001 }, 1.95);
+      }
+      if (nLine) intro.to(nLine, { scaleY: 1, duration: 0.9, ease: "power2.inOut" }, 0.25);
       if (paragraphs.length) {
         intro.to(paragraphs, { opacity: 1, y: 0, duration: 0.42, stagger: 0.06 }, 0.11);
       }
@@ -174,7 +190,7 @@ export function useCaseStudyChapterAnimation(
         defaults: { ease: "power3.out" },
       });
 
-      let cursor = 0.05;
+      const cursor = 0.05;
       if (bridge) outcomesTl.to(bridge, { opacity: 1, y: 0, duration: 0.32 }, cursor);
       if (timeline) outcomesTl.to(timeline, { opacity: 1, y: 0, duration: 0.34 }, cursor + 0.02);
       if (flowRail) outcomesTl.to(flowRail, { opacity: 1, duration: 0.3 }, cursor + 0.06);
@@ -191,7 +207,11 @@ export function useCaseStudyChapterAnimation(
         outcomesTl.call(() => {
           resetMarkers();
           setMarkerActive(marker, true);
+          section.querySelectorAll<HTMLElement>("[data-case-metric-value]").forEach((v) => v.classList.remove("case-chapter__metric-value--lit"));
+          valueEl?.classList.add("case-chapter__metric-value--lit");
         }, undefined, stepTime);
+        const arrow = col.querySelector<HTMLElement>("[data-case-arrow]");
+        if (arrow) outcomesTl.to(arrow, { opacity: 1, duration: 0.3 }, stepTime + 0.2);
 
         if (flowLine) {
           outcomesTl.to(

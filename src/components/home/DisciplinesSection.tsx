@@ -1,327 +1,344 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useInView, useReducedMotion } from "framer-motion";
-import { disciplines } from "@/content/home";
-import { Container } from "@/components/ui/Container";
-import { SectionLabel } from "@/components/ui/SectionLabel";
+import Image from "next/image";
+import { Fragment, useId, useLayoutEffect, useRef, useState } from "react";
+import { useReducedMotion } from "framer-motion";
+import { disciplineColumns, disciplines } from "@/content/home";
+import { disciplinesPageHero, disciplinesPagePeople } from "@/content/disciplines-page";
 import { homeSections } from "@/content/home-sections";
-import {
-  useDisciplinesChapterAnimation,
-  type DisciplinesStoryState,
-} from "@/components/home/useDisciplinesChapterAnimation";
+import { Container } from "@/components/ui/Container";
 import { cn } from "@/lib/cn";
+import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
-const DISCIPLINE_LABELS = [
-  "Commercial Strategy",
-  "Paid Search",
-  "Search & Technology",
-] as const;
+const PORTRAITS: Record<string, string> = {
+  "Michael Simkin": "/images/team/michael-simkin.webp",
+  "Junaid Kazi": "/images/team/junaid-kazi.webp",
+  "Noumaan Khatib": "/images/team/noumaan-khatib.webp",
+};
 
+const EMPHASIS = "commercial objective.";
+
+/* Diagram geometry (viewBox 560 × 400). Index order matches the three disciplines. */
+const CX = 280;
+const CY = 215;
 const NODES = [
-  { cx: 148, cy: 248, labelX: 148, labelY: 288 },
-  { cx: 400, cy: 68, labelX: 400, labelY: 26 },
-  { cx: 652, cy: 248, labelX: 652, labelY: 288 },
+  { x: 100, y: 215, label: ["Commercial", "Strategy"], pos: "left" }, // 01 Commercial Strategy
+  { x: 280, y: 65, label: ["Paid Search"], pos: "top" }, // 02 Paid Search
+  { x: 460, y: 215, label: ["Search &", "Technology"], pos: "right" }, // 03 Search & Technology
 ] as const;
 
-const HUB = { cx: 400, cy: 188 } as const;
-
-function DisciplineDiagram({
-  activeIndex,
-  hubLit,
-  reduce,
-}: {
-  activeIndex: number;
-  hubLit: boolean;
-  reduce: boolean | null;
-}) {
-  return (
-    <div
-      className="disc-chapter__diagram relative mx-auto w-full max-w-[34rem] lg:max-w-none"
-      aria-hidden
-    >
-      <div className="relative aspect-[800/340] w-full">
-        <svg
-          viewBox="0 0 800 340"
-          className="absolute inset-0 h-full w-full overflow-visible"
-          role="presentation"
-        >
-          <defs>
-            <linearGradient id="disc-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="rgb(27 61 47 / 0.55)" />
-              <stop offset="100%" stopColor="rgb(182 83 32 / 0.65)" />
-            </linearGradient>
-          </defs>
-
-          {NODES.map((node, i) => (
-            <g key={`line-${i}`}>
-              <path
-                data-disc-line={i}
-                d={`M ${node.cx} ${node.cy} L ${HUB.cx} ${HUB.cy}`}
-                fill="none"
-                stroke="rgb(27 61 47 / 0.38)"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                style={reduce ? { strokeDashoffset: 0 } : undefined}
-              />
-              <path
-                data-disc-line-glow={i}
-                d={`M ${node.cx} ${node.cy} L ${HUB.cx} ${HUB.cy}`}
-                fill="none"
-                stroke="url(#disc-line-grad)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                opacity={0}
-              />
-            </g>
-          ))}
-
-          {NODES.map((node, i) => {
-            const isActive = !hubLit && activeIndex === i;
-            const isJoined = hubLit;
-            return (
-              <g
-                key={`node-${i}`}
-                data-disc-node={i}
-                className={cn(
-                  "disc-chapter__node",
-                  isActive && "disc-chapter__node--lit",
-                  (isJoined || i <= activeIndex) && "disc-chapter__node--seen",
-                  isJoined && "disc-chapter__node--joined",
-                )}
-              >
-                <circle
-                  cx={node.cx}
-                  cy={node.cy}
-                  r={isActive ? 30 : 26}
-                  className="disc-chapter__node-ring transition-[r] duration-300"
-                  fill="var(--color-ivory)"
-                  stroke="rgb(27 61 47 / 0.42)"
-                  strokeWidth="1.5"
-                />
-                <circle
-                  cx={node.cx}
-                  cy={node.cy}
-                  r={7}
-                  className="disc-chapter__node-core transition-colors duration-300"
-                  fill="var(--color-forest)"
-                />
-              </g>
-            );
-          })}
-
-          <circle
-            data-disc-hub-ring
-            cx={HUB.cx}
-            cy={HUB.cy}
-            r={34}
-            className={cn(
-              "disc-chapter__hub-ring fill-copper/14 transition-opacity duration-300",
-              hubLit && "disc-chapter__hub--lit",
-            )}
-            data-disc-hub
-          />
-          <circle
-            data-disc-hub-core
-            cx={HUB.cx}
-            cy={HUB.cy}
-            r={11}
-            className={cn(
-              "fill-copper transition-transform duration-300",
-              hubLit && "disc-chapter__hub--lit",
-            )}
-          />
-        </svg>
-
-        {NODES.map((node, i) => (
-          <span
-            key={`label-${i}`}
-            data-disc-label={i}
-            className={cn(
-              "absolute w-max max-w-[8.5rem] -translate-x-1/2 text-center font-mono text-[0.625rem] uppercase leading-snug tracking-[0.14em] transition-colors duration-300 sm:max-w-none sm:text-[0.6875rem]",
-              i === 1 ? "-translate-y-full" : "",
-              !hubLit && activeIndex === i
-                ? "disc-chapter__label--lit text-copper"
-                : "text-forest/78",
-            )}
-            style={{
-              left: `${(node.labelX / 800) * 100}%`,
-              top: `${(node.labelY / 340) * 100}%`,
-            }}
-          >
-            {DISCIPLINE_LABELS[i]}
-          </span>
-        ))}
-
-        <p
-          data-disc-objective
-          className={cn(
-            "absolute left-1/2 top-[calc(100%+0.65rem)] w-max max-w-[min(100%,18rem)] -translate-x-1/2 text-center font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-forest/55 transition-colors duration-300 sm:text-xs",
-            hubLit && "disc-chapter__objective--lit text-copper",
-          )}
-        >
-          {disciplines.objective}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function PersonCard({
-  person,
-  index,
-  lit,
-  hubLit,
-  onFocus,
-}: {
-  person: (typeof disciplines.people)[number];
-  index: number;
-  lit: boolean;
-  hubLit: boolean;
-  onFocus: (index: number) => void;
-}) {
-  const ref = useRef<HTMLLIElement>(null);
-  const inView = useInView(ref, { amount: 0.35, margin: "-6% 0px" });
-
-  useEffect(() => {
-    if (inView && !hubLit) onFocus(index);
-  }, [inView, index, onFocus, hubLit]);
-
-  return (
-    <li
-      ref={ref}
-      data-disc-profile
-      data-disc-profile-index={index}
-      className={cn(
-        "disc-chapter__profile relative border-b border-forest/14 py-3.5 sm:py-4",
-        lit && !hubLit && "disc-chapter__profile--lit",
-      )}
-    >
-      <span
-        className="disc-chapter__profile-signal pointer-events-none absolute left-0 top-3.5 bottom-3.5 w-0.5 origin-top scale-y-0 bg-copper/75 transition-transform duration-300 sm:top-4 sm:bottom-4"
-        aria-hidden
-      />
-      <h3 className="font-display text-[clamp(1.28rem,1.05rem+0.75vw,1.65rem)] font-medium leading-[1.15] tracking-[-0.01em] text-forest">
-        {person.name}
-      </h3>
-      <p className="mt-1 font-mono text-[0.6875rem] uppercase leading-snug tracking-[0.12em] text-forest/72 sm:text-[0.75rem]">
-        {person.discipline}
-      </p>
-
-      <details className="group mt-2.5 sm:mt-3">
-        <summary
-          className="disc-chapter__bio-trigger flex cursor-pointer list-none items-center justify-between gap-3 rounded-sm border border-forest/14 bg-paper/60 px-3 py-2.5 outline-none transition-colors hover:border-copper/40 focus-visible:ring-2 focus-visible:ring-copper/45 focus-visible:ring-offset-2 focus-visible:ring-offset-ivory [&::-webkit-details-marker]:hidden"
-          onMouseEnter={() => onFocus(index)}
-          onFocus={() => onFocus(index)}
-        >
-          <span className="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-forest/88 group-hover:text-copper">
-            <span className="group-open:hidden">Read bio</span>
-            <span className="hidden group-open:inline">Hide bio</span>
-          </span>
-          <span
-            className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-forest/18 text-copper transition-transform duration-300 group-open:rotate-90 group-hover:border-copper/35"
-            aria-hidden
-          >
-            →
-          </span>
-        </summary>
-        <p className="mt-2.5 border-l-2 border-copper/35 pl-3.5 text-[0.95rem] leading-[1.58] text-charcoal/90 sm:mt-3 sm:pl-4 sm:text-[0.98rem]">
-          {person.bio}
-        </p>
-      </details>
-    </li>
-  );
-}
+const iconProps = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.5,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+};
+const ICONS = [
+  <svg key="s" {...iconProps}>
+    <path d="M12 3 3 8l9 5 9-5-9-5z" />
+    <path d="m3 12 9 5 9-5" />
+    <path d="m3 16 9 5 9-5" />
+  </svg>,
+  <svg key="p" {...iconProps}>
+    <circle cx="10.5" cy="10.5" r="6.5" />
+    <path d="m20 20-4.9-4.9" />
+  </svg>,
+  <svg key="t" {...iconProps}>
+    <path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 5l-4 14" />
+  </svg>,
+];
 
 export function DisciplinesSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
-  const [story, setStory] = useState<DisciplinesStoryState>({
-    activeIndex: 0,
-    hubLit: false,
-  });
+  const ref = useRef<HTMLElement>(null);
+  const reduce = !!useReducedMotion();
+  const uid = useId();
+  const [active, setActive] = useState<number | null>(null);
+  const [open, setOpen] = useState<number | null>(null);
 
-  const onStoryChange = useCallback((next: DisciplinesStoryState) => {
-    setStory(next);
-  }, []);
+  useLayoutEffect(() => {
+    const section = ref.current;
+    if (!section || reduce) return;
+    ensureGsapPlugins();
+    const q = (sel: string) => Array.from(section.querySelectorAll<SVGGeometryElement | HTMLElement>(sel));
+    const ctx = gsap.context(() => {
+      const head = q("[data-dsc-head]");
+      const words = q("[data-dsc-w]");
+      const emWords = q("[data-dsc-ew]");
+      const sub = q("[data-dsc-sub]");
+      const arcs = q("[data-dsc-arc]") as SVGGeometryElement[];
+      const spokes = q("[data-dsc-path]") as SVGGeometryElement[];
+      const ring = q("[data-dsc-ring]");
+      const nodes = q("[data-dsc-node]");
+      const icons = q("[data-dsc-node] svg");
+      const centre = q("[data-dsc-centre]");
+      const runner = q("[data-dsc-runner]");
+      const colsWrap = q("[data-dsc-cols]");
+      const hideLine = (p: SVGGeometryElement) => {
+        const len = p.getTotalLength?.() ?? 0;
+        gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+      };
+      gsap.set(head, { opacity: 0, y: 12 });
+      gsap.set(words, { yPercent: 110 });
+      gsap.set(emWords, { yPercent: 110, opacity: 0 });
+      gsap.set(sub, { opacity: 0, y: 14 });
+      [...arcs, ...spokes].forEach(hideLine);
+      gsap.set(ring, { opacity: 0 });
+      gsap.set(nodes, { opacity: 0, scale: 0.8 });
+      gsap.set(icons, { opacity: 0, y: 6 });
+      gsap.set(centre, { opacity: 0, scale: 0.88, transformOrigin: "50% 50%" });
+      gsap.set(runner, { opacity: 0 });
 
-  useEffect(() => {
-    if (reduce) {
-      setStory({ activeIndex: disciplines.people.length - 1, hubLit: true });
-    }
+      gsap
+        .timeline({
+          defaults: { ease: "power2.out" },
+          scrollTrigger: { trigger: section, start: "top 72%", once: true },
+        })
+        .to(head, { opacity: 1, y: 0, duration: 0.45 }, 0)
+        .to(words, { yPercent: 0, duration: 0.65, stagger: 0.09 }, 0.1)
+        .to(emWords, { yPercent: 0, opacity: 1, duration: 0.7, stagger: 0.1 }, 0.55)
+        .to(sub, { opacity: 1, y: 0, duration: 0.55, stagger: 0.12 }, 0.7)
+        .to(centre, { opacity: 1, scale: 1, duration: 0.8 }, 0.25)
+        .to(ring, { opacity: 1, duration: 0.8 }, 0.4)
+        .to(spokes, { strokeDashoffset: 0, duration: 0.8, stagger: 0.14, ease: "power1.inOut" }, 0.6)
+        .to(arcs, { strokeDashoffset: 0, duration: 1.1, stagger: 0.15, ease: "power1.inOut" }, 0.7)
+        .to(nodes, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.16 }, 0.9)
+        .to(icons, { opacity: 1, y: 0, duration: 0.45, stagger: 0.16 }, 1.05)
+        .to(runner, { opacity: 1, duration: 0.6 }, 1.8);
+
+      // Columns: each one builds in on its own as it scrolls into view.
+      q("[data-dsc-col]").forEach((col, k) => {
+        const part = (sel: string) => Array.from(col.querySelectorAll<HTMLElement>(sel));
+        const rule = part("[data-dsc-crule]");
+        const body = part("[data-dsc-ch], [data-dsc-cp]");
+        const photo = part("[data-dsc-cphoto]");
+        const who = part("[data-dsc-cwho]");
+        const line = part("[data-dsc-cdiv]");
+        gsap.set(col, { opacity: 1 });
+        gsap.set(rule, { scaleX: 0, transformOrigin: "0% 50%" });
+        gsap.set(body, { opacity: 0, y: 16 });
+        gsap.set(line, { scaleX: 0, transformOrigin: "0% 50%" });
+        gsap.set(photo, { opacity: 0, scale: 0.85 });
+        gsap.set(who, { opacity: 0, x: 10 });
+        gsap
+          .timeline({
+            defaults: { ease: "power2.out" },
+            scrollTrigger: { trigger: colsWrap[0] ?? col, start: "top 82%", once: true },
+            delay: k * 0.14,
+          })
+          .to(rule, { scaleX: 1, duration: 0.6 }, 0)
+          .to(body, { opacity: 1, y: 0, duration: 0.55, stagger: 0.1 }, 0.1)
+          .to(line, { scaleX: 1, duration: 0.6 }, 0.45)
+          .to(photo, { opacity: 1, scale: 1, duration: 0.6 }, 0.55)
+          .to(who, { opacity: 1, x: 0, duration: 0.5 }, 0.7);
+      });
+    }, section);
+    return () => ctx.revert();
   }, [reduce]);
 
-  useDisciplinesChapterAnimation(sectionRef, Boolean(reduce), onStoryChange);
-
-  const focusDiscipline = useCallback((index: number) => {
-    setStory({ activeIndex: index, hubLit: false });
-  }, []);
+  const [lead] = disciplines.headline.split(EMPHASIS);
 
   return (
     <section
-      ref={sectionRef}
+      ref={ref}
       id="disciplines"
-      className="disc-chapter accent-copper relative scroll-mt-[var(--header-h)] overflow-x-clip bg-ivory py-[clamp(1.75rem,1.35rem+1.6vw,3.5rem)] md:py-[clamp(2rem,1.5rem+1.8vw,4rem)]"
-      aria-labelledby="disciplines-heading"
+      aria-labelledby="dsc-heading"
+      className="dsc scroll-mt-[var(--header-h)]"
     >
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-forest/12 to-transparent"
-        aria-hidden
-      />
+      <svg className="dsc__waves" viewBox="0 0 1440 220" preserveAspectRatio="none" aria-hidden>
+        <path d="M0 120 C 240 60, 480 150, 760 110 S 1200 40, 1440 100 V220 H0Z" fill="rgb(167 180 157 / 0.14)" />
+        <path d="M0 160 C 300 110, 560 190, 880 150 S 1250 100, 1440 150 V220 H0Z" fill="rgb(167 180 157 / 0.16)" />
+        <path d="M0 195 C 360 160, 640 215, 960 190 S 1300 160, 1440 190 V220 H0Z" fill="rgb(167 180 157 / 0.18)" />
+      </svg>
 
-      <Container>
-        <div className="grid gap-7 lg:grid-cols-12 lg:gap-x-9 lg:gap-y-6 xl:gap-x-11">
-          <div data-disc-intro className="min-w-0 lg:col-span-6 lg:row-start-1">
-            <SectionLabel className="mb-2.5 lg:mb-3">
+      <Container className="dsc__inner">
+        <div className="dsc__top">
+          <header className="dsc__head">
+            <span className="dsc__accent" aria-hidden />
+            <p data-dsc-head className="dsc__eyebrow">
               {homeSections.disciplines.name}
-            </SectionLabel>
-            <h2
-              id="disciplines-heading"
-              className="font-display text-[clamp(1.65rem,1.02rem+2.35vw,3.05rem)] font-medium leading-[1.08] tracking-[-0.015em] text-balance text-forest"
-            >
-              {disciplines.headline}
+            </p>
+            <h2 id="dsc-heading" className="dsc__title">
+              {lead.trim().split(" ").map((w, k) => (
+                <Fragment key={`${w}-${k}`}>
+                  <span className="dsc__wm">
+                    <span data-dsc-w className="dsc__w">
+                      {w}
+                    </span>
+                  </span>{" "}
+                </Fragment>
+              ))}
+              <em>
+                {EMPHASIS.split(" ").map((w, k, all) => (
+                  <Fragment key={`${w}-${k}`}>
+                    <span className="dsc__wm">
+                      <span data-dsc-ew className="dsc__w">
+                        {w}
+                      </span>
+                    </span>
+                    {k < all.length - 1 ? " " : ""}
+                  </Fragment>
+                ))}
+              </em>
             </h2>
-            <p className="mt-3 max-w-[38rem] text-[1.02rem] leading-[1.55] text-charcoal/90 sm:text-[1.0625rem] lg:mt-3.5">
+            <p data-dsc-sub className="dsc__sub">
               {disciplines.subheading}
             </p>
-            <p className="mt-2.5 max-w-[36rem] text-[0.96rem] leading-[1.58] text-charcoal/82 sm:text-[0.98rem]">
+            <p data-dsc-sub className="dsc__body">
               {disciplines.body}
             </p>
-          </div>
+            <details data-dsc-sub className="dsc__more">
+              <summary>
+                <span aria-hidden>→</span>
+                <em>Read more</em>
+                <em className="dsc__less">Hide detail</em>
+              </summary>
+              <p>{disciplinesPageHero.body}</p>
+            </details>
+          </header>
 
-          <div
-            data-disc-diagram
-            className="min-w-0 lg:col-span-6 lg:col-start-7 lg:row-span-2 lg:row-start-1 lg:sticky lg:top-[calc(var(--header-h)+1rem)] lg:self-start"
-          >
-            <DisciplineDiagram
-              activeIndex={story.activeIndex}
-              hubLit={story.hubLit}
-              reduce={reduce}
-            />
-          </div>
+          <div className="dsc__diagram">
+            <div className="dsc__diagram-box">
+              <svg viewBox="0 0 560 400" className="dsc__svg" aria-hidden>
+                <defs>
+                  <radialGradient id={`${uid}-core`} cx="35%" cy="30%" r="80%">
+                    <stop offset="0%" stopColor="#1f5a48" />
+                    <stop offset="100%" stopColor="#0d3329" />
+                  </radialGradient>
+                  <radialGradient id={`${uid}-halo`}>
+                    <stop offset="55%" stopColor="rgb(230 154 97 / 0.28)" />
+                    <stop offset="100%" stopColor="rgb(230 154 97 / 0)" />
+                  </radialGradient>
+                </defs>
+                <circle data-dsc-ring cx={CX} cy={CY} r="170" fill="none" stroke="rgb(167 180 157 / 0.35)" strokeWidth="1" strokeDasharray="2 5" />
+                <path data-dsc-arc d={`M ${NODES[0].x} ${NODES[0].y} A 180 150 0 0 1 ${NODES[1].x} ${NODES[1].y}`} fill="none" stroke="rgb(182 83 32 / 0.55)" strokeWidth="1" />
+                <path data-dsc-arc d={`M ${NODES[1].x} ${NODES[1].y} A 180 150 0 0 1 ${NODES[2].x} ${NODES[2].y}`} fill="none" stroke="rgb(182 83 32 / 0.55)" strokeWidth="1" />
+                {NODES.map((n, i) => (
+                  <path
+                    key={i}
+                    data-dsc-path
+                    d={`M ${CX + (n.x < CX ? -76 : n.x > CX ? 76 : 0)} ${CY + (n.y < CY ? -76 : 0)} L ${n.x + (n.x < CX ? 30 : n.x > CX ? -30 : 0)} ${n.y + (n.y < CY ? 30 : 0)}`}
+                    fill="none"
+                    stroke={active === i ? "#b65320" : "rgb(84 92 59 / 0.5)"}
+                    strokeWidth="1"
+                    style={{ transition: "stroke 0.3s" }}
+                  />
+                ))}
+                <circle cx="153" cy="120" r="3.5" fill="#d9672b" />
+                <circle cx="407" cy="120" r="3.5" fill="#d9672b" />
+                <path id={`${uid}-orbit`} d={`M ${NODES[0].x} ${NODES[0].y} A 180 150 0 0 1 ${NODES[1].x} ${NODES[1].y} A 180 150 0 0 1 ${NODES[2].x} ${NODES[2].y}`} fill="none" stroke="none" />
+                {!reduce && (
+                  <g data-dsc-runner>
+                    <circle r="9" fill="rgb(230 154 97 / 0.3)">
+                      <animateMotion dur="11s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.45 0 0.55 1" rotate="auto" keyPoints="0;1">
+                        <mpath href={`#${uid}-orbit`} />
+                      </animateMotion>
+                    </circle>
+                    <circle r="3" fill="#d9672b">
+                      <animateMotion dur="11s" repeatCount="indefinite" calcMode="spline" keyTimes="0;1" keySplines="0.45 0 0.55 1" keyPoints="0;1">
+                        <mpath href={`#${uid}-orbit`} />
+                      </animateMotion>
+                    </circle>
+                  </g>
+                )}
+                <g data-dsc-centre>
+                  <circle className="dsc__halo" cx={CX} cy={CY} r="118" fill={`url(#${uid}-halo)`} />
+                  <circle cx={CX} cy={CY} r="76" fill={`url(#${uid}-core)`} />
+                  <text x={CX} y={CY - 16} textAnchor="middle" className="dsc__ct">ONE</text>
+                  <text x={CX} y={CY + 2} textAnchor="middle" className="dsc__ct">COMMERCIAL</text>
+                  <text x={CX} y={CY + 20} textAnchor="middle" className="dsc__ct">OBJECTIVE</text>
+                  <line x1={CX - 16} x2={CX + 16} y1={CY + 34} y2={CY + 34} stroke="#e69a61" strokeWidth="1.5" />
+                </g>
+              </svg>
 
-          <div data-disc-team className="min-w-0 lg:col-span-6 lg:row-start-2">
-            <ul className="border-t border-forest/14" aria-label="The team">
-              {disciplines.people.map((person, i) => (
-                <PersonCard
-                  key={person.name}
-                  person={person}
-                  index={i}
-                  lit={story.activeIndex === i}
-                  hubLit={story.hubLit}
-                  onFocus={focusDiscipline}
-                />
+              {NODES.map((n, i) => (
+                <button
+                  key={disciplinesPagePeople[i].label}
+                  type="button"
+                  data-dsc-node
+                  onMouseEnter={() => setActive(i)}
+                  onMouseLeave={() => setActive(null)}
+                  onFocus={() => setActive(i)}
+                  onBlur={() => setActive(null)}
+                  className={cn("dsc__node", `dsc__node--${n.pos}`, active === i && "is-active")}
+                  style={{ left: `${(n.x / 560) * 100}%`, top: `${(n.y / 400) * 100}%` }}
+                  aria-label={disciplinesPagePeople[i].label}
+                >
+                  <span className="dsc__ico">{ICONS[i]}</span>
+                  <span className="dsc__nlabel" aria-hidden>
+                    {n.label.map((l) => (
+                      <span key={l} className="block">
+                        {l}
+                      </span>
+                    ))}
+                  </span>
+                </button>
               ))}
-            </ul>
-
-            <p
-              data-disc-closing
-              className="mt-6 font-display text-[clamp(1.35rem,1rem+1.35vw,2.05rem)] font-medium italic leading-[1.18] tracking-[-0.015em] text-copper sm:mt-7"
-            >
-              {disciplines.closingLine}
-            </p>
+            </div>
           </div>
         </div>
+
+        <ol data-dsc-cols className="dsc__cols" aria-label="The three disciplines and the team">
+          {disciplinesPagePeople.map((person, i) => {
+            const col = disciplineColumns[i];
+            const isOpen = open === i;
+            const panelId = `${uid}-bio-${i}`;
+            return (
+              <li
+                key={person.name}
+                data-dsc-col
+                className={cn("dsc__col", active === i && "is-active")}
+                onMouseEnter={() => setActive(i)}
+                onMouseLeave={() => setActive(null)}
+              >
+                <p className="dsc__tag">
+                  <span>0{i + 1}</span>
+                  <i data-dsc-crule aria-hidden />
+                  {person.label}
+                </p>
+                <h3 data-dsc-ch className="dsc__h">{col.heading}</h3>
+                <p data-dsc-cp className="dsc__p">{col.text}</p>
+                <div className="dsc__profile">
+                  <span data-dsc-cdiv className="dsc__pdiv" aria-hidden />
+                  <div data-dsc-cphoto className="dsc__photo">
+                    <Image
+                      src={PORTRAITS[person.name]}
+                      alt={`Portrait of ${person.name}`}
+                      fill
+                      sizes="104px"
+                      className="object-cover object-top"
+                    />
+                  </div>
+                  <div data-dsc-cwho className="dsc__who">
+                    <p className="dsc__name">{person.name}</p>
+                    <p className="dsc__role">{person.role}</p>
+                    <button
+                      type="button"
+                      className="dsc__toggle"
+                      aria-expanded={isOpen}
+                      aria-controls={panelId}
+                      onClick={() => setOpen(isOpen ? null : i)}
+                    >
+                      {isOpen ? "Hide bio" : "Read bio"}
+                      <span aria-hidden>→</span>
+                    </button>
+                  </div>
+                </div>
+                <div className={cn("dsc__panel", isOpen && "is-open")} id={panelId} inert={!isOpen}>
+                  <div>
+                    <p>{person.body}</p>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+
+        <p data-dsc-sub className="dsc__closing">
+          {disciplines.closingLine}
+        </p>
       </Container>
     </section>
   );
