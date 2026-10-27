@@ -252,26 +252,26 @@ export function ResultsStory({
       <div className="cs-results__inputs">
         {[
           { m: spend, i: 1 },
-          { m: leads, i: 3 },
-          { m: duration, i: 4 },
+          { m: leads, i: 2 },
+          { m: duration, i: 3 },
         ].map(({ m, i }) => (
           <div key={m.label} className="cs-stat cs-rise" style={{ ["--i" as string]: i }}>
             <p className="type-caption cs-stat__label">{m.label}</p>
-            <p className="cs-stat__value"><CountUp value={m.value} delay={i * 150} duration={1100} /></p>
+            <p className="cs-stat__value"><CountUp value={m.value} delay={i * 70} duration={900} /></p>
           </div>
         ))}
       </div>
 
-      <p className="cs-results__group cs-rise" style={{ ["--i" as string]: 6 }}>{story.results.outputLabel}</p>
+      <p className="cs-results__group cs-rise" style={{ ["--i" as string]: 4 }}>{story.results.outputLabel}</p>
       <div className="cs-quote-sales">
-        <div className="cs-quote-sales__sales cs-rise" style={{ ["--i" as string]: 11 }}>
+        <div className="cs-quote-sales__sales cs-rise" style={{ ["--i" as string]: 6 }}>
           <p className="type-caption cs-stat__label">{sales.label}</p>
-          <p className="cs-sales-figure"><CountUp value={sales.value} delay={11 * 150} duration={1500} /></p>
+          <p className="cs-sales-figure"><CountUp value={sales.value} delay={6 * 70} duration={1300} /></p>
         </div>
-        <div className="cs-quote-sales__bar cs-rise" style={{ ["--i" as string]: 8 }}>
+        <div className="cs-quote-sales__bar cs-rise" style={{ ["--i" as string]: 5 }}>
           <div className="flex items-baseline justify-between gap-4">
             <p className="type-caption cs-stat__label">{quotes.label}</p>
-            <p className="cs-quote-figure"><CountUp value={quotes.value} delay={8 * 150} duration={1300} /></p>
+            <p className="cs-quote-figure"><CountUp value={quotes.value} delay={5 * 70} duration={1100} /></p>
           </div>
           <div className="cs-bar" role="img" aria-label={`${sales.value} of ${quotes.value} quoted converted into sales, roughly 25.5%`}>
             <span className="cs-bar__sales" />
@@ -286,7 +286,7 @@ export function ResultsStory({
         </div>
       </div>
 
-      <div className="cs-ratio cs-rise" style={{ ["--i" as string]: 14 }}>
+      <div className="cs-ratio cs-rise" style={{ ["--i" as string]: 8 }}>
         <p className="type-caption cs-stat__label">{story.results.ratioLead}</p>
         <p className="cs-ratio__text" aria-label={highlight}>
           {ratioMatch ? (
@@ -300,7 +300,7 @@ export function ResultsStory({
         <p className="mt-4 type-small cs-results__muted">{ratioText}</p>
       </div>
 
-      <p className="cs-qualification cs-rise" style={{ ["--i" as string]: 15 }}>
+      <p className="cs-qualification cs-rise" style={{ ["--i" as string]: 10 }}>
         <span className="type-caption" aria-hidden="true">Please note</span>
         {qualification}
       </p>

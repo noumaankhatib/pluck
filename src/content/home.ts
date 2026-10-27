@@ -58,12 +58,13 @@ export const quality = {
     "business",
   ],
   cta: "Talk to us",
-  ctaHref: "/contact",
+  ctaHref: "/#contact",
 };
 
 export const searchIntelligence = {
-  headline: "Search leaves clues.",
+  headline: "The way potential customers search tells you what they need.",
   lead: "The way potential customers search tells you what they need.",
+  clue: "Search leaves clues.",
   body: [
     "Some search for a particular product.",
     "Others search for a specification, a supplier or a problem they need to solve.",
@@ -83,7 +84,7 @@ export const searchIntelligence = {
 export const journey = {
   title: "How we find the business",
   cta: "Talk to us",
-  ctaHref: "/contact",
+  ctaHref: "/#contact",
   stages: [
     {
       step: "01",
@@ -246,5 +247,5 @@ export const closing = {
     "Let's see what's out there.",
   ],
   cta: "Talk to us",
-  ctaHref: "/contact",
+  ctaHref: "/#contact",
 };

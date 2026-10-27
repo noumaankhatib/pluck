@@ -32,7 +32,7 @@ export const aboutTeam = {
   headline: "The people behind Pluck",
   people: [
     {
-      name: "Michael Simkin",
+      name: "Michael Jack Simkin",
       role: "Commercial strategy, positioning & customer understanding",
       body: [
         "Michael has more than a decade of experience helping businesses understand their markets and customers. He identifies what makes propositions valuable and where commercial opportunities may lie. His work includes research, positioning, communication, copywriting, art direction and the commercial conversations that turn opportunities into projects.",
@@ -91,7 +91,7 @@ export const aboutCta = {
     "Depending on the opportunity, we may use search, social advertising, SEO, dedicated landing pages or other approaches.",
   ],
   cta: "Talk to us",
-  ctaHref: "/contact",
+  ctaHref: "/#contact",
 };
 
 /** Presentation copy for the redesigned About page. Supporting labels only; no new claims. */
@@ -102,7 +102,7 @@ export const aboutStory = {
   },
   belief: {
     kicker: "Our belief",
-    headline: "Good growth starts with better questions.",
+    headline: "What we believe",
     nodes: [
       { label: "Business", text: "What you sell and why customers choose you." },
       { label: "Customer", text: "Who buys, and how they search." },
@@ -112,7 +112,7 @@ export const aboutStory = {
   },
   approach: {
     kicker: "Our approach",
-    headline: "Curiosity, connected to commercial thinking.",
+    headline: "Why we work together",
     disciplines: [
       {
         label: "Research",
@@ -133,7 +133,7 @@ export const aboutStory = {
   },
   people: {
     kicker: "The team",
-    headline: "Specialist expertise. A shared perspective.",
+    headline: "The people behind Pluck",
   },
   together: {
     kicker: "How we work together",
@@ -142,10 +142,10 @@ export const aboutStory = {
   },
   advice: {
     kicker: "Our advice",
-    headline: "Find the opportunity hiding in plain sight.",
+    headline: "We start by understanding",
   },
   cta: {
     kicker: "Let's see what we might find.",
-    headline: "What could you be missing?",
+    headline: "Let's see what we might find.",
   },
 };

@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { hero } from "@/content/home";
-import { HeroJourneyTimeline } from "@/components/home/HeroJourneyTimeline";
 import { HeroVideoLoader } from "@/components/home/HeroVideoLoader";
-import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
 /** Web delivery encode (~3MB, faststart). Master: hero-background-pluck.mp4 */
 const HERO_VIDEO = "/videos/hero-background-pluck.web.mp4";
@@ -22,11 +20,7 @@ export function HeroSection() {
   const accentRef = useRef<HTMLDivElement>(null);
   const sublineRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<HTMLDivElement>(null);
-  const scrollCueRef = useRef<HTMLDivElement>(null);
 
-  const pathProgress = useMotionValue(reduce ? 1 : 0);
-  const [activeStep, setActiveStep] = useState(reduce ? hero.journey.length - 1 : 0);
 
   useEffect(() => {
     if (reduce) return;
@@ -72,64 +66,11 @@ export function HeroSection() {
     };
   }, [reduce]);
 
-  useLayoutEffect(() => {
-    if (reduce) {
-      pathProgress.set(1);
-      setActiveStep(hero.journey.length - 1);
-      return;
-    }
-
-    ensureGsapPlugins();
-
-    const section = sectionRef.current;
-    const timeline = timelineRef.current;
-
-    if (!section) return;
-
-    const progressProxy = { p: 0 };
-    const stepDuration = 1.28;
-
-    const ctx = gsap.context(() => {
-      const journeyDuration = hero.journey.length * stepDuration;
-      const pauseAtEnd = 1.75;
-      const stepCount = hero.journey.length;
-
-      const syncJourneyProgress = (p: number) => {
-        const clamped = Math.min(1, Math.max(0, p));
-        pathProgress.set(clamped);
-        const idx =
-          clamped >= 1
-            ? stepCount - 1
-            : Math.min(stepCount - 1, Math.floor(clamped * stepCount));
-        setActiveStep(idx);
-      };
-
-      const runJourneyCycle = () => {
-        progressProxy.p = 0;
-        syncJourneyProgress(0);
-
-        gsap.to(progressProxy, {
-          p: 1,
-          duration: journeyDuration,
-          ease: "none",
-          onUpdate: () => syncJourneyProgress(progressProxy.p),
-          onComplete: () => {
-            syncJourneyProgress(1);
-            gsap.delayedCall(pauseAtEnd, runJourneyCycle);
-          },
-        });
-      };
-
-      gsap.delayedCall(1.05, runJourneyCycle);
-    }, section);
-
-    return () => ctx.revert();
-  }, [reduce, pathProgress]);
-
   return (
     <section
       ref={sectionRef}
-      className="hero-chapter hero-viewport relative isolate flex h-[100dvh] max-h-[100dvh] w-full flex-col overflow-hidden bg-forest"
+      id="home"
+      className="hero-chapter hero-viewport relative isolate flex mt-[var(--header-h)] h-[calc(100dvh-var(--header-h))] max-h-[calc(100dvh-var(--header-h))] w-full flex-col overflow-hidden bg-forest"
       aria-labelledby="hero-heading"
     >
       <div className="absolute inset-0 z-0 overflow-hidden bg-[#002a23]">
@@ -160,10 +101,8 @@ export function HeroSection() {
       </div>
 
       <div className="relative z-[2] mx-auto flex min-h-0 w-full max-w-[var(--content-max)] flex-1 flex-col px-[var(--gutter)]">
-        <div className="h-[var(--header-h)] shrink-0" aria-hidden />
-
         <div className="hero-copy-zone grid min-h-0 flex-1 grid-cols-1 items-center lg:grid-cols-12 lg:gap-x-8">
-          <div className="min-w-0 lg:col-span-5 lg:col-start-1 xl:col-span-5">
+          <div className="min-w-0 lg:col-span-8 lg:col-start-1">
             <div className="hero-copy-stack">
               <h1
                 ref={headlineRef}
@@ -172,13 +111,13 @@ export function HeroSection() {
               >
                 <span className="sr-only">{hero.headline}</span>
                 <span data-hero-line className="block">
-                  <span data-hero-line-inner className="block">
+                  <span data-hero-line-inner className="hero-reveal block" style={{ "--d": "0.15s" } as React.CSSProperties}>
                     There&apos;s{" "}
                     <span className="hero-headline__emphasis">business</span>
                   </span>
                 </span>
                 <span data-hero-line className="block">
-                  <span data-hero-line-inner className="block">
+                  <span data-hero-line-inner className="hero-reveal block" style={{ "--d": "0.3s" } as React.CSSProperties}>
                     you&apos;re{" "}
                     <span className="hero-headline__emphasis">missing.</span>
                   </span>
@@ -190,7 +129,7 @@ export function HeroSection() {
                 className="hero-subheading hero-subheading--viewport mt-2 font-display font-medium sm:mt-2.5"
               >
                 <span className="block">
-                  <span data-hero-sub-inner className="block">
+                  <span data-hero-sub-inner className="hero-reveal block" style={{ "--d": "0.6s" } as React.CSSProperties}>
                     {hero.subheading}
                   </span>
                 </span>
@@ -199,25 +138,26 @@ export function HeroSection() {
               <div
                 ref={accentRef}
                 data-hero-accent
-                className="hero-accent-rule mt-3 h-px w-14 origin-left bg-gradient-to-r from-[#D8783E] via-[#D8783E]/70 to-transparent sm:mt-3.5 sm:w-16"
+                className="hero-accent-rule hero-reveal mt-3 h-px w-14 origin-left bg-gradient-to-r from-[#e69a61] via-[#e69a61]/70 to-transparent sm:mt-3.5 sm:w-16"
                 aria-hidden
               />
 
               <p
                 ref={sublineRef}
-                className="hero-body-copy hero-body-copy--viewport mt-3 sm:mt-3.5"
+                className="hero-body-copy hero-body-copy--viewport hero-reveal mt-3 sm:mt-3.5"
+                style={{ "--d": "0.85s" } as React.CSSProperties}
               >
                 {hero.subline}
               </p>
 
-              <div ref={ctaRef} className="mt-4 sm:mt-5">
+              <div ref={ctaRef} className="hero-reveal mt-5 sm:mt-6" style={{ "--d": "1.1s" } as React.CSSProperties}>
                 <motion.div
                   whileHover={reduce ? undefined : { y: -2 }}
                   whileTap={reduce ? undefined : { scale: 0.992 }}
                   transition={{ type: "spring", stiffness: 400, damping: 26 }}
                 >
                   <Link
-                    href="/contact"
+                    href="/#contact"
                     className="hero-cta cta-glass"
                   >
                     Talk to us
@@ -228,27 +168,6 @@ export function HeroSection() {
           </div>
         </div>
 
-        <footer
-          ref={timelineRef}
-          className="hero-viewport__footer mt-1 shrink-0 px-2 py-1.5 sm:mt-2 sm:px-3 sm:py-2"
-        >
-          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-            <div className="min-w-0 flex-1">
-              <HeroJourneyTimeline
-                activeStep={activeStep}
-                progress={pathProgress}
-                reduce={reduce}
-              />
-            </div>
-            <p
-              ref={scrollCueRef}
-              className="type-caption shrink-0 text-center tracking-[0.2em] text-ivory/58 sm:pb-0.5 sm:text-right"
-              aria-hidden
-            >
-              Scroll
-            </p>
-          </div>
-        </footer>
       </div>
     </section>
   );

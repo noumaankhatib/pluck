@@ -9,11 +9,11 @@ import { motionEase } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
 const STEP_COLORS = [
-  "#7a8b7e",
-  "#4f7a66",
-  "#1b3d2f",
-  "#e5895a",
-  "#c45c26",
+  "#a7b49d",
+  "#545c3b",
+  "#123d32",
+  "#e69a61",
+  "#b65320",
 ] as const;
 
 type HeroDiscoveryPathProps = {
@@ -99,7 +99,7 @@ export function HeroDiscoveryPath({
         <motion.span
           className={cn(
             "absolute -top-10 left-[7px] h-[calc(2.5rem+0.75rem)] w-[2px] origin-top bg-gradient-to-b from-transparent",
-            panelSurface ? "to-[#e5895a]/85" : "to-[#7a8b7e]",
+            panelSurface ? "to-[#e69a61]/85" : "to-[#a7b49d]",
           )}
           initial={reduce ? false : { scaleY: 0 }}
           animate={{ scaleY: 1 }}
@@ -149,7 +149,7 @@ export function HeroDiscoveryPath({
                     animate={{
                       width: isActive ? 13 : 8,
                       height: isActive ? 13 : 8,
-                      backgroundColor: lit ? color : panelSurface ? "#2a2622" : "#f7f4ef",
+                      backgroundColor: lit ? color : panelSurface ? "#123d32" : "#faf9f3",
                       borderColor: lit ? color : panelSurface ? "rgb(250 249 243 / 0.22)" : "rgba(27,61,47,0.28)",
                     }}
                     transition={{ duration: 0.45, ease: motionEase }}
@@ -285,7 +285,7 @@ export function HeroDiscoveryPath({
                   animate={{
                     width: isActive ? 13 : 8,
                     height: isActive ? 13 : 8,
-                    backgroundColor: lit ? color : panelSurface ? "#2a2622" : "#f7f4ef",
+                    backgroundColor: lit ? color : panelSurface ? "#123d32" : "#faf9f3",
                     borderColor: lit ? color : panelSurface ? "rgb(250 249 243 / 0.22)" : "rgba(27,61,47,0.28)",
                   }}
                   transition={{ duration: 0.45, ease: motionEase }}

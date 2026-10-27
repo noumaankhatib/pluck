@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // The separate pages were merged into the single-page homepage; keep old links working.
+  async redirects() {
+    return [
+      { source: "/about", destination: "/#about", permanent: true },
+      { source: "/disciplines", destination: "/#disciplines", permanent: true },
+      { source: "/how-we-work", destination: "/#how-we-work", permanent: true },
+      { source: "/contact", destination: "/#contact", permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

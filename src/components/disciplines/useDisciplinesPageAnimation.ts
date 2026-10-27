@@ -79,6 +79,12 @@ export function useDisciplinesPageAnimation(
     const heroHeadline = root.querySelector<HTMLElement>("[data-disc-page-headline]");
     const heroBody = root.querySelector<HTMLElement>("[data-disc-page-hero-body]");
     const heroDiagram = root.querySelector<HTMLElement>("[data-disc-page-hero-diagram]");
+    const vLabels = root.querySelectorAll<HTMLElement>("[data-disc-page-vlabel]");
+    const chartBars = root.querySelectorAll<SVGElement>("[data-disc-bar]");
+    const chartArrow = root.querySelector<SVGPathElement>("[data-disc-arrow]");
+    const chartHead = root.querySelector<SVGElement>("[data-disc-arrow-head]");
+    const growth = root.querySelector<HTMLElement>("[data-disc-growth]");
+    const heroLines = root.querySelectorAll<HTMLElement>("[data-disc-line]");
     const profiles = root.querySelector<HTMLElement>("[data-disc-page-profiles]");
     const profileCards = root.querySelectorAll<HTMLElement>("[data-disc-page-profile]");
     const profileBars = root.querySelectorAll<HTMLElement>("[data-disc-page-profile-bar]");
@@ -122,7 +128,12 @@ export function useDisciplinesPageAnimation(
         gsap.set(conclusionParas, { opacity: 1, y: 0 });
         gsap.set(profileCards, { opacity: 1, y: 0 });
         gsap.set(profileBars, { scaleX: 1 });
-        gsap.set([hubRing, hubCore], { opacity: 1, scale: 1 });
+        gsap.set(vLabels, { opacity: 1, y: 0 });
+        gsap.set(chartBars, { scaleY: 1 });
+        gsap.set(chartHead, { opacity: 1 });
+        gsap.set(growth, { opacity: 1, y: 0 });
+        if (chartArrow) gsap.set(chartArrow, { strokeDasharray: 1, strokeDashoffset: 0 });
+        if (hubRing && hubCore) gsap.set([hubRing, hubCore], { opacity: 1, scale: 1 });
         lines.forEach((l) => gsap.set(l, { strokeDashoffset: 0 }));
         emit(PROFILE_COUNT - 1, true);
       };
@@ -133,17 +144,23 @@ export function useDisciplinesPageAnimation(
       }
 
       gsap.set(heroEyebrow, { y: 10 });
-      gsap.set(heroHeadline, { y: 14 });
+      gsap.set(heroLines, { yPercent: 110 });
+      gsap.set(heroBody, { opacity: 0 });
       gsap.set(heroBody, { y: 12 });
       gsap.set(heroDiagram, { y: 10 });
+      gsap.set(vLabels, { opacity: 0, y: 16 });
+      gsap.set(chartBars, { scaleY: 0, transformBox: "fill-box", transformOrigin: "50% 100%" });
+      if (chartArrow) gsap.set(chartArrow, { strokeDasharray: 1, strokeDashoffset: 1 });
+      gsap.set(chartHead, { opacity: 0 });
+      gsap.set(growth, { opacity: 0, y: 8 });
       gsap.set(profileCards, { opacity: 0, y: 12 });
       gsap.set(profileBars, { scaleX: 0, transformOrigin: "left center" });
-      gsap.set(conclusionParas, { opacity: 0, y: 12 });
+      gsap.set(conclusionParas, { opacity: 0, y: 28 });
       gsap.set(conclusionCta, { opacity: 0, y: 10 });
       gsap.set(conclusionRule, { scaleX: 0, transformOrigin: "left center" });
       gsap.set(bridge, { scaleY: 0, transformOrigin: "top center" });
-      gsap.set([threadH, threadV], { scaleX: 0, scaleY: 0, transformOrigin: "left top" });
-      gsap.set([hubRing, hubCore], { opacity: 0, scale: 0.75, transformOrigin: "center center" });
+      if (threadV) gsap.set(threadV, { scaleY: 0, transformOrigin: "top center" });
+      if (hubRing && hubCore) gsap.set([hubRing, hubCore], { opacity: 0, scale: 0.75, transformOrigin: "center center" });
       signals.forEach((s) => gsap.set(s, { opacity: 0 }));
       const lengths = Array.from(lines).map((line) => {
         const len = prepareLine(line);
@@ -163,12 +180,17 @@ export function useDisciplinesPageAnimation(
           delay: 0.06,
         });
         if (heroEyebrow) heroTl.to(heroEyebrow, { y: 0, duration: 0.4 }, 0);
-        if (heroHeadline) heroTl.to(heroHeadline, { y: 0, duration: 0.52 }, 0.06);
-        if (heroBody) heroTl.to(heroBody, { y: 0, duration: 0.5 }, 0.14);
+        if (heroLines.length) heroTl.to(heroLines, { yPercent: 0, duration: 0.9, stagger: 0.14, ease: "power4.out" }, 0.18);
+        if (heroBody) heroTl.to(heroBody, { y: 0, opacity: 1, duration: 0.8 }, 0.7);
         if (heroDiagram) {
           heroTl.to(heroDiagram, { y: 0, duration: 0.48 }, 0.08);
-          heroTl.to(hubRing, { opacity: 1, scale: 1, duration: 0.45 }, 0.3);
-          heroTl.to(hubCore, { opacity: 1, scale: 1, duration: 0.4 }, 0.36);
+          if (hubRing) heroTl.to(hubRing, { opacity: 1, scale: 1, duration: 0.45 }, 0.3);
+          if (hubCore) heroTl.to(hubCore, { opacity: 1, scale: 1, duration: 0.4 }, 0.36);
+          heroTl.to(vLabels, { opacity: 1, y: 0, duration: 0.8, stagger: 0.22, ease: "power3.out" }, 0.45);
+          heroTl.to(chartBars, { scaleY: 1, duration: 0.7, stagger: 0.16, ease: "power3.out" }, 1.3);
+          if (chartArrow) heroTl.to(chartArrow, { strokeDashoffset: 0, duration: 0.9, ease: "power2.inOut" }, 1.9);
+          heroTl.to(chartHead, { opacity: 1, duration: 0.3 }, 2.7);
+          heroTl.to(growth, { opacity: 1, y: 0, duration: 0.9, ease: "power2.out" }, 2.9);
           lines.forEach((line, i) => {
             const glow = lineGlows[i];
             const signal = signals[i];
@@ -194,6 +216,14 @@ export function useDisciplinesPageAnimation(
         }
       }
 
+      if (heroDiagram && hero) {
+        gsap.to(heroDiagram, {
+          yPercent: -4,
+          ease: "none",
+          scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: 0.5 },
+        });
+      }
+
       profileCards.forEach((card, i) => {
         const bar = card.querySelector<HTMLElement>("[data-disc-page-profile-bar]");
         const tl = gsap.timeline({
@@ -206,6 +236,14 @@ export function useDisciplinesPageAnimation(
           defaults: { ease: "power3.out" },
         });
         tl.to(card, { opacity: 1, y: 0, duration: 0.48 }, 0);
+        const img = card.querySelector<HTMLElement>("[data-disc-page-img]");
+        const imgInner = card.querySelector<HTMLElement>("[data-disc-page-img-inner]");
+        if (img && imgInner) {
+          gsap.set(img, { clipPath: "inset(0 0 100% 0)" });
+          gsap.set(imgInner, { scale: 1.12 });
+          tl.to(img, { clipPath: "inset(0 0 0% 0)", duration: 0.9, ease: "power3.inOut" }, 0.05);
+          tl.to(imgInner, { scale: 1, duration: 1.2 }, 0.05);
+        }
         if (bar) tl.to(bar, { scaleX: 1, duration: 0.55, ease: "power2.inOut" }, 0.08);
       });
 
@@ -245,9 +283,9 @@ export function useDisciplinesPageAnimation(
         if (bridge) closeTl.to(bridge, { scaleY: 1, duration: 0.5, ease: "power2.inOut" }, 0);
         if (conclusionRule) closeTl.to(conclusionRule, { scaleX: 1, duration: 0.55 }, 0.06);
         if (conclusionParas.length) {
-          closeTl.to(conclusionParas, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1 }, 0.12);
+          closeTl.to(conclusionParas, { opacity: 1, y: 0, duration: 0.8, stagger: 0.25, ease: "power3.out" }, 0.15);
         }
-        if (conclusionCta) closeTl.to(conclusionCta, { opacity: 1, y: 0, duration: 0.4 }, 0.3);
+        if (conclusionCta) closeTl.to(conclusionCta, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 0.75);
       }
     }, root);
 

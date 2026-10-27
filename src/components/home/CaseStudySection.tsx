@@ -77,7 +77,7 @@ export function CaseStudySection() {
   return (
     <section
       ref={sectionRef}
-      id="case-study"
+      id="our-work"
       className="case-chapter accent-copper relative scroll-mt-[var(--header-h)] overflow-x-clip overflow-y-visible bg-ivory py-[clamp(1.75rem,1.35rem+1.6vw,3.5rem)] text-forest md:py-[clamp(2.1rem,1.65rem+2vw,4rem)]"
       aria-labelledby="case-heading"
     >

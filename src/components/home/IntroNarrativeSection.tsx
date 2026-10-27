@@ -133,7 +133,7 @@ function PremiseNetworkOverlay({ reduce, triggerRef }: PremiseNetworkOverlayProp
           data-network-path
           d={hubPathTo(point)}
           fill="none"
-          stroke="#bd6c36"
+          stroke="#e69a61"
           strokeWidth={0.22}
           vectorEffect="non-scaling-stroke"
         />
@@ -146,7 +146,7 @@ function PremiseNetworkOverlay({ reduce, triggerRef }: PremiseNetworkOverlayProp
             cy={point.cy}
             r={1.35}
             fill="none"
-            stroke="#bd6c36"
+            stroke="#e69a61"
             strokeWidth={0.28}
             vectorEffect="non-scaling-stroke"
           />
@@ -155,7 +155,7 @@ function PremiseNetworkOverlay({ reduce, triggerRef }: PremiseNetworkOverlayProp
             cx={point.cx}
             cy={point.cy}
             r={0.45}
-            fill="#bd6c36"
+            fill="#e69a61"
             vectorEffect="non-scaling-stroke"
           />
         </g>
@@ -166,7 +166,7 @@ function PremiseNetworkOverlay({ reduce, triggerRef }: PremiseNetworkOverlayProp
         cy={NETWORK_HUB.cy}
         r={0.9}
         fill="none"
-        stroke="#bd6c36"
+        stroke="#e69a61"
         strokeWidth={0.22}
         strokeOpacity={0.4}
         vectorEffect="non-scaling-stroke"
@@ -176,7 +176,7 @@ function PremiseNetworkOverlay({ reduce, triggerRef }: PremiseNetworkOverlayProp
         cx={NETWORK_HUB.cx}
         cy={NETWORK_HUB.cy}
         r={0.35}
-        fill="#bd6c36"
+        fill="#e69a61"
         fillOpacity={0.6}
         vectorEffect="non-scaling-stroke"
       />
@@ -282,50 +282,33 @@ export function IntroNarrativeSection() {
   return (
     <section
       ref={sectionRef}
-      id="intro"
-      className="intro-chapter relative overflow-hidden bg-[#14100d] text-[#faf9f3]"
+      id="opportunity"
+      className="intro-chapter relative overflow-hidden bg-[#faf9f3] text-[#123d32]"
       aria-labelledby="intro-heading"
     >
+
       <div
-        className="intro-chapter__hero-bridge pointer-events-none absolute inset-x-0 top-0 z-[1] h-[clamp(2rem,5vh,3.5rem)] bg-gradient-to-b from-[#0a1210] via-[#14100d]/80 to-transparent"
-        aria-hidden
-      />
-      <div
-        className="intro-chapter__next-bridge pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[clamp(2.5rem,8vh,4.5rem)] bg-gradient-to-b from-transparent via-[#14100d]/35 to-[#faf9f3]/8"
+        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-[#123d32]/15 to-transparent"
         aria-hidden
       />
 
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-px bg-gradient-to-r from-transparent via-[#bd6c36]/25 to-transparent"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_65%_40%_at_14%_22%,rgb(189_108_54/0.06),transparent_45%)]"
-        aria-hidden
-      />
-      <div
-        className="intro-chapter__grain pointer-events-none absolute inset-0 opacity-[0.045]"
-        aria-hidden
-      />
-
-      <Container className="relative z-[2] py-8 md:py-9 lg:py-10">
+      <Container className="relative z-[2] py-14 md:py-20 lg:py-24">
         <div ref={labelRef} className={cn(!reduce && "will-change-transform")}>
           <SectionLabel
-            tone="dark"
-            className="mb-5 text-[#faf9f3]/55 md:mb-6 [&_span.font-mono]:text-[#d49263]"
+            className="mb-8 !text-[#123d32]/70 md:mb-10 [&_span.font-mono]:text-[#b65320]"
           >
             {homeSections.intro.name}
           </SectionLabel>
         </div>
 
         <div
-          className="intro-chapter__stage grid grid-cols-1 gap-6 md:gap-7 lg:grid-cols-12 lg:items-stretch lg:gap-x-9 xl:gap-x-10"
+          className="intro-chapter__stage grid grid-cols-1 gap-10 md:gap-12 lg:grid-cols-12 lg:items-stretch lg:gap-x-12 xl:gap-x-16"
         >
           <div
-            className="intro-chapter__copy-column flex min-w-0 flex-col lg:col-span-5 lg:col-start-1 lg:border-r lg:border-[#faf9f3]/[0.08] lg:pr-9 xl:pr-10"
+            className="intro-chapter__copy-column flex min-w-0 flex-col lg:col-span-5 lg:col-start-1 lg:border-r lg:border-[#123d32]/15 lg:pr-12 xl:pr-14"
           >
             <div ref={copyRef} className="intro-chapter__copy flex flex-col justify-center">
-              <div className="intro-chapter__prose space-y-3.5 md:space-y-4">
+              <div className="intro-chapter__prose space-y-5 md:space-y-6">
                 {intro.sentences.map((sentence, index) => (
                   <p
                     key={sentence}
@@ -347,11 +330,11 @@ export function IntroNarrativeSection() {
 
             <div
               ref={closeRef}
-              className="intro-chapter__close intro-chapter__close--integrated relative mt-5 pt-5 md:mt-6 md:pt-5"
+              className="intro-chapter__close intro-chapter__close--integrated relative mt-8 pt-7 md:mt-10"
             >
               <span
                 data-intro-close-line
-                className="absolute left-0 top-0 block h-px w-full max-w-[10rem] origin-left bg-gradient-to-r from-[#bd6c36]/60 via-[#bd6c36]/28 to-transparent"
+                className="absolute left-0 top-0 block h-px w-full max-w-[10rem] origin-left bg-gradient-to-r from-[#b65320]/70 via-[#b65320]/30 to-transparent"
                 aria-hidden
               />
               <blockquote
@@ -361,14 +344,14 @@ export function IntroNarrativeSection() {
               >
                 <span
                   data-intro-anchor-rule
-                  className="absolute left-0 top-1 bottom-1 w-[2px] origin-top rounded-full bg-[#bd6c36]/70"
+                  className="absolute left-0 top-1 bottom-1 w-[2px] origin-top rounded-full bg-[#b65320]"
                   aria-hidden
                 />
                 <span
                   data-intro-anchor-inner
                   className="intro-chapter__anchor-text block pl-4 md:pl-5"
                 >
-                  <span className="text-[#d49263]">{intro.anchor}</span>
+                  <span className="text-[#b65320]">{intro.anchor}</span>
                 </span>
               </blockquote>
             </div>
@@ -377,14 +360,14 @@ export function IntroNarrativeSection() {
           <div
             ref={mediaRef}
             className={cn(
-              "intro-chapter__media relative min-h-[clamp(14rem,44vw,20rem)] w-full lg:col-span-7 lg:col-start-6 lg:min-h-0 lg:self-stretch",
+              "intro-chapter__media relative min-h-[clamp(18rem,56vw,26rem)] w-full lg:col-span-7 lg:col-start-6 lg:min-h-[32rem] lg:self-stretch",
               "lg:-mr-[calc(var(--gutter)+max(0px,(100vw-var(--content-max))/2))]",
               "lg:w-[calc(100%+var(--gutter)+max(0px,(100vw-var(--content-max))/2))]",
               !reduce && "will-change-transform",
             )}
           >
             <figure className="intro-chapter__figure relative h-full min-h-[inherit] w-full">
-              <div className="intro-chapter__frame relative h-full min-h-[inherit] w-full overflow-hidden rounded-sm bg-[#14100d] shadow-[inset_0_0_0_1px_rgb(250_249_243/0.08)]">
+              <div className="intro-chapter__frame relative h-full min-h-[inherit] w-full overflow-hidden rounded-sm bg-[#123d32]">
                 <div
                   ref={mediaInnerRef}
                   className="intro-chapter__media-inner absolute inset-0 will-change-transform"
@@ -401,9 +384,6 @@ export function IntroNarrativeSection() {
                 </div>
 
                 <PremiseNetworkOverlay reduce={reduce} triggerRef={sectionRef} />
-
-                <div className="intro-chapter__scrim-left pointer-events-none absolute inset-0 z-[3]" aria-hidden />
-                <div className="intro-chapter__scrim-edge pointer-events-none absolute inset-y-0 right-0 z-[3] w-[5%]" aria-hidden />
                 <div className="intro-chapter__scrim-foot pointer-events-none absolute inset-x-0 bottom-0 z-[3] h-[14%]" aria-hidden />
               </div>
               <figcaption className="sr-only">

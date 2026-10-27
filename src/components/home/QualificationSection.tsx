@@ -121,7 +121,7 @@ export function QualificationSection() {
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_38%_at_0%_0%,rgb(189_108_54/0.04),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_38%_at_0%_0%,rgb(182_83_32/0.04),transparent_55%)]"
         aria-hidden
       />
       <div

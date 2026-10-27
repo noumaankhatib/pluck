@@ -97,7 +97,7 @@ export const serverFactoryCaseStudy = {
       "We can help you investigate where that opportunity may exist and whether it makes commercial sense to pursue it.",
     ],
     label: "Talk to us about your market",
-    href: "/contact",
+    href: "/#contact",
   },
 };
 

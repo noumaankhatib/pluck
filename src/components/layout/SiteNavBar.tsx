@@ -1,188 +1,152 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useReducedMotion,
-  useScroll,
-} from "framer-motion";
+import { usePathname } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { navigation } from "@/content/site";
 import { cn } from "@/lib/cn";
 import { PluckLogo } from "@/components/brand/PluckLogo";
 
-const navLinkHero =
-  "rounded-sm text-[0.9375rem] font-medium tracking-[0.02em] text-ivory/92 [text-shadow:0_1px_14px_rgb(0_0_0/0.55)] transition-[color,opacity] duration-300 hover:text-ivory focus-visible:text-ivory focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-copper/80";
+/** "Our Work" points at the homepage work section; it stays active on the case-study route too. */
+const isActivePath = (pathname: string, href: string, section: string) =>
+  href.startsWith("/#")
+    ? pathname === "/"
+      ? section === href.slice(2)
+      : pathname.startsWith("/work") && href === "/#our-work"
+    : pathname.startsWith(href);
 
 type SiteNavBarProps = {
-  /** Hero: fixed over full-screen media. Page: sticky document header. */
+  /** Hero: fixed above the homepage hero. Page: sticky document header. Same cream bar either way. */
   variant: "hero" | "page";
 };
 
 export function SiteNavBar({ variant }: SiteNavBarProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [section, setSection] = useState("");
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll();
-
+  const pathname = usePathname();
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const isHero = variant === "hero";
-  const onHero = isHero && !scrolled && !open;
+  const menuId = isHero ? "mobile-nav-hero" : "mobile-nav";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
+    const onScroll = () => setScrolled(window.scrollY > 16);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const ids = navigation.map((n) => n.href.slice(2));
+    const update = () => {
+      let current = "";
+      let best = -Infinity;
+      const all = [...ids, "contact"];
+      for (const id of all) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top;
+        if (top <= window.innerHeight * 0.4 && top > best) {
+          best = top;
+          current = id;
+        }
+      }
+      setSection(current);
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  const bar = "block h-0.5 w-6 bg-forest transition-transform duration-300";
+
   return (
     <header
-      className={cn(
-        "z-50 transition-[background-color,backdrop-filter,box-shadow] duration-300",
-        isHero
-          ? cn(
-              "fixed inset-x-0 top-0",
-              onHero
-                ? "!border-0 !bg-transparent !shadow-none"
-                : "border-b border-border/60 bg-ivory/92 shadow-sm backdrop-blur-md",
-            )
-          : cn(
-              "sticky top-0 border-b",
-              scrolled
-                ? "border-border/60 bg-ivory/92 backdrop-blur-md"
-                : "border-transparent bg-ivory",
-            ),
-      )}
+      className={cn("site-nav z-50", isHero ? "fixed inset-x-0 top-0" : "sticky top-0")}
+      data-scrolled={scrolled}
     >
-      <div
-        className={cn(
-          "relative mx-auto h-[var(--header-h)] max-w-[var(--content-max)] px-[var(--gutter)]",
-          isHero
-            ? "grid grid-cols-12 items-center gap-x-6 lg:gap-x-10 xl:gap-x-14"
-            : "flex items-center justify-between gap-6 sm:gap-8 lg:gap-10",
-        )}
-      >
+      <div className="mx-auto flex h-[var(--header-h)] max-w-[var(--content-max)] items-center justify-between gap-6 px-[var(--gutter)]">
         <Link
           href="/"
           aria-label="Pluck Media — home"
-          className={cn(
-            "flex items-center self-center py-0.5",
-            isHero ? "col-span-7 lg:col-span-5" : "shrink-0",
-          )}
+          className="flex shrink-0 items-center rounded-sm py-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-copper"
         >
-          <PluckLogo variant="nav" priority onVideo={onHero} />
+          <PluckLogo variant="nav" priority />
         </Link>
 
-        <nav
-          className={cn(
-            "hidden items-center gap-8 lg:flex xl:gap-9",
-            isHero && "col-span-5 justify-end lg:col-span-6 lg:col-start-7 lg:justify-end",
-          )}
-          aria-label="Primary"
-        >
+        <nav className="hidden items-center gap-9 lg:flex xl:gap-11" aria-label="Primary">
           {navigation.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                "transition-colors",
-                onHero
-                  ? navLinkHero
-                  : "text-sm text-foreground/70 hover:text-forest",
-              )}
+              className="nav-link"
+              aria-current={isActivePath(pathname, item.href, section) ? "location" : undefined}
             >
               {item.label}
             </Link>
           ))}
-          {/* Over the hero the hero's own CTA is the single "Talk to us"; the nav one takes over once you scroll. */}
-          {!onHero && (
-            <Link href="/contact" className="cta-glass cta-glass--light cta-glass--sm cta-appear">
-              Talk to us
-            </Link>
-          )}
+          <Link href="/#contact" className="nav-cta ml-2">
+            Talk to us
+          </Link>
         </nav>
 
         <button
+          ref={buttonRef}
           type="button"
-          className={cn(
-            "flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 lg:hidden",
-            isHero && "col-span-5 justify-self-end",
-          )}
+          className="flex min-h-11 min-w-11 flex-col items-center justify-center gap-1.5 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-copper lg:hidden"
           aria-expanded={open}
-          aria-controls={isHero ? "mobile-nav-hero" : "mobile-nav"}
+          aria-controls={menuId}
           onClick={() => setOpen((v) => !v)}
         >
           <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
-          <span
-            className={cn(
-              "block h-0.5 w-6 transition-transform",
-              onHero ? "bg-ivory shadow-[0_0_10px_rgb(0_0_0/0.55)]" : "bg-foreground",
-              open && "translate-y-2 rotate-45",
-            )}
-          />
-          <span
-            className={cn(
-              "block h-0.5 w-6 transition-opacity",
-              onHero ? "bg-ivory shadow-[0_0_10px_rgb(0_0_0/0.55)]" : "bg-foreground",
-              open && "opacity-0",
-            )}
-          />
-          <span
-            className={cn(
-              "block h-0.5 w-6 transition-transform",
-              onHero ? "bg-ivory shadow-[0_0_10px_rgb(0_0_0/0.55)]" : "bg-foreground",
-              open && "-translate-y-2 -rotate-45",
-            )}
-          />
+          <span className={cn(bar, open && "translate-y-2 rotate-45")} />
+          <span className={cn(bar, "transition-opacity", open && "opacity-0")} />
+          <span className={cn(bar, open && "-translate-y-2 -rotate-45")} />
         </button>
       </div>
-
-      {!reduce && !onHero && (
-        <motion.div
-          className="pointer-events-none absolute inset-x-0 bottom-[-1px] h-[2px] origin-left bg-copper xl:hidden"
-          style={{ scaleX: scrollYProgress }}
-          aria-hidden
-        />
-      )}
 
       <AnimatePresence>
         {open && (
           <motion.nav
-            id={isHero ? "mobile-nav-hero" : "mobile-nav"}
+            id={menuId}
             initial={reduce ? false : { height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className={cn(
-              "overflow-hidden lg:hidden",
-              onHero
-                ? "bg-charcoal/94 backdrop-blur-md"
-                : "border-t border-border bg-ivory",
-            )}
+            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: reduce ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden border-t border-forest/10 bg-ivory lg:hidden"
             aria-label="Mobile"
           >
-            <ul className="flex flex-col gap-0.5 px-[var(--gutter)] py-4">
+            <ul className="flex flex-col px-[var(--gutter)] pb-6 pt-3">
               {navigation.map((item) => (
-                <li key={item.href}>
+                <li key={item.href} className="border-b border-forest/10">
                   <Link
                     href={item.href}
-                    className={cn(
-                      "block min-h-11 py-2.5 text-base",
-                      onHero ? "text-ivory/95" : "text-foreground",
-                    )}
+                    className="flex min-h-14 items-center font-display text-xl text-forest"
                     onClick={() => setOpen(false)}
                   >
                     {item.label}
                   </Link>
                 </li>
               ))}
-              <li className="pt-3">
+              <li className="pt-5">
                 <Link
-                  href="/contact"
-                  className={cn(
-                    "inline-flex min-h-11 w-full items-center justify-center px-6 text-sm font-medium tracking-wide",
-                    onHero ? "bg-ivory text-forest" : "bg-forest text-ivory",
-                  )}
+                  href="/#contact"
+                  className="nav-cta w-full"
                   onClick={() => setOpen(false)}
                 >
                   Talk to us

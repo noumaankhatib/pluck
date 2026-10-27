@@ -37,5 +37,5 @@ export const disciplinesPageConclusion = {
     "Together, we connect commercial thinking with the expertise needed to identify, reach and convert worthwhile opportunities.",
   ],
   cta: "Talk to us",
-  ctaHref: "/contact",
+  ctaHref: "/#contact",
 } as const;

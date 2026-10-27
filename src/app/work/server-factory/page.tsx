@@ -1,17 +1,18 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { serverFactoryCaseStudySeo, site } from "@/content/site";
 import { serverFactoryCaseStudy, serverFactoryStory as story } from "@/content/server-factory-case-study";
 import { SplitHeading } from "@/components/case-study/SplitHeading";
 import { ChapterRail } from "@/components/case-study/ChapterRail";
+import { HeroJourney } from "@/components/case-study/HeroJourney";
 import { ReadingProgress } from "@/components/case-study/ReadingProgress";
 import { InView } from "@/components/case-study/InView";
 import {
   BuyerCards,
   ClosingSignal,
   DisciplinesDiagram,
-  HeroNetwork,
   NextTimeline,
   OpportunityVisual,
   ProcessTimeline,
@@ -90,9 +91,12 @@ export default function ServerFactoryPage() {
     <main aria-label="Server Factory case study" className="cs">
       <ReadingProgress />
 
-      <section className="cs-hero" aria-labelledby="cs-title">
+      <section className="cs-hero sf-hero" aria-labelledby="cs-title">
         <Container className="cs-hero__grid">
           <div>
+            <Link href="/#our-work" className="cs-backlink cs-hero-in" style={{ ["--i" as string]: 0 }}>
+              <span aria-hidden="true">←</span> Back to Our Work
+            </Link>
             <ul className="cs-meta" aria-label="Project type">
               {story.heroMeta.map((m, i) => (
                 <li key={m} className="cs-hero-in" style={{ ["--i" as string]: i }}>
@@ -115,8 +119,8 @@ export default function ServerFactoryPage() {
               Read the story
             </a>
           </div>
-          <HeroNetwork />
         </Container>
+        <HeroJourney />
       </section>
 
       <ChapterRail chapters={chapters} />
@@ -134,7 +138,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--paper" aria-labelledby="customer">
         <Container>
           <InView>
-            <Head kicker="The research" title={story.customer.headline} id="customer" />
+            <Head kicker="The research" title={sections[1].title} id="customer" />
             <div className="cs-prose-grid">
               <Prose paragraphs={customer.paragraphs} />
             </div>
@@ -148,7 +152,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--ivory" aria-labelledby="buyers">
         <Container>
           <InView>
-            <Head kicker="The buyers" title={story.buyers.headline} id="buyers" />
+            <Head kicker="The buyers" title={sections[2].title} id="buyers" />
             <div className="cs-prose-grid">
               <Prose paragraphs={buyers.paragraphs} />
             </div>
@@ -160,7 +164,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--paper" aria-labelledby="website">
         <Container>
           <InView>
-            <Head kicker="The website" title={story.website.headline} id="website" />
+            <Head kicker="The website" title={sections[3].title} id="website" />
             <div className="cs-prose-grid">
               <Prose paragraphs={website.paragraphs} />
             </div>
@@ -174,7 +178,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--ivory" aria-labelledby="paid">
         <Container>
           <InView>
-            <Head kicker="Paid search" title={story.paid.headline} id="paid" />
+            <Head kicker="Paid search" title={sections[4].title} id="paid" />
             <div className="cs-prose-grid">
               <Prose paragraphs={paid.paragraphs} />
             </div>
@@ -198,9 +202,9 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--ivory" aria-labelledby="difference">
         <Container>
           <InView>
-            <Head kicker="The difference" title={story.difference.headline} id="difference" />
+            <Head kicker="The difference" title={difference.title} id="difference" />
             <div className="cs-prose-grid">
-              <Prose paragraphs={difference.paragraphs.slice(1)} />
+              <Prose paragraphs={difference.paragraphs} />
             </div>
           </InView>
           <DisciplinesDiagram />
@@ -210,7 +214,7 @@ export default function ServerFactoryPage() {
       <section className="cs-section cs-section--paper cs-section--pending" aria-labelledby="next">
         <Container>
           <InView>
-            <Head kicker="What comes next" title={story.next.headline} id="next" />
+            <Head kicker="What comes next" title={next.title} id="next" />
             <div className="cs-prose-grid">
               <Prose paragraphs={next.paragraphs} />
             </div>

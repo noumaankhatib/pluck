@@ -31,8 +31,8 @@ export function DisciplinesPageDiagram({ idPrefix }: Props) {
         >
           <defs>
             <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#A8B9AC" stopOpacity="0.45" />
-              <stop offset="100%" stopColor="#D8783F" stopOpacity="0.95" />
+              <stop offset="0%" stopColor="#a7b49d" stopOpacity="0.45" />
+              <stop offset="100%" stopColor="#e69a61" stopOpacity="0.95" />
             </linearGradient>
           </defs>
 
@@ -42,7 +42,7 @@ export function DisciplinesPageDiagram({ idPrefix }: Props) {
                 data-disc-page-line={node.id}
                 d={`M ${node.cx} ${node.cy} L ${HUB.cx} ${HUB.cy}`}
                 fill="none"
-                stroke="#A8B9AC"
+                stroke="#a7b49d"
                 strokeOpacity={0.4}
                 strokeWidth="1.75"
                 strokeLinecap="round"
@@ -59,7 +59,7 @@ export function DisciplinesPageDiagram({ idPrefix }: Props) {
               <circle
                 data-disc-page-signal={node.id}
                 r="4"
-                fill="#D8783F"
+                fill="#e69a61"
                 opacity={0}
               />
             </g>
@@ -71,11 +71,11 @@ export function DisciplinesPageDiagram({ idPrefix }: Props) {
                 cx={node.cx}
                 cy={node.cy}
                 r={22}
-                className="disc-page__node-ring fill-[#003D32] stroke-[#A8B9AC]"
+                className="disc-page__node-ring fill-[#123d32] stroke-[#a7b49d]"
                 strokeWidth="1.5"
                 strokeOpacity={0.55}
               />
-              <circle cx={node.cx} cy={node.cy} r={5.5} className="disc-page__node-core fill-[#F7F3EA]" />
+              <circle cx={node.cx} cy={node.cy} r={5.5} className="disc-page__node-core fill-[#faf9f3]" />
             </g>
           ))}
 
@@ -85,10 +85,10 @@ export function DisciplinesPageDiagram({ idPrefix }: Props) {
               cx={HUB.cx}
               cy={HUB.cy}
               r={28}
-              className="fill-[#D8783F]"
+              className="fill-[#e69a61]"
               fillOpacity={0.16}
             />
-            <circle data-disc-page-hub-core cx={HUB.cx} cy={HUB.cy} r={9} className="fill-[#D8783F]" />
+            <circle data-disc-page-hub-core cx={HUB.cx} cy={HUB.cy} r={9} className="fill-[#e69a61]" />
           </g>
 
           {NODES.map((node) => (
@@ -98,7 +98,7 @@ export function DisciplinesPageDiagram({ idPrefix }: Props) {
                 x={node.cx}
                 y={node.labelY}
                 textAnchor="middle"
-                className="disc-page__svg-label fill-[#A8B9AC] font-mono text-[11px] uppercase tracking-[0.12em]"
+                className="disc-page__svg-label fill-[#a7b49d] font-mono text-[11px] uppercase tracking-[0.12em]"
               >
                 {node.label}
               </text>
@@ -107,7 +107,7 @@ export function DisciplinesPageDiagram({ idPrefix }: Props) {
                   x={node.cx}
                   y={node.labelY + 14}
                   textAnchor="middle"
-                  className="disc-page__svg-label fill-[#A8B9AC] font-mono text-[11px] uppercase tracking-[0.12em]"
+                  className="disc-page__svg-label fill-[#a7b49d] font-mono text-[11px] uppercase tracking-[0.12em]"
                 >
                   {node.labelLine2}
                 </text>
@@ -120,7 +120,7 @@ export function DisciplinesPageDiagram({ idPrefix }: Props) {
             x={HUB.cx}
             y={HUB.labelY}
             textAnchor="middle"
-            className="disc-page__svg-label fill-[#A8B9AC] font-mono text-[10px] uppercase tracking-[0.14em]"
+            className="disc-page__svg-label fill-[#a7b49d] font-mono text-[10px] uppercase tracking-[0.14em]"
           >
             {disciplinesPageHero.objective}
           </text>

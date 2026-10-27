@@ -10,7 +10,7 @@ export const site = {
 };
 
 export const contactSeo = {
-  title: "Talk to us | Pluck",
+  title: "Contact | Pluck",
   description:
     "If you suspect you're not reaching all the customers you should be, tell us about your business. We'll explore the opportunity together — no generic package required.",
   keywords: [
@@ -60,8 +60,8 @@ export const serverFactoryCaseStudySeo = {
 };
 
 export const navigation = [
-  { label: "How we work", href: "/how-we-work" },
-  { label: "Disciplines", href: "/disciplines" },
-  { label: "Work", href: "/work/server-factory" },
-  { label: "About", href: "/about" },
+  { label: "How we work", href: "/#how-we-work" },
+  { label: "Disciplines", href: "/#disciplines" },
+  { label: "Our Work", href: "/#our-work" },
+  { label: "About", href: "/#about" },
 ] as const;

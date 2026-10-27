@@ -29,14 +29,14 @@ const TYPE_MS_SPACE = 44;
 const HOLD_MS = 2600;
 
 const STAGE_COLORS = [
-  "#7a8b7e",
-  "#4f7a66",
-  "#1b3d2f",
-  "#e5895a",
-  "#c45c26",
+  "#a7b49d",
+  "#545c3b",
+  "#123d32",
+  "#e69a61",
+  "#b65320",
 ] as const;
 
-const STAGE_COPPER = "#e5895a";
+const STAGE_COPPER = "#e69a61";
 
 function typingDelay(char: string, manualStage: boolean) {
   const base = manualStage ? 22 : TYPE_MS;
@@ -145,11 +145,13 @@ export function SearchIntelligenceSection() {
               <span className="italic text-copper">{headLast}</span>
             </h2>
 
+
+
             <p
               data-search-lead
-              className="search-chapter__lead mt-2.5 max-w-[33rem] text-[clamp(1.02rem,0.98rem+0.18vw,1.1rem)] leading-[1.58] text-charcoal"
+              className="search-chapter__clue mt-3 font-display text-[clamp(1.1rem,0.95rem+0.6vw,1.45rem)] italic leading-[1.3] text-copper"
             >
-              {searchIntelligence.lead}
+              {searchIntelligence.clue}
             </p>
 
             <div className="search-chapter__rail mt-4 w-full" data-search-rail>
@@ -161,7 +163,7 @@ export function SearchIntelligenceSection() {
                   aria-hidden
                 />
                 <motion.div
-                  className="pointer-events-none absolute left-[2%] top-[0.52rem] h-[2px] w-[96%] origin-left rounded-full bg-gradient-to-r from-[#7a8b7e] via-[#e5895a] to-[#c45c26]"
+                  className="pointer-events-none absolute left-[2%] top-[0.52rem] h-[2px] w-[96%] origin-left rounded-full bg-gradient-to-r from-[#a7b49d] via-[#e69a61] to-[#b65320]"
                   initial={false}
                   animate={{ scaleX: reduce ? 1 : stageProgress }}
                   transition={{ duration: 0.48, ease: motionEase }}
@@ -190,7 +192,7 @@ export function SearchIntelligenceSection() {
                           <span className="relative flex h-3.5 w-3.5 items-center justify-center">
                             {isActive && (
                               <motion.span
-                                className="absolute -inset-1 rounded-full border border-[#e5895a]/60"
+                                className="absolute -inset-1 rounded-full border border-[#e69a61]/60"
                                 layoutId={reduce ? undefined : "search-stage-ring"}
                                 transition={{ type: "spring", stiffness: 320, damping: 28 }}
                                 aria-hidden
@@ -206,7 +208,7 @@ export function SearchIntelligenceSection() {
                                   ? STAGE_COPPER
                                   : lit
                                     ? color
-                                    : "#e8e6dc",
+                                    : "#e5e9dd",
                                 borderColor: isActive
                                   ? STAGE_COPPER
                                   : lit
@@ -226,7 +228,7 @@ export function SearchIntelligenceSection() {
                             <span
                               className={cn(
                                 "inline-block max-w-full border-b-2 border-transparent pb-px",
-                                isActive && "border-[#e5895a] font-medium text-forest",
+                                isActive && "border-[#e69a61] font-medium text-forest",
                                 lit && !isActive && "text-forest/88",
                               )}
                               style={
@@ -371,7 +373,7 @@ export function SearchIntelligenceSection() {
                     aria-hidden
                   />
                   <motion.div
-                    className="pointer-events-none absolute left-0 top-1 w-[2px] origin-top rounded-full bg-gradient-to-b from-[#7a8b7e] via-[#e5895a] to-[#c45c26]"
+                    className="pointer-events-none absolute left-0 top-1 w-[2px] origin-top rounded-full bg-gradient-to-b from-[#a7b49d] via-[#e69a61] to-[#b65320]"
                     initial={false}
                     animate={{ scaleY: reduce ? 1 : stageProgress }}
                     transition={{ duration: 0.48, ease: motionEase }}
@@ -411,7 +413,7 @@ export function SearchIntelligenceSection() {
                             initial={false}
                             animate={{
                               scale: logged ? 1 : 0.75,
-                              backgroundColor: logged ? stageColor : "#ccc8bc",
+                              backgroundColor: logged ? stageColor : "#cdd5c3",
                             }}
                             transition={{ duration: 0.32 }}
                             aria-hidden

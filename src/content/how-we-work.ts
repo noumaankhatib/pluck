@@ -47,5 +47,5 @@ export const howWeWorkHero = {
   climaxLead: "Let's see what's ",
   climaxEmphasis: "out there.",
   cta: "Talk to us",
-  ctaHref: "/contact",
+  ctaHref: "/#contact",
 } as const;

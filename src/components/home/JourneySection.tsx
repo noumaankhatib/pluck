@@ -18,8 +18,8 @@ const FIND_QUERIES = [
   "process cooling systems",
 ];
 
-const STAGE_COLORS = ["#7a8b7e", "#4f7a66", "#1b3d2f", "#e5895a"] as const;
-const STAGE_COPPER = "#bd6c36";
+const STAGE_COLORS = ["#a7b49d", "#545c3b", "#123d32", "#e69a61"] as const;
+const STAGE_COPPER = "#b65320";
 
 const R = 118;
 const C = 160;
@@ -103,9 +103,9 @@ function Loop({
           />
           <defs>
             <linearGradient id="journey-copper-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#7a8b7e" />
-              <stop offset="45%" stopColor="#4f7a66" />
-              <stop offset="100%" stopColor="#e5895a" />
+              <stop offset="0%" stopColor="#a7b49d" />
+              <stop offset="45%" stopColor="#545c3b" />
+              <stop offset="100%" stopColor="#e69a61" />
             </linearGradient>
           </defs>
           {NODE_ANGLES.map((deg, i) => {
@@ -133,7 +133,7 @@ function Loop({
                   initial={false}
                   animate={{
                     r: isActive ? 11 : isLit ? 8 : 7,
-                    fill: isActive ? STAGE_COPPER : isLit ? color : "#f0ede4",
+                    fill: isActive ? STAGE_COPPER : isLit ? color : "#e5e9dd",
                     stroke: isActive ? STAGE_COPPER : isLit ? color : "rgba(27,61,47,0.28)",
                   }}
                   strokeWidth={2}
@@ -145,7 +145,7 @@ function Loop({
           {!reduce && (
             <motion.circle
               r={5}
-              fill="#e5895a"
+              fill="#e69a61"
               initial={false}
               animate={{ cx: spark.x, cy: spark.y }}
               transition={{ duration: 0.55, ease: motionEase }}
@@ -332,7 +332,7 @@ export function JourneySection() {
   return (
     <section
       ref={ref}
-      id="journey"
+      id="approach"
       className="journey-chapter accent-copper relative scroll-mt-[var(--header-h)] overflow-visible bg-ivory text-forest"
       aria-labelledby="journey-heading"
     >

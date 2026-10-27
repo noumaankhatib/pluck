@@ -11,7 +11,7 @@ import { hero } from "@/content/home";
 import { motionEase } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
-const COPPER = "#D8783E";
+const COPPER = "#e69a61";
 
 function stepIndexFromProgress(p: number, stepCount: number): number {
   const clamped = Math.min(1, Math.max(0, p));
@@ -59,23 +59,23 @@ export function HeroJourneyTimeline({
 
       <div className="relative min-w-0 px-0.5" aria-live="polite" aria-atomic="true">
         <div
-          className="pointer-events-none absolute left-[3%] right-[3%] top-[0.55rem] h-px bg-[#FFF8EC]/22"
+          className="pointer-events-none absolute left-[3%] right-[3%] top-[0.55rem] h-px bg-[#faf9f3]/22"
           aria-hidden
         />
         {reduce ? (
           <div
-            className="pointer-events-none absolute left-[3%] top-[0.48rem] h-[1.5px] w-[94%] origin-left rounded-full bg-gradient-to-r from-[#D8783E]/25 via-[#D8783E] to-[#D8783E]/85"
+            className="pointer-events-none absolute left-[3%] top-[0.48rem] h-[1.5px] w-[94%] origin-left rounded-full bg-gradient-to-r from-[#e69a61]/25 via-[#e69a61] to-[#e69a61]/85"
             aria-hidden
           />
         ) : (
           <>
             <motion.div
-              className="pointer-events-none absolute left-[3%] top-[0.48rem] h-[1.5px] w-[94%] origin-left rounded-full bg-gradient-to-r from-[#D8783E]/20 via-[#D8783E] to-[#D8783E]/80"
+              className="pointer-events-none absolute left-[3%] top-[0.48rem] h-[1.5px] w-[94%] origin-left rounded-full bg-gradient-to-r from-[#e69a61]/20 via-[#e69a61] to-[#e69a61]/80"
               style={{ scaleX: lineScale }}
               aria-hidden
             />
             <motion.div
-              className="pointer-events-none absolute top-[0.42rem] z-[1] h-2 w-2 -translate-x-1/2 rounded-full border border-[#FFF8EC]/35 bg-[#D8783E] shadow-[0_0_0_2px_rgb(16_37_29/0.45)]"
+              className="pointer-events-none absolute top-[0.42rem] z-[1] h-2 w-2 -translate-x-1/2 rounded-full border border-[#faf9f3]/35 bg-[#e69a61] shadow-[0_0_0_2px_rgb(16_37_29/0.45)]"
               style={{ left: indicatorLeft }}
               aria-hidden
             />
@@ -95,7 +95,7 @@ export function HeroJourneyTimeline({
                 <span className="relative flex h-3.5 w-3.5 items-center justify-center">
                   {isActive && (
                     <motion.span
-                      className="absolute -inset-1 rounded-full border border-[#D8783E]/80"
+                      className="absolute -inset-1 rounded-full border border-[#e69a61]/80"
                       layoutId={reduce ? undefined : "hero-copper-ring"}
                       transition={{ type: "spring", stiffness: 340, damping: 30 }}
                       aria-hidden
@@ -125,15 +125,15 @@ export function HeroJourneyTimeline({
                   data-active={isActive || undefined}
                   className={cn(
                     "hero-journey-step-label mt-1 w-full px-0.5 font-sans font-semibold uppercase",
-                    isActive && "text-[#FFF8EC]",
-                    !isActive && lit && "text-[#FFF8EC]/82",
-                    !isActive && !lit && "text-[#FFF8EC]/52",
+                    isActive && "text-[#faf9f3]",
+                    !isActive && lit && "text-[#faf9f3]/82",
+                    !isActive && !lit && "text-[#faf9f3]/52",
                   )}
                 >
                   <span
                     className={cn(
                       "inline-block border-b-2 border-transparent pb-px transition-colors duration-300",
-                      isActive && "border-[#D8783E] font-bold",
+                      isActive && "border-[#e69a61] font-bold",
                     )}
                   >
                     {step.label}

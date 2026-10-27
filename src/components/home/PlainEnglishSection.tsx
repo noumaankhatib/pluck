@@ -42,7 +42,7 @@ export function PlainEnglishSection() {
         aria-hidden
       />
       <div
-        className="plain-chapter__wash pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_8%_0%,rgb(189_108_54/0.1),transparent_55%)]"
+        className="plain-chapter__wash pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_8%_0%,rgb(182_83_32/0.1),transparent_55%)]"
         aria-hidden
       />
 

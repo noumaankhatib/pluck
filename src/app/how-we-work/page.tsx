@@ -1,12 +1,6 @@
-import type { Metadata } from "next";
-import { HowWeWorkPageContent } from "@/components/how-we-work/HowWeWorkPageContent";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "How We Work | Pluck",
-  description:
-    "Pluck's approach to finding commercially valuable business opportunities — understanding your market, identifying demand and reaching the right customers.",
-};
-
-export default function HowWeWorkPage() {
-  return <HowWeWorkPageContent />;
+/** Merged into the single-page homepage; kept as a fallback in case the config redirect is bypassed. */
+export default function Page() {
+  redirect("/#how-we-work");
 }

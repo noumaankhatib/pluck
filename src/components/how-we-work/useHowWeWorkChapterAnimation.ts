@@ -40,6 +40,7 @@ export function useHowWeWorkChapterAnimation(
     const closingClimax = root.querySelector<HTMLElement>("[data-hww-closing-climax]");
     const closingCta = root.querySelector<HTMLElement>("[data-hww-closing-cta]");
     const closingDivider = root.querySelector<HTMLElement>("[data-hww-closing-divider]");
+    const closingMedia = root.querySelector<HTMLElement>("[data-hww-closing-media]");
 
     const emit = (index: number) => {
       const clamped = Math.min(STAGE_COUNT - 1, Math.max(0, index));
@@ -89,7 +90,7 @@ export function useHowWeWorkChapterAnimation(
       gsap.set(heroProgress, { scaleX: 0, opacity: 0, transformOrigin: "left center" });
       gsap.set(processIntro, { opacity: 0, y: 12 });
       gsap.set(cards, { opacity: 0, y: 22 });
-      gsap.set([connectorFill, connectorFillV], { scaleX: 0, scaleY: 0, transformOrigin: "left top" });
+      if (connectorFillV) gsap.set(connectorFillV, { scaleY: 0, transformOrigin: "top center" });
       gsap.set(cycle, { opacity: 0, y: 10 });
       if (cycleLoop) {
         const len = cycleLoop.getTotalLength();
@@ -143,6 +144,14 @@ export function useHowWeWorkChapterAnimation(
         }
 
         cards.forEach((card, i) => {
+          const parts = card.querySelectorAll<HTMLElement>("h2, .hww-card__number, :scope > p");
+          gsap.from(parts, {
+            x: -14,
+            duration: 0.7,
+            ease: "power3.out",
+            stagger: 0.07,
+            scrollTrigger: { trigger: card, start: "top 88%", once: true },
+          });
           gsap.to(card, {
             opacity: 1,
             y: 0,
@@ -190,6 +199,18 @@ export function useHowWeWorkChapterAnimation(
         }
       }
 
+      if (closing && closingMedia && window.matchMedia("(min-width: 1024px)").matches) {
+        gsap.fromTo(
+          closingMedia,
+          { yPercent: -4 },
+          {
+            yPercent: 4,
+            ease: "none",
+            scrollTrigger: { trigger: closing, start: "top bottom", end: "bottom top", scrub: 0.5 },
+          },
+        );
+      }
+
       if (closing) {
         const closeTl = gsap.timeline({
           scrollTrigger: {
@@ -206,6 +227,7 @@ export function useHowWeWorkChapterAnimation(
         if (closingClimax) {
           const words = closingClimax.querySelectorAll<HTMLElement>("[data-hww-climax-part]");
           gsap.set(words, { opacity: 0, y: 12 });
+          closeTl.to(closingClimax, { opacity: 1, y: 0, duration: 0.2 }, 0.16);
           closeTl.to(words, { opacity: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.18);
         }
         if (closingCta) closeTl.to(closingCta, { opacity: 1, y: 0, duration: 0.42 }, 0.38);

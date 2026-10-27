@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bodoni_Moda, Manrope, Montserrat, Libre_Baskerville } from "next/font/google";
 import { ConditionalSiteHeader } from "@/components/layout/ConditionalSiteHeader";
+import { SectionScroll } from "@/components/layout/SectionScroll";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { homeSeo, site } from "@/content/site";
@@ -42,7 +43,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(site.domain),
   title: {
     default: homeSeo.title,
-    template: `%s | ${site.name}`,
+    template: "%s",
   },
   description: site.description,
   openGraph: {
@@ -85,6 +86,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
         <MotionProvider>
+          <SectionScroll />
           <ConditionalSiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />

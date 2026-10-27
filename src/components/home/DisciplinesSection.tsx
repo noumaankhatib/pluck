@@ -49,7 +49,7 @@ function DisciplineDiagram({
           <defs>
             <linearGradient id="disc-line-grad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="rgb(27 61 47 / 0.55)" />
-              <stop offset="100%" stopColor="rgb(189 108 54 / 0.65)" />
+              <stop offset="100%" stopColor="rgb(182 83 32 / 0.65)" />
             </linearGradient>
           </defs>
 

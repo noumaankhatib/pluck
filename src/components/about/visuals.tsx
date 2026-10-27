@@ -49,10 +49,10 @@ export function HeroLandscape() {
           <Topo cx={1120} cy={230} count={9} step={46} seed={2} sx={1.7} />
           <Topo cx={260} cy={160} count={5} step={40} seed={5} sx={1.5} />
         </g>
-        <path className="ab-layer ab-layer--1" d={ridge(1, 470, 38)} fill="#00443a" />
-        <path className="ab-layer ab-layer--2" d={ridge(3.2, 540, 42)} fill="#003a30" />
-        <path className="ab-layer ab-layer--3" d={ridge(5.4, 610, 36)} fill="#002f27" />
-        <path d={ridge(7.1, 670, 20)} fill="#002d25" />
+        <path className="ab-layer ab-layer--1" d={ridge(1, 470, 38)} fill="#0b2f26" />
+        <path className="ab-layer ab-layer--2" d={ridge(3.2, 540, 42)} fill="#0a2b23" />
+        <path className="ab-layer ab-layer--3" d={ridge(5.4, 610, 36)} fill="#08271f" />
+        <path d={ridge(7.1, 670, 20)} fill="#06271f" />
       </svg>
     </AboutParallax>
   );
@@ -159,7 +159,7 @@ export function ApproachSteps() {
 /* ─── Team ─── */
 
 const PHOTOS: Record<string, { src: string; position: string }> = {
-  "Michael Simkin": { src: "/images/team/michael-simkin.webp", position: "50% 6%" },
+  "Michael Jack Simkin": { src: "/images/team/michael-simkin.webp", position: "50% 6%" },
   "Junaid Kazi": { src: "/images/team/junaid-kazi.webp", position: "50% 6%" },
   "Noumaan Khatib": { src: "/images/team/noumaan-khatib.webp", position: "50% 6%" },
 };
@@ -198,21 +198,50 @@ export function TeamGrid({ people }: { people: readonly { name: string; role: st
 
 /* ─── Together: three paths, one objective ─── */
 
-export function TogetherDiagram() {
-  const xs = [16.7, 50, 83.3];
+const TG_ROWS_D = [58, 180, 302] as const;
+const TG_ROWS_M = [14.5, 50, 85.5] as const;
+
+function TgFlow({ vertical }: { vertical?: boolean }) {
+  const labels = story.approach.disciplines;
   return (
-    <InView className="ab-together">
-      <ul className="ab-together__chips">
-        {story.approach.disciplines.map((d, i) => (
-          <li key={d.label} className="cs-rise" style={{ ["--i" as string]: i }}>{d.label}</li>
+    <div className={vertical ? "ab-tg__stage ab-tg__stage--m" : "ab-tg__stage ab-tg__stage--d"}>
+      <svg viewBox={vertical ? "0 0 300 220" : "0 0 400 360"} className="ab-tg__svg" aria-hidden="true">
+        {(vertical ? TG_ROWS_M : TG_ROWS_D).map((v, i) => {
+          const d = vertical
+            ? `M${v * 3} 8 C ${v * 3} 120, 150 100, 150 205`
+            : `M158 ${v} C 270 ${v}, 290 180, 388 180`;
+          return (
+            <g key={i}>
+              <path d={d} pathLength={1} className="cs-draw ab-tg__line" data-p={i} style={{ ["--d" as string]: `${0.5 + i * 0.35}s` }} />
+              <path d={d} pathLength={1} className="ab-tg__flow" style={{ ["--k" as string]: i }} />
+            </g>
+          );
+        })}
+        <g transform={vertical ? "translate(150 208)" : "translate(388 180)"}>
+          <circle r="22" className="ab-tg__pulse" />
+          <circle r="22" className="ab-tg__pulse ab-tg__pulse--2" />
+          <circle r="16" className="ab-tg__halo cs-pop" style={{ ["--d" as string]: "1.7s" }} />
+          <circle r="5.5" className="ab-tg__core cs-pop" style={{ ["--d" as string]: "1.6s" }} />
+        </g>
+      </svg>
+      <ul className="ab-tg__labels">
+        {labels.map((d, i) => (
+          <li key={d.label} data-k={i} className="cs-rise" style={{ ["--i" as string]: i * 3 + 1 }}>
+            <span aria-hidden="true">0{i + 1}</span>
+            {d.label}
+          </li>
         ))}
       </ul>
-      <svg viewBox="0 0 600 150" preserveAspectRatio="none" className="ab-together__lines" aria-hidden="true">
-        {xs.map((x, i) => (
-          <path key={x} d={`M${x * 6} 0 C ${x * 6} 90, 300 60, 300 150`} pathLength={1} className="cs-draw ab-copper-line" style={{ ["--d" as string]: `${0.6 + i * 0.25}s` }} />
-        ))}
-      </svg>
-      <p className="ab-together__objective cs-rise" style={{ ["--i" as string]: 5 }}>
+    </div>
+  );
+}
+
+export function TogetherDiagram() {
+  return (
+    <InView className="ab-tg">
+      <div className="ab-tg__wide"><TgFlow /></div>
+      <div className="ab-tg__narrow"><TgFlow vertical /></div>
+      <p className="ab-tg__objective cs-rise" style={{ ["--i" as string]: 14 }}>
         <span className="type-caption">One shared objective</span>
         {story.together.objective}
       </p>

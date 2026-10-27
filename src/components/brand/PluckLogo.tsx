@@ -64,7 +64,7 @@ export function PluckLogo({
       priority={priority}
       className={cn(
         "w-auto max-w-[10rem] object-contain object-left",
-        "h-[3.25rem] lg:h-[3.5rem] xl:h-[3.75rem]",
+        "h-[3.4rem] lg:h-[3.8rem]",
         className,
       )}
       sizes="(max-width: 1024px) 160px, 200px"

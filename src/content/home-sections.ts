@@ -4,7 +4,7 @@ export const homeSections = {
   intro: { name: "The premise" },
   quality: { name: "The right leads" },
   search: { name: "Search intelligence" },
-  journey: { name: "How we find business" },
+  journey: { name: "How we find the business" },
   caseStudy: { name: "What success looks like" },
   qualification: { name: "Fit" },
   plainEnglish: { name: "Plain English" },
