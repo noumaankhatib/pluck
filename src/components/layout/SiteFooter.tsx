@@ -12,12 +12,30 @@ import { motionEase, motionDurations } from "@/lib/motion";
 const linkClass =
   "site-footer__link inline-flex min-h-10 items-center text-[0.9375rem] leading-snug outline-none";
 
+const TRAIL = "M-40 340 C 260 400, 520 270, 820 318 S 1260 210, 1500 262";
+const [taglineLead, taglineEnd] = intro.anchor.split("missing");
+
 export function SiteFooter() {
   const year = new Date().getFullYear();
   const reduce = useReducedMotion();
 
   return (
-    <footer className="site-footer relative isolate w-full bg-[#123d32] text-[#faf9f3]">
+    <footer className="site-footer relative isolate w-full overflow-hidden text-[#faf9f3]">
+      <div className="site-footer__fx" aria-hidden>
+        <svg viewBox="0 0 1440 420" preserveAspectRatio="xMidYMax slice" className="site-footer__trail" focusable="false">
+          <defs>
+            <linearGradient id="sf-trail" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stopColor="#087b50" stopOpacity="0" />
+              <stop offset="0.3" stopColor="#087b50" stopOpacity="0.55" />
+              <stop offset="0.75" stopColor="#0a4936" stopOpacity="0.5" />
+              <stop offset="1" stopColor="#087b50" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path className="site-footer__trail-glow" d={TRAIL} fill="none" stroke="url(#sf-trail)" strokeWidth="14" />
+          <path className="site-footer__trail-line" d={TRAIL} fill="none" stroke="url(#sf-trail)" strokeWidth="1.25" />
+          <path className="site-footer__trail-light" d={TRAIL} pathLength={1} fill="none" stroke="#e69a61" strokeWidth="1.75" strokeLinecap="round" />
+        </svg>
+      </div>
       <motion.div
         className="site-footer__rule pointer-events-none absolute inset-x-0 top-0 h-px origin-left"
         aria-hidden
@@ -37,7 +55,9 @@ export function SiteFooter() {
               <PluckLogo variant="footer" />
             </Link>
             <p className="site-footer__tagline mt-3 max-w-[26rem] font-tagline text-[1.25rem] italic leading-[1.35] sm:mt-4 sm:text-[1.375rem]">
-              {intro.anchor}
+              {taglineLead}
+              <em className="site-footer__missing">missing</em>
+              {taglineEnd}
             </p>
             <p className="site-footer__description mt-3.5 max-w-[28rem] text-[0.9375rem] leading-[1.65] sm:mt-4">
               {site.description}
@@ -52,6 +72,7 @@ export function SiteFooter() {
                   <li key={item.href}>
                     <Link href={item.href} className={linkClass}>
                       {item.label}
+                      <span className="site-footer__arrow" aria-hidden>→</span>
                     </Link>
                   </li>
                 ))}

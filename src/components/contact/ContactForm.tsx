@@ -6,21 +6,54 @@ import { site } from "@/content/site";
 
 const { fields, submit } = contactPage.form;
 
+type FieldName = "name" | "company" | "email" | "website" | "message";
+type Errors = Partial<Record<FieldName, string>>;
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validate(values: Record<FieldName, string>): Errors {
+  const errors: Errors = {};
+  if (!values.name.trim()) errors.name = "Please enter your name.";
+  if (!values.company.trim()) errors.company = "Please enter your company.";
+  if (!values.email.trim()) errors.email = "Please enter your email address.";
+  else if (!EMAIL_RE.test(values.email.trim())) errors.email = "Please enter a valid email address.";
+  if (values.website.trim()) {
+    try {
+      new URL(values.website.trim());
+    } catch {
+      errors.website = "Please enter a full web address, for example https://example.com.";
+    }
+  }
+  if (!values.message.trim()) errors.message = "Please tell us a little about your business.";
+  return errors;
+}
+
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "opened">("idle");
+  const [errors, setErrors] = useState<Errors>({});
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    if (!form.reportValidity()) return;
-
     const data = new FormData(form);
-    const name = String(data.get("name") ?? "");
-    const company = String(data.get("company") ?? "");
-    const email = String(data.get("email") ?? "");
-    const website = String(data.get("website") ?? "");
-    const message = String(data.get("message") ?? "");
+    const values = {
+      name: String(data.get("name") ?? ""),
+      company: String(data.get("company") ?? ""),
+      email: String(data.get("email") ?? ""),
+      website: String(data.get("website") ?? ""),
+      message: String(data.get("message") ?? ""),
+    };
 
+    const found = validate(values);
+    setErrors(found);
+    const firstInvalid = (Object.keys(found) as FieldName[])[0];
+    if (firstInvalid) {
+      setStatus("idle");
+      form.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus();
+      return;
+    }
+
+    const { name, company, email, website, message } = values;
     const subject = encodeURIComponent(`Enquiry from ${name} at ${company}`);
     const body = encodeURIComponent(
       [
@@ -39,27 +72,40 @@ export function ContactForm() {
     setStatus("opened");
   }
 
+  function clearError(name: FieldName) {
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: undefined }));
+  }
+
+  const fieldProps = (name: FieldName) => ({
+    id: `contact-${name}`,
+    name,
+    "aria-required": fields[name].required || undefined,
+    "aria-invalid": errors[name] ? (true as const) : undefined,
+    "aria-describedby": errors[name] ? `contact-${name}-error` : undefined,
+    onChange: () => clearError(name),
+  });
+
   return (
-    <form onSubmit={handleSubmit} className="ct-form" noValidate={false}>
+    <form onSubmit={handleSubmit} className="ct-form" noValidate>
       <div className="ct-form__row">
-        <Field id="contact-name" label={fields.name.label} i={4}>
-          <input id="contact-name" name="name" type="text" required aria-required="true" autoComplete="name" className="ct-input" />
+        <Field name="name" label={fields.name.label} required error={errors.name} i={4}>
+          <input {...fieldProps("name")} type="text" autoComplete="name" className="ct-input" />
         </Field>
-        <Field id="contact-company" label={fields.company.label} i={5}>
-          <input id="contact-company" name="company" type="text" required aria-required="true" autoComplete="organization" className="ct-input" />
+        <Field name="company" label={fields.company.label} required error={errors.company} i={5}>
+          <input {...fieldProps("company")} type="text" autoComplete="organization" className="ct-input" />
         </Field>
       </div>
 
-      <Field id="contact-email" label={fields.email.label} i={6}>
-        <input id="contact-email" name="email" type="email" required aria-required="true" autoComplete="email" className="ct-input" />
+      <Field name="email" label={fields.email.label} required error={errors.email} i={6}>
+        <input {...fieldProps("email")} type="email" autoComplete="email" className="ct-input" />
       </Field>
 
-      <Field id="contact-website" label={fields.website.label} i={7}>
-        <input id="contact-website" name="website" type="url" autoComplete="url" placeholder="https://" className="ct-input" />
+      <Field name="website" label={fields.website.label} error={errors.website} i={7}>
+        <input {...fieldProps("website")} type="url" autoComplete="url" placeholder="https://" className="ct-input" />
       </Field>
 
-      <Field id="contact-message" label={fields.message.label} i={8}>
-        <textarea id="contact-message" name="message" required aria-required="true" rows={6} className="ct-input ct-input--area" />
+      <Field name="message" label={fields.message.label} required error={errors.message} i={8}>
+        <textarea {...fieldProps("message")} rows={6} className="ct-input ct-input--area" />
       </Field>
 
       <div className="ct-form__actions cs-rise" style={{ ["--i" as string]: 9 }}>
@@ -71,12 +117,8 @@ export function ContactForm() {
         </button>
         {status === "opened" && (
           <p className="ct-success" role="status">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true">
-              <circle cx="12" cy="12" r="10.5" stroke="currentColor" strokeWidth="1.5" pathLength={1} className="ct-success__ring" />
-              <path d="M7 12.5l3.2 3.2L17 8.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" pathLength={1} className="ct-success__tick" />
-            </svg>
             <span>
-              If your email app did not open, write to us at{" "}
+              Your email app should open with your message ready to send. If it doesn&apos;t, write to us at{" "}
               <a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>.
             </span>
           </p>
@@ -86,14 +128,37 @@ export function ContactForm() {
   );
 }
 
-function Field({ id, label, i, children }: { id: string; label: string; i: number; children: React.ReactNode }) {
+function Field({
+  name,
+  label,
+  required,
+  error,
+  i,
+  children,
+}: {
+  name: string;
+  label: string;
+  required?: boolean;
+  error?: string;
+  i: number;
+  children: React.ReactNode;
+}) {
   return (
     <div className="ct-field cs-rise" style={{ ["--i" as string]: i }}>
-      <label htmlFor={id} className="ct-label">
+      <label htmlFor={`contact-${name}`} className="ct-label">
         {label}
+        {required && (
+          <span className="ct-required" aria-hidden="true">
+            {" "}*
+          </span>
+        )}
       </label>
       {children}
-      <span className="ct-field__bar" aria-hidden="true" />
+      {error && (
+        <p id={`contact-${name}-error`} className="ct-error" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

@@ -207,6 +207,7 @@ export function useCaseStudyChapterAnimation(
         outcomesTl.call(() => {
           resetMarkers();
           setMarkerActive(marker, true);
+          outcomes.style.setProperty("--case-glow-x", `${(i + 0.5) * (100 / stepCount)}%`);
           section.querySelectorAll<HTMLElement>("[data-case-metric-value]").forEach((v) => v.classList.remove("case-chapter__metric-value--lit"));
           valueEl?.classList.add("case-chapter__metric-value--lit");
         }, undefined, stepTime);

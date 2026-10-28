@@ -46,15 +46,20 @@ export function HowWeFindSection() {
 
   const stages = journey.stages;
   const total = stages.length;
-  const [turns, setTurns] = useState(0); // only increases, so the light always travels forward
+  const [turns, setTurns] = useState(0); // signed step count: autoplay moves forward, clicks take the shortest path
   const [hold, setHold] = useState(false); // hover / focus
   const [manual, setManual] = useState(false); // user picked a stage: stop autoplay
-  const active = turns % total;
+  const active = ((turns % total) + total) % total;
   const [intro, statement] = disciplinesPageConclusion.paragraphs;
 
   const pick = (i: number) => {
     setManual(true);
-    setTurns((t) => t + ((i - (t % total) + total) % total));
+    // Take the shortest way round the ring (−1, 0, +1 or +2 steps) so a click never spins the long way.
+    setTurns((t) => {
+      const cur = ((t % total) + total) % total;
+      const delta = ((i - cur + total + 1) % total) - 1;
+      return t + delta;
+    });
   };
 
   useEffect(() => {

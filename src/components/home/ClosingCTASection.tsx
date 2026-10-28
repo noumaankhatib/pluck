@@ -38,7 +38,7 @@ export function ClosingCTASection() {
         />
       </div>
 
-      <Container className="relative z-10 pb-10 pt-[clamp(3rem,2rem+3vw,5.5rem)] md:pb-12">
+      <Container className="closing-chapter__main relative z-10 pb-10 pt-[clamp(3rem,2rem+3vw,5.5rem)] md:pb-12">
         <div data-closing-label className="mb-6">
           <SectionLabel className="!text-[#123d32]/70">{homeSections.closing.name}</SectionLabel>
         </div>
@@ -167,7 +167,7 @@ export function ClosingCTASection() {
         </div>
       </Container>
 
-      <Container className="pb-[clamp(3rem,2rem+3vw,5.5rem)]">
+      <Container className="closing-chapter__media-wrap pb-[clamp(3rem,2rem+3vw,5.5rem)]">
         <div data-closing-media className="relative h-[clamp(11rem,22vw,18rem)] overflow-hidden bg-[#123d32]" aria-hidden>
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-1/3 bg-gradient-to-b from-[#e5e9dd]/35 to-transparent" aria-hidden />
           <div data-closing-bg className="absolute -inset-y-[10%] inset-x-0 will-change-transform">

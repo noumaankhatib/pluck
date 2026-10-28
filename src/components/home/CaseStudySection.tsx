@@ -151,12 +151,13 @@ export function CaseStudySection() {
 
         <div
           data-case-outcomes
-          className="case-chapter__outcomes mt-6 rounded-sm border border-forest/10 bg-gradient-to-b from-paper/50 to-paper/30 pt-4 sm:mt-7 sm:pt-5 lg:mt-8"
+          className="case-chapter__outcomes relative mt-6 pt-4 sm:mt-7 sm:pt-5 lg:mt-8"
         >
-          <div data-case-bridge className="case-chapter__bridge px-4 sm:px-5">
+          <div className="case-chapter__ambient pointer-events-none absolute inset-x-0 top-0 h-56" aria-hidden />
+          <div data-case-bridge className="case-chapter__bridge relative px-4 sm:px-5">
             <div
               data-case-timeline
-              className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 border-b border-forest/10 pb-3 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-charcoal/72"
+              className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 border-b border-sage/60 pb-3 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-charcoal/72"
             >
               <span className="font-display text-[1rem] normal-case italic tracking-normal text-copper sm:text-[1.125rem]">
                 {caseStudy.timeline}
@@ -168,7 +169,7 @@ export function CaseStudySection() {
 
           <div
             data-case-pipeline
-            className="case-chapter__pipeline relative overflow-visible border-t border-forest/8 bg-forest/[0.06]"
+            className="case-chapter__pipeline relative overflow-visible"
           >
             <ol
               className="case-chapter__stage-grid relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
@@ -178,7 +179,7 @@ export function CaseStudySection() {
                 className="case-chapter__flow-rail pointer-events-none absolute inset-x-0 top-0 z-[1] hidden h-[var(--case-rail-h)] lg:block"
                 aria-hidden
               >
-                <div className="case-chapter__flow-track absolute left-[6.25%] right-[6.25%] top-[calc(var(--case-rail-h)-0.75rem)] h-px bg-forest/14" />
+                <div className="case-chapter__flow-track absolute left-[6.25%] right-[6.25%] top-[calc(var(--case-rail-h)-0.75rem)] h-px bg-sage/70" />
                 <div
                   data-case-flow-line
                   className="case-chapter__flow-progress absolute left-[6.25%] top-[calc(var(--case-rail-h)-0.75rem)] h-[2px] w-[87.5%] -translate-y-1/2 origin-left bg-gradient-to-r from-copper via-copper/85 to-copper/50"
@@ -220,7 +221,7 @@ export function CaseStudySection() {
 
           <div
             data-case-return
-            className="case-chapter__return surface-espresso relative overflow-visible border-t border-forest/12"
+            className="case-chapter__return relative mt-5 overflow-hidden rounded-sm sm:mt-6"
           >
             <div
               data-case-return-glow
@@ -237,25 +238,33 @@ export function CaseStudySection() {
               className="absolute left-0 top-0 h-full w-[3px] origin-top bg-gradient-to-b from-copper via-copper/60 to-transparent"
               aria-hidden
             />
-            <div className="relative grid gap-3 px-5 py-5 sm:px-7 sm:py-6 md:grid-cols-12 md:items-center md:gap-6 md:px-8 lg:py-6">
-              <p className="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-ivory/60 md:col-span-3">
+            <div className="relative grid gap-3 px-6 py-8 sm:px-8 sm:py-9 md:grid-cols-12 md:items-center md:gap-6 md:px-10 lg:py-11">
+              <p className="flex items-center gap-3 font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-sage md:col-span-3">
+                <span className="h-px w-6 bg-copper-soft/70" aria-hidden />
                 {ret.label}
               </p>
               <p
                 data-case-return-text
-                className="font-display text-[clamp(1.12rem,0.9rem+0.95vw,1.9rem)] font-medium leading-[1.3] tracking-[-0.02em] text-ivory md:col-span-9"
+                className="case-chapter__roi-text font-display text-[clamp(1.35rem,1rem+1.5vw,2.5rem)] font-medium leading-[1.22] tracking-[-0.02em] text-ivory md:col-span-9"
               >
-                {ret.value}
+                {ret.value.replace(/^\$80/, "") !== ret.value ? (
+                  <>
+                    <span className="case-chapter__roi-figure">$80</span>
+                    {ret.value.slice(3)}
+                  </>
+                ) : (
+                  ret.value
+                )}
               </p>
             </div>
           </div>
 
-          <div data-case-link className="px-4 pb-4 pt-4 sm:px-5 sm:pb-5">
+          <div data-case-link className="px-1 pb-2 pt-5 sm:pt-6">
             <Link
               href={caseStudy.link}
-              className="group inline-flex min-h-11 items-center gap-3 border-b border-forest/30 pb-0.5 text-[0.9375rem] font-medium text-forest transition-colors hover:border-copper hover:text-copper"
+              className="case-chapter__cta group inline-flex min-h-11 items-center gap-3 font-display text-[1.0625rem] font-medium text-forest transition-colors duration-300 hover:text-copper focus-visible:text-copper"
             >
-              {caseStudy.linkLabel}
+              <span className="case-chapter__cta-text">{caseStudy.linkLabel}</span>
               <svg
                 width="14"
                 height="10"

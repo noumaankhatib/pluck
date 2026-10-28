@@ -1,7 +1,7 @@
+import Image from "next/image";
 import { Container } from "@/components/ui/Container";
 import { InView } from "@/components/case-study/InView";
 import { SplitHeading } from "@/components/case-study/SplitHeading";
-import { Topo } from "@/components/about/visuals";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { contactPage } from "@/content/contact";
 import { site } from "@/content/site";
@@ -12,33 +12,47 @@ export function ContactContent() {
   return (
     <div id="contact" className="cs ct scroll-mt-[var(--header-h)]">
       {/* Hero */}
-      <section className="cs-hero ct-hero" aria-labelledby="ct-title">
-        <div className="ct-hero__topo" aria-hidden="true">
-          <svg viewBox="0 0 1440 560" preserveAspectRatio="xMaxYMid slice" className="h-full w-full">
-            <g style={{ color: "var(--color-sage-light)" }} className="ct-topo">
-              <Topo cx={1120} cy={270} count={11} step={40} seed={6} sx={1.8} />
-            </g>
-          </svg>
-          <i className="ct-ping" />
-        </div>
-        <Container className="relative">
-          <p className="cs-kicker cs-hero-in" style={{ ["--i" as string]: 0, color: "var(--color-copper-soft)" }}>
-            Contact
-          </p>
-          <h2 id="ct-title" className="cs-hero__title mt-5">
-            <span className="cs-hero-in" style={{ ["--i" as string]: 1 }}>
-              Let&apos;s <span className="cs-hero__accent">talk.</span>
-            </span>
-          </h2>
-          <div className="ct-hero__intro">
-            {contactPage.intro.map((paragraph, i) => (
-              <p key={paragraph} className="cs-hero-in" style={{ ["--i" as string]: i + 3 }}>
-                {paragraph}
-              </p>
-            ))}
+      <InView
+        as="section"
+        margin="0px 0px -8% 0px"
+        className="cs-hero ct-hero"
+        aria-labelledby="ct-title"
+      >
+        <div className="ct-hero__glow" aria-hidden="true" />
+        <Container className="ct-hero__grid relative">
+          <div className="ct-hero__media ct-r" style={{ ["--i" as string]: 0 }} aria-hidden="true">
+            <div className="ct-hero__photo">
+              <Image
+                src="/images/contact-section-workspace.webp"
+                alt=""
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover object-left"
+              />
+            </div>
+          </div>
+          <div className="ct-hero__content">
+            <p className="cs-kicker ct-kicker ct-r" style={{ ["--i" as string]: 1, color: "var(--color-copper-soft)" }}>
+              Contact
+            </p>
+            <h2 id="ct-title" className="cs-hero__title ct-hero__title mt-5">
+              <span className="ct-r ct-hero__word" style={{ ["--i" as string]: 2 }}>Let&apos;s</span>{" "}
+              <span className="ct-r ct-hero__word cs-hero__accent" style={{ ["--i" as string]: 3 }}>talk.</span>
+            </h2>
+            <div className="ct-hero__intro">
+              {contactPage.intro.map((paragraph, i) => (
+                <p key={paragraph} className="ct-r" style={{ ["--i" as string]: i + 4 }}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+            <a href="#ct-form-section" className="ct-link ct-hero__cta ct-r" style={{ ["--i" as string]: 7 }}>
+              {contactPage.form.title}
+              <span aria-hidden="true">→</span>
+            </a>
           </div>
         </Container>
-      </section>
+      </InView>
 
       {/* What happens next */}
       <section className="cs-section cs-section--ivory" aria-labelledby="ct-next">
@@ -59,63 +73,47 @@ export function ContactContent() {
       </section>
 
       {/* Form */}
-      <section className="cs-section cs-section--paper ct-form-section" aria-labelledby="ct-form">
-        <Container className="ct-split ct-split--form">
-          <InView>
+      <section id="ct-form-section" className="cs-section cs-section--paper ct-form-section scroll-mt-[var(--header-h)]" aria-labelledby="ct-form">
+        <Container>
+          <InView className="ct-form-head">
             <p className="cs-kicker cs-rise">Write to us</p>
             <SplitHeading id="ct-form" text={contactPage.form.title} className="cs-h2 mt-3" />
-            <div className="ct-card cs-rise" style={{ ["--i" as string]: 3 }}>
-              <ContactForm />
-            </div>
           </InView>
+          <div className="ct-split ct-split--form ct-form-grid">
+            <InView>
+              <div className="ct-card cs-rise" style={{ ["--i" as string]: 3 }}>
+                <ContactForm />
+              </div>
+            </InView>
 
-          <InView as="div" className="ct-aside-wrap">
-            <aside className="ct-aside cs-rise" style={{ ["--i" as string]: 2 }} aria-label="Contact details">
-              <p className="type-caption ct-aside__lead">{contactPage.form.preferDirect}</p>
-              <ul className="ct-aside__list">
-                <li>
-                  <span className="ct-aside__label">{contactPage.form.emailLabel}</span>
-                  <a href={`mailto:${site.contactEmail}`} className="ct-link">
-                    {site.contactEmail}
-                    <span aria-hidden="true">→</span>
-                  </a>
-                </li>
-                <li>
-                  <span className="ct-aside__label">{contactPage.form.calendarLabel}</span>
-                  {bookingUrl ? (
-                    <a href={bookingUrl} className="ct-link" target="_blank" rel="noopener noreferrer">
-                      {contactPage.form.calendarLinkText}
+            <InView as="div" className="ct-aside-wrap">
+              <aside className="ct-aside cs-rise" style={{ ["--i" as string]: 3 }} aria-label="Contact details">
+                <p className="ct-aside__lead">{contactPage.form.preferDirect}</p>
+                <ul className="ct-aside__list">
+                  <li className="cs-rise" style={{ ["--i" as string]: 5 }}>
+                    <span className="ct-aside__label">{contactPage.form.emailLabel}</span>
+                    <a href={`mailto:${site.contactEmail}`} className="ct-link">
+                      {site.contactEmail}
                       <span aria-hidden="true">→</span>
                     </a>
-                  ) : (
-                    <span className="ct-aside__soon">
-                      {contactPage.form.calendarLinkText} (link coming soon)
-                    </span>
-                  )}
-                </li>
-              </ul>
-            </aside>
-          </InView>
-        </Container>
-      </section>
-
-      {/* Closing */}
-      <section className="cs-section cs-section--ink ct-closing" aria-label="Closing">
-        <div className="ct-hero__topo ct-closing__topo" aria-hidden="true">
-          <svg viewBox="0 0 1440 400" preserveAspectRatio="xMidYMid slice" className="h-full w-full">
-            <g style={{ color: "var(--color-sage-light)" }} className="ct-topo">
-              <Topo cx={260} cy={220} count={9} step={38} seed={3} sx={1.9} />
-            </g>
-          </svg>
-        </div>
-        <Container className="relative">
-          <InView>
-            <SplitHeading text={contactPage.closing.title} className="ct-closing__title" as="h2" />
-            <span className="ct-closing__line cs-draw-bar" aria-hidden="true" />
-            <p className="ct-closing__tag cs-rise" style={{ ["--i" as string]: 6 }}>
-              {contactPage.closing.tagline}
-            </p>
-          </InView>
+                  </li>
+                  <li className="cs-rise" style={{ ["--i" as string]: 6 }}>
+                    <span className="ct-aside__label">{contactPage.form.calendarLabel}</span>
+                    {bookingUrl ? (
+                      <a href={bookingUrl} className="ct-link" target="_blank" rel="noopener noreferrer">
+                        {contactPage.form.calendarLinkText}
+                        <span aria-hidden="true">→</span>
+                      </a>
+                    ) : (
+                      <span className="ct-aside__soon">
+                        {contactPage.form.calendarLinkText} (link coming soon)
+                      </span>
+                    )}
+                  </li>
+                </ul>
+              </aside>
+            </InView>
+          </div>
         </Container>
       </section>
     </div>

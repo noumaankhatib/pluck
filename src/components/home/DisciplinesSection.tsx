@@ -12,7 +12,7 @@ import { ensureGsapPlugins, gsap } from "@/lib/gsap/register";
 
 const PORTRAITS: Record<string, string> = {
   "Michael Simkin": "/images/team/disciplines-about-michael-simkin.webp",
-  "Junaid Kazi": "/images/team/disciplines-about-junaid-kazi.webp",
+  "Junaid Kazi": "/images/team/junaid-kazi-profile.webp",
   "Noumaan Khatib": "/images/team/disciplines-about-noumaan-khatib.webp",
 };
 

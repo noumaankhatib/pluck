@@ -160,7 +160,7 @@ export function ApproachSteps() {
 
 const PHOTOS: Record<string, { src: string; position: string }> = {
   "Michael Jack Simkin": { src: "/images/team/disciplines-about-michael-simkin.webp", position: "50% 6%" },
-  "Junaid Kazi": { src: "/images/team/disciplines-about-junaid-kazi.webp", position: "50% 6%" },
+  "Junaid Kazi": { src: "/images/team/junaid-kazi-profile.webp", position: "50% 6%" },
   "Noumaan Khatib": { src: "/images/team/disciplines-about-noumaan-khatib.webp", position: "50% 6%" },
 };
 

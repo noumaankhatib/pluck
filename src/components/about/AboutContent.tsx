@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { InView } from "@/components/case-study/InView";
 import {
-  HeroLandscape,
   TeamGrid,
 } from "@/components/about/visuals";
 import { BeliefSection } from "@/components/about/BeliefSection";
@@ -33,7 +32,6 @@ export function AboutContent() {
   return (
     <div id="about" className="cs ab scroll-mt-[var(--header-h)]">
       <section className="cs-hero ab-hero" aria-labelledby="ab-title">
-        <HeroLandscape />
         <Container className="cs-hero__grid ab-hero__grid">
           <div>
             <p className="cs-kicker cs-hero-in" style={{ ["--i" as string]: 0, color: "var(--color-copper-soft)" }}>
